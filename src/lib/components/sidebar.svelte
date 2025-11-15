@@ -33,20 +33,23 @@
 			commandfor={PUBLISH_DIALOG_ID}
 			command="show-modal"
 		>
+			<!-- publish icon -->
 			<svg
 				class="plus-icon"
 				xmlns="http://www.w3.org/2000/svg"
 				width="24"
 				height="24"
-				viewBox="0 0 28 28"
+				viewBox="0 0 24 24"
 				fill="none"
 				stroke="currentColor"
 				stroke-linecap="round"
 				stroke-linejoin="round"
 			>
-				<line x1="14" y1="7" x2="14" y2="21"></line>
-				<line x1="7" y1="14" x2="21" y2="14"></line>
+				<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+				<polyline points="17 8 12 3 7 8"></polyline>
+				<line x1="12" y1="3" x2="12" y2="15"></line>
 			</svg>
+
 			<span>Publish ({selectedFiles.size})</span>
 		</button>
 	</div>
