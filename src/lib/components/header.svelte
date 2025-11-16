@@ -1,7 +1,42 @@
-<script>
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { authState } from '$lib/auth-state.svelte';
 	import logo from '$lib/assets/icon-32x32.png';
-	import appSwitchIcon from '$lib/assets/icon-app-switch.svg';
-	import profileIcon from '$lib/assets/icon-profile.png';
+	import LoginBtn from './login-btn.svelte';
+	import LogoutBtn from './logout-btn.svelte';
+
+	const GOOGLE_CLIENT_ID =
+		'366080807482-blfdpr7mcl9filupgplomhfpajur01iu.apps.googleusercontent.com';
+
+	// Scopes for Street View Publish API
+	// Documentation: https://developers.google.com/streetview/publish/first-app
+	const SCOPES = [
+		'https://www.googleapis.com/auth/streetviewpublish',
+		'https://www.googleapis.com/auth/userinfo.email',
+		'https://www.googleapis.com/auth/userinfo.profile'
+	];
+
+	let user = $derived(authState.user);
+	let isAuthenticated = $derived(authState.isAuthenticated);
+	let isLoading = $derived(authState.isLoading);
+
+	onMount(() => {
+		// Initialize Google Identity Services Token Client (for API access)
+		const initializeAuth = () => {
+			if (typeof google !== 'undefined' && google.accounts) {
+				authState.initializeGIS(GOOGLE_CLIENT_ID, SCOPES);
+			} else {
+				// Retry if script not loaded yet
+				setTimeout(initializeAuth, 100);
+			}
+		};
+
+		initializeAuth();
+	});
+
+	function handleSignOut() {
+		authState.signOut();
+	}
 </script>
 
 <header>
@@ -10,11 +45,12 @@
 		<span>360 Image Uploader</span>
 	</div>
 	<div class="g-container">
-		<div class="g-app-switch">
-			<img src={appSwitchIcon} alt="App Switch" />
-		</div>
 		<div class="g-profile">
-			<img src={profileIcon} alt="Profile Options" />
+			{#if isAuthenticated && user}
+				<LogoutBtn dropdownId="1" />
+			{:else}
+				<LoginBtn />
+			{/if}
 		</div>
 	</div>
 </header>
@@ -56,34 +92,20 @@
 			padding: 0 4px;
 			padding-left: 30px;
 
-			/* width: 124px;
-			height: 48px; */
-
 			.g-profile {
 				padding: 6px;
-
-				img {
-					background-size: 32px 32px;
-					border: 0;
-					border-radius: 50%;
-					display: block;
-					margin: 0px;
-					position: relative;
-					height: 32px;
-					width: 32px;
-					z-index: 0;
-				}
 			}
+		}
 
-			.g-app-switch {
-				padding: 8px;
-				display: grid;
-				place-items: center;
+		@media (width < 576px) {
+			.logo-container span {
+				font-size: 18px;
+			}
+		}
 
-				img {
-					height: 22px; /* 24px in original */
-					width: 22px; /* 24px in original */
-				}
+		@media (width < 376px) {
+			.logo-container span {
+				font-size: 16px;
 			}
 		}
 	}
