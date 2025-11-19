@@ -2,7 +2,7 @@
 	import { authState } from '$lib/auth-state.svelte';
 	import { getInitials, getAvatarColor } from '$lib/utils/avatar-helpers';
 
-	let { dropdownId = '1' }: { dropdownId: string } = $props();
+	let { dropdownId = crypto.randomUUID() }: { dropdownId?: string } = $props();
 	let user = $derived(authState.user);
 	let imageError = $state(false);
 

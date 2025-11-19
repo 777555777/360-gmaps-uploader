@@ -10,8 +10,9 @@
 <aside>
 	<div class="sidebar-option-header">
 		<button class="upload-btn" commandfor={UPLOAD_DIALOG_ID} command="show-modal">
+			<!-- plus icon -->
 			<svg
-				class="plus-icon"
+				class="svg-icon"
 				xmlns="http://www.w3.org/2000/svg"
 				width="24"
 				height="24"
@@ -35,7 +36,7 @@
 		>
 			<!-- publish icon -->
 			<svg
-				class="plus-icon"
+				class="svg-icon"
 				xmlns="http://www.w3.org/2000/svg"
 				width="24"
 				height="24"
@@ -111,7 +112,7 @@
 					margin-left: 16px;
 				}
 
-				.plus-icon {
+				.svg-icon {
 					width: 24px;
 					height: 24px;
 					flex-shrink: 0;
@@ -127,7 +128,7 @@
 					background-color: #3b82f633;
 					color: #3b82f6;
 
-					.plus-icon {
+					.svg-icon {
 						color: #3b82f6;
 					}
 				}
@@ -144,7 +145,7 @@
 						0 1px 3px 0 rgba(60, 64, 67, 0.3),
 						0 4px 8px 3px rgba(60, 64, 67, 0.15);
 
-					.plus-icon {
+					.svg-icon {
 						color: #3b82f6;
 					}
 				}
@@ -160,7 +161,7 @@
 						0 4px 4px 0 rgba(60, 64, 67, 0.3),
 						0 8px 12px 6px rgba(60, 64, 67, 0.15);
 
-					.plus-icon {
+					.svg-icon {
 						color: #3b82f6;
 					}
 				}

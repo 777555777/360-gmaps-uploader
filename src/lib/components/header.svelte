@@ -42,7 +42,7 @@
 	<div class="g-container">
 		<div class="g-profile">
 			{#if isAuthenticated && user}
-				<LogoutBtn dropdownId="1" />
+				<LogoutBtn />
 			{:else}
 				<LoginBtn />
 			{/if}

@@ -69,8 +69,9 @@
 	tabindex="0"
 	onkeydown={(e) => e.key === 'Enter' && handleClick()}
 >
+	<!-- publish icon -->
 	<svg
-		class="upload-icon"
+		class="svg-icon"
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 24 24"
 		fill="none"
@@ -128,15 +129,15 @@
 		background-color: #eff6ff;
 	}
 
-	.upload-icon {
+	.svg-icon {
 		width: 48px;
 		height: 48px;
 		color: #64748b;
 		transition: color 0.2s ease;
 	}
 
-	.upload-area:hover .upload-icon,
-	.upload-area.dragging .upload-icon {
+	.upload-area:hover .svg-icon,
+	.upload-area.dragging .svg-icon {
 		color: #3b82f6;
 	}
 

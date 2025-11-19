@@ -70,7 +70,9 @@
 		style="position-anchor: --image-anchor-{index}"
 		onclick={handleRemove}
 	>
+		<!-- close icon -->
 		<svg
+			class="svg-icon"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -100,8 +102,9 @@
 					</div>
 				{:else}
 					<div class="geo-data">
+						<!-- map-pin -->
 						<svg
-							class="map-icon"
+							class="svg-icon"
 							xmlns="http://www.w3.org/2000/svg"
 							width="16"
 							height="16"
@@ -126,8 +129,9 @@
 						{/if}
 					</div>
 					<div class="file-size">
-						<!-- filesize icon -->
+						<!-- file icon -->
 						<svg
+							class="svg-icon"
 							xmlns="http://www.w3.org/2000/svg"
 							width="16"
 							height="16"
@@ -238,7 +242,7 @@
 			justify-content: center;
 			gap: 6px;
 
-			.map-icon {
+			.svg-icon {
 				flex-shrink: 0;
 				color: rgb(95, 99, 104);
 			}
