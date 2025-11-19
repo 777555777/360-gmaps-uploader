@@ -15,6 +15,11 @@ export interface ImageMetadata {
 	model?: string; // Kamera-Modell
 }
 
+export interface ValidationResult {
+	isValid: boolean;
+	errors: string[];
+}
+
 /**
  * Formatiert eine Dateigröße in Bytes zu einer menschenlesbaren Zeichenkette
  * @param bytes - Die Dateigröße in Bytes
@@ -134,4 +139,132 @@ export async function extractBatchMetadata(files: File[] | FileList): Promise<Im
 	const fileArray = Array.from(files);
 	const metadataPromises = fileArray.map((file) => extractImageMetadata(file));
 	return Promise.all(metadataPromises);
+}
+
+export async function getThumbnail(file: File): Promise<string> {
+	// 1) Versuche EXIF Thumbnail
+	try {
+		const exifThumb = await exifr.thumbnail(file);
+		if (exifThumb) {
+			return URL.createObjectURL(exifThumb as Blob);
+		}
+	} catch {
+		/* empty */
+	}
+
+	// 2) Canvas Thumbnail
+	return await createThumbnail(file, 512);
+}
+
+async function createThumbnail(file: File, maxSize = 512): Promise<string> {
+	const bitmap = await createImageBitmap(file);
+	const scale = Math.min(maxSize / bitmap.width, maxSize / bitmap.height);
+
+	const w = bitmap.width * scale;
+	const h = bitmap.height * scale;
+
+	const canvas = document.createElement('canvas');
+	canvas.width = w;
+	canvas.height = h;
+
+	canvas.getContext('2d')!.drawImage(bitmap, 0, 0, w, h);
+
+	bitmap.close();
+
+	// Base64 JPEG thumbnail
+	return canvas.toDataURL('image/jpeg', 0.8);
+}
+
+// =========================================
+// 360°- Image Validation
+// =========================================
+
+/**
+ * Validiert ein 360°-Bild für die Street View API.
+ * Anforderungen:
+ * JPEG
+ * max. 75 MB
+ * Mindestauflösung (3840x1920)
+ * Seitenverhältnis 2:1
+ *
+ * Nutzt schnellen JPEG-Header-Parser (kein decode!).
+ */
+export async function validateStreetViewImage(file: File): Promise<ValidationResult> {
+	const errors: string[] = [];
+
+	const MAX_FILE_SIZE = 75 * 1024 * 1024; // 75 MB
+	const MIN_WIDTH = 3840;
+	const MIN_HEIGHT = 1920;
+
+	// --- 1. MIME-Typ prüfen ---
+	if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
+		errors.push('Datei muss ein JPEG-Bild sein.');
+	}
+
+	// --- 2. Dateigröße prüfen ---
+	if (file.size > MAX_FILE_SIZE) {
+		errors.push(`Dateigröße überschreitet das Limit von 75 MB.`);
+	}
+
+	// --- 3. JPEG-Dimensionen schnell aus Header auslesen ---
+	try {
+		const { width, height } = await getJpegSize(file);
+
+		// Mindestauflösung
+		if (width < MIN_WIDTH || height < MIN_HEIGHT) {
+			errors.push(
+				`Auflösung zu niedrig. Mindestens ${MIN_WIDTH}×${MIN_HEIGHT} erforderlich (Aktuell: ${width}×${height}).`
+			);
+		}
+
+		// Seitenverhältnis 2:1
+		const ratio = width / height;
+		if (Math.abs(ratio - 2) > 0.01) {
+			errors.push(`Seitenverhältnis muss 2:1 sein (Aktuell: ${ratio.toFixed(2)}:1).`);
+		}
+	} catch (err) {
+		console.log('err', err);
+		errors.push('Konnte JPEG-Dimensionen nicht lesen. Ist die Datei beschädigt?');
+	}
+
+	return {
+		isValid: errors.length === 0,
+		errors
+	};
+}
+
+/**
+ * Liest JPEG-Breite und -Höhe sehr schnell aus dem SOF-Segment.
+ * Nutzt nur die ersten 1 MB der Datei.
+ */
+async function getJpegSize(file: File): Promise<{ width: number; height: number }> {
+	const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB reichen locker
+	const buffer = await file.slice(0, CHUNK_SIZE).arrayBuffer();
+	const view = new DataView(buffer);
+
+	let offset = 2; // JPEG beginnt mit 0xFFD8
+
+	while (offset < view.byteLength) {
+		if (view.getUint8(offset) !== 0xff) {
+			throw new Error('Ungültiges JPEG (fehlender Marker).');
+		}
+
+		const marker = view.getUint8(offset + 1);
+		offset += 2;
+
+		// SOF0, SOF2 enthalten Breite/Höhe
+		if (marker >= 0xc0 && marker <= 0xc3) {
+			offset += 3; // Segmentlänge + Präzision überspringen
+			const height = view.getUint16(offset);
+			offset += 2;
+			const width = view.getUint16(offset);
+			return { width, height };
+		}
+
+		// Andere Segmente überspringen
+		const length = view.getUint16(offset);
+		offset += length;
+	}
+
+	throw new Error('SOF-Marker nicht gefunden (kein gültiges JPEG?).');
 }

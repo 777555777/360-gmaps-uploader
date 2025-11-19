@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { fileState } from '$lib/file-state.svelte';
-	import { UPLOAD_DIALOG_ID } from '$lib/globals';
+	import { MAX_FILES_UPLOAD, UPLOAD_DIALOG_ID } from '$lib/globals';
 	import { closeDialogById } from '$lib/utils/dialog-helpers';
+	import { validateStreetViewImage } from '$lib/utils/image-helpers';
 
 	let isDragging = $state(false);
 	let fileInput: HTMLInputElement | undefined;
@@ -37,19 +38,45 @@
 		}
 	}
 
-	function processFiles(files: FileList): void {
+	async function processFiles(files: FileList): Promise<void> {
 		if (!files.length) {
 			return;
 		}
 
-		fileState.addFiles(files);
-		closeDialogById(UPLOAD_DIALOG_ID);
+		if (files.length > MAX_FILES_UPLOAD) {
+			alert(
+				`Sie können maximal ${MAX_FILES_UPLOAD} Dateien auf einmal hochladen. Bitte wählen Sie weniger Dateien aus.`
+			);
+			return;
+		}
+
+		const validFiles: File[] = [];
+		const errors: string[] = [];
+
+		for (const file of files) {
+			console.log(`Validiere Bild: ${file.name}`);
+			const result = await validateStreetViewImage(file);
+
+			if (result.isValid) {
+				validFiles.push(file);
+			} else {
+				errors.push(`• ${file.name}:\n  ${result.errors.join('\n  ')}`);
+			}
+		}
+
+		if (validFiles.length > 0) {
+			fileState.addFiles(validFiles);
+			closeDialogById(UPLOAD_DIALOG_ID);
+			console.log(`${validFiles.length} file(s) added. Total: ${fileState.count}`);
+		}
+
+		if (errors.length > 0) {
+			alert(`Einige Dateien konnten nicht hinzugefügt werden:\n\n${errors.join('\n\n')}`);
+		}
 
 		if (fileInput) {
 			fileInput.value = '';
 		}
-
-		console.log(`${files.length} file(s) added. Total: ${fileState.count}`);
 	}
 
 	function handleClick(): void {

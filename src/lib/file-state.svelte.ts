@@ -19,6 +19,14 @@ class FileState {
 	// Reactive Set für ausgewählte Files (für Publish-Funktionalität)
 	selectedFiles = new SvelteSet<File>();
 
+	// Reactive Map für Metadata-Fehler
+	metadataErrors = new SvelteMap<File, string>();
+
+	// Queue-System für throttled Metadata-Extraktion
+	private metadataQueue: File[] = [];
+	private activeExtractions = 0;
+	private readonly MAX_CONCURRENT = 3; // Max 3 parallele Extraktionen
+
 	addFile(file: File): void {
 		this.files.add(file);
 		this.extractMetadataAsync(file);
@@ -34,28 +42,40 @@ class FileState {
 		}
 	}
 
-	// Private Methode für asynchrone Metadaten-Extraktion
+	// Private Methode für asynchrone Metadaten-Extraktion mit Queue
 	private extractMetadataAsync(file: File): void {
-		// Markiere als "loading"
-		this.loadingFiles.add(file);
+		this.metadataQueue.push(file);
+		this.processQueue();
+	}
 
-		// Starte asynchrone Extraktion
-		extractImageMetadata(file)
-			.then((metadata) => {
-				this.metadata.set(file, metadata);
-				console.log(`Metadata loaded for ${file.name}:`, metadata);
-			})
-			.catch((error) => {
-				console.error(`Failed to extract metadata for ${file.name}:`, error);
-			})
-			.finally(() => {
-				this.loadingFiles.delete(file);
-			});
+	// Verarbeite Queue mit Concurrency-Limit
+	private processQueue(): void {
+		while (this.activeExtractions < this.MAX_CONCURRENT && this.metadataQueue.length > 0) {
+			const file = this.metadataQueue.shift()!;
+			this.activeExtractions++;
+			this.loadingFiles.add(file);
+
+			extractImageMetadata(file)
+				.then((metadata) => {
+					this.metadata.set(file, metadata);
+					this.metadataErrors.delete(file);
+				})
+				.catch((error) => {
+					console.error(`Metadata extraction failed for ${file.name}:`, error);
+					this.metadataErrors.set(file, 'Metadaten konnten nicht geladen werden');
+				})
+				.finally(() => {
+					this.activeExtractions--;
+					this.loadingFiles.delete(file);
+					this.processQueue(); // Process next in queue
+				});
+		}
 	}
 
 	removeFile(file: File): void {
 		this.files.delete(file);
 		this.metadata.delete(file);
+		this.metadataErrors.delete(file);
 		this.loadingFiles.delete(file);
 		this.selectedFiles.delete(file);
 	}
@@ -63,6 +83,7 @@ class FileState {
 	clearFiles(): void {
 		this.files.clear();
 		this.metadata.clear();
+		this.metadataErrors.clear();
 		this.loadingFiles.clear();
 		this.selectedFiles.clear();
 	}
@@ -84,6 +105,11 @@ class FileState {
 	// Prüfe, ob ein File gerade verarbeitet wird
 	isLoading(file: File): boolean {
 		return this.loadingFiles.has(file);
+	}
+
+	// Hole Metadata-Fehler für ein File (oder undefined)
+	getMetadataError(file: File): string | undefined {
+		return this.metadataErrors.get(file);
 	}
 
 	// Getter für Array-Zugriff (z.B. für Loops)

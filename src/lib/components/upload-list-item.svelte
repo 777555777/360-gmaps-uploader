@@ -1,13 +1,17 @@
 <script lang="ts">
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
+	import { getThumbnail } from '$lib/utils/image-helpers';
 
 	let { file, index } = $props();
 
 	let metadata = $derived(fileState.getMetadata(file));
-	let imageUrl = $state<string>('');
+	let metadataError = $derived(fileState.getMetadataError(file));
 	let isSelected = $derived(fileState.isSelected(file));
 	let isMapFocused = $derived(mapState.isFocused(file));
+	let thumbUrl = $state<string>('');
+	let isLoadingThumbnail = $state(true);
+	let thumbnailError = $state(false);
 
 	function isLoading(file: File) {
 		return fileState.isLoading(file);
@@ -43,12 +47,24 @@
 
 	// Erstelle Object URL für das Bild und räume auf
 	$effect(() => {
-		imageUrl = URL.createObjectURL(file);
+		getThumbnail(file)
+			.then((url) => {
+				thumbUrl = url;
+				isLoadingThumbnail = false;
+				thumbnailError = false;
+			})
+			.catch((err) => {
+				console.error(`Thumbnail generation failed for ${file.name}:`, err);
+				// Fallback zu data URL placeholder
+				thumbUrl =
+					'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="14"%3ENo Preview%3C/text%3E%3C/svg%3E';
+				isLoadingThumbnail = false;
+				thumbnailError = true;
+			});
 
 		return () => {
-			// Cleanup: URL freigeben wenn Component zerstört wird
-			if (imageUrl) {
-				URL.revokeObjectURL(imageUrl);
+			if (thumbUrl && thumbUrl.startsWith('blob:')) {
+				URL.revokeObjectURL(thumbUrl);
 			}
 		};
 	});
@@ -63,7 +79,17 @@
 	onclick={handleCardClick}
 	onkeydown={handleKeyDown}
 >
-	<img src={imageUrl} alt={file.name} style="anchor-name: --image-anchor-{index}" />
+	{#if isLoadingThumbnail}
+		<div
+			class="loading-indicator thumbnail-loading-position"
+			style="anchor-name: --image-anchor-{index}"
+		>
+			<span class="spinner"></span>
+			<span>Loading Thumbnail...</span>
+		</div>
+	{:else}
+		<img src={thumbUrl} alt={file.name} style="anchor-name: --image-anchor-{index}" />
+	{/if}
 	<button
 		class="clickable-icon close-btn-overlay"
 		aria-label="Löschen"
@@ -95,7 +121,25 @@
 			</header>
 
 			<footer>
-				{#if isLoading(file)}
+				{#if metadataError}
+					<div class="error-state">
+						<svg
+							class="svg-icon"
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<circle cx="12" cy="12" r="10"></circle>
+							<line x1="12" y1="8" x2="12" y2="12"></line>
+							<line x1="12" y1="16" x2="12.01" y2="16"></line>
+						</svg>
+						<span>{metadataError}</span>
+					</div>
+				{:else if isLoading(file)}
 					<div class="loading-indicator">
 						<span class="spinner"></span>
 						<span>Loading Metadata...</span>
@@ -319,5 +363,28 @@
 		border-color: #3b82f6;
 		border-style: solid;
 		border-width: 1px;
+	}
+
+	/* ====================== */
+
+	.thumbnail-loading-position {
+		height: 200px;
+		background-color: #d8e6fd;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.error-state {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		color: rgb(223, 32, 32);
+		font-size: 0.75rem;
+		font-style: italic;
+
+		.svg-icon {
+			flex-shrink: 0;
+		}
 	}
 </style>
