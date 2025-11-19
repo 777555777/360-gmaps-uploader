@@ -9,6 +9,8 @@
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
 	import { closeDialogById } from '$lib/utils/dialog-helpers';
+	import { authState } from '$lib/auth-state.svelte';
+	import LoginBtn from '$lib/components/login-btn.svelte';
 
 	let selectedFiles = $derived(fileState.selectedFiles);
 
@@ -63,9 +65,14 @@
 
 {#snippet publishDialogContent()}
 	<div class="publish-area-container">
-		<p>Publishing functionality coming soon!</p>
-		<!-- Dummy Button -->
-		<button onclick={() => clearUploadedFiles()}>Clear Items</button>
+		{#if !authState.isAuthenticated}
+			<p>To Publish your photos to Google Maps you need to sign in with Google.</p>
+			<LoginBtn />
+		{:else}
+			<p>Publishing functionality coming soon!</p>
+			<!-- Dummy Button -->
+			<button onclick={() => clearUploadedFiles()}>Clear Items</button>
+		{/if}
 	</div>
 {/snippet}
 
@@ -92,6 +99,13 @@
 		font-size: 14px;
 		color: var(--text-secondary-color);
 		text-align: center;
+	}
+
+	.publish-area-container {
+		display: grid;
+		place-items: center;
+		gap: 0.75rem;
+		padding-block: 0.75rem;
 	}
 
 	@media (width < 768px) {

@@ -37,6 +37,7 @@
 		justify-content: space-between;
 		height: 100%;
 		width: 100%;
+		max-width: fit-content;
 		height: 40px;
 		padding: 0 12px;
 		background: #202124;

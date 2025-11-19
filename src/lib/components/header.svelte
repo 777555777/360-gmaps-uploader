@@ -18,7 +18,6 @@
 
 	let user = $derived(authState.user);
 	let isAuthenticated = $derived(authState.isAuthenticated);
-	let isLoading = $derived(authState.isLoading);
 
 	onMount(() => {
 		// Initialize Google Identity Services Token Client (for API access)
@@ -33,10 +32,6 @@
 
 		initializeAuth();
 	});
-
-	function handleSignOut() {
-		authState.signOut();
-	}
 </script>
 
 <header>
