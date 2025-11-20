@@ -85,7 +85,7 @@
 			style="anchor-name: --image-anchor-{index}"
 		>
 			<span class="spinner"></span>
-			<span>Loading Thumbnail...</span>
+			<span>Generating Thumbnail...</span>
 		</div>
 	{:else}
 		<img src={thumbUrl} alt={file.name} style="anchor-name: --image-anchor-{index}" />

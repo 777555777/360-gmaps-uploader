@@ -36,7 +36,6 @@ class FileState {
 		// Svelte 5 Best Practice: Synchron hinzufügen für sofortiges UI-Feedback
 		// Metadaten asynchron im Hintergrund laden
 		for (const file of files) {
-			console.log('Adding file:', file.name);
 			this.files.add(file);
 			this.extractMetadataAsync(file);
 		}

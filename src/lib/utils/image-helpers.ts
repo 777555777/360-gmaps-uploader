@@ -76,8 +76,7 @@ export async function extractImageMetadata(file: File): Promise<ImageMetadata> {
 		fileSize: file.size,
 		fileSizeFormatted: formatFileSize(file.size)
 	};
-	const test123 = await exifr.thumbnail(file);
-	console.log('Thumbnail URL:', test123);
+
 	try {
 		// Extrahiere EXIF-Daten
 		const exifData = await exifr.parse(file, {
@@ -126,7 +125,6 @@ export async function extractImageMetadata(file: File): Promise<ImageMetadata> {
  */
 export async function hasGeoLocation(file: File): Promise<boolean> {
 	const geoLocation = await extractGeoLocation(file);
-	console.log('geoLocation', geoLocation);
 	return geoLocation !== undefined;
 }
 
@@ -141,27 +139,28 @@ export async function extractBatchMetadata(files: File[] | FileList): Promise<Im
 	return Promise.all(metadataPromises);
 }
 
-export async function getThumbnail(file: File): Promise<string> {
-	// 1) Versuche EXIF Thumbnail
-	try {
-		const exifThumb = await exifr.thumbnail(file);
-		if (exifThumb) {
-			return URL.createObjectURL(exifThumb as Blob);
-		}
-	} catch {
-		/* empty */
+export async function getThumbnail(file: File, useWorker: boolean = true): Promise<string> {
+	// Generiere Thumbnail mit Worker Pool (beste Qualität & Performance)
+	if (useWorker && typeof Worker !== 'undefined') {
+		const { getThumbnailWorkerPool } = await import('../workers/thumbnail-pool');
+		const pool = getThumbnailWorkerPool();
+		return await pool.generateThumbnail(file, 512);
+	} else {
+		// Fallback: Main Thread (für alte Browser ohne Worker-Support)
+		return await createThumbnailMainThread(file, 512);
 	}
-
-	// 2) Canvas Thumbnail
-	return await createThumbnail(file, 512);
 }
 
-async function createThumbnail(file: File, maxSize = 512): Promise<string> {
+/**
+ * Fallback: Thumbnail-Generierung im Main Thread
+ * @internal
+ */
+async function createThumbnailMainThread(file: File, maxSize = 512): Promise<string> {
 	const bitmap = await createImageBitmap(file);
 	const scale = Math.min(maxSize / bitmap.width, maxSize / bitmap.height);
 
-	const w = bitmap.width * scale;
-	const h = bitmap.height * scale;
+	const w = Math.floor(bitmap.width * scale);
+	const h = Math.floor(bitmap.height * scale);
 
 	const canvas = document.createElement('canvas');
 	canvas.width = w;

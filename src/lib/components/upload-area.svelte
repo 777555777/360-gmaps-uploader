@@ -54,7 +54,6 @@
 		const errors: string[] = [];
 
 		for (const file of files) {
-			console.log(`Validiere Bild: ${file.name}`);
 			const result = await validateStreetViewImage(file);
 
 			if (result.isValid) {
@@ -67,7 +66,6 @@
 		if (validFiles.length > 0) {
 			fileState.addFiles(validFiles);
 			closeDialogById(UPLOAD_DIALOG_ID);
-			console.log(`${validFiles.length} file(s) added. Total: ${fileState.count}`);
 		}
 
 		if (errors.length > 0) {
