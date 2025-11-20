@@ -1,0 +1,166 @@
+@startuml 360-GMaps-Uploader Architecture
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName "Segoe UI"
+skinparam shadowing false
+
+' Title
+title 360° Google Maps Uploader - File Upload Architecture\n
+
+' Actors and Components
+actor User
+participant "Dialog\n(upload-dialog)" as Dialog
+participant "UploadArea\n(Component)" as UploadArea
+participant "validateStreetViewImage\n(image-helpers)" as Validator
+participant "FileState\n(Global State)" as FileState
+participant "Sidebar\n(Component)" as Sidebar
+participant "UploadList\n(Component)" as UploadList
+participant "UploadListItem\n(Component)" as ListItem
+participant "MapState\n(Global State)" as MapState
+participant "Map\n(Leaflet)" as LeafletMap
+participant "Google Street View\nPublish API" as GoogleAPI
+
+' === Phase 1: File Selection & Validation ===
+group #LightCyan Phase 1: File Selection & Validation
+    User -> Dialog: Click "Add 360-Photo" button
+    activate Dialog
+    Dialog -> UploadArea: Opens upload dialog
+    activate UploadArea
+    
+    User -> UploadArea: Drag & Drop or\nFile Select (FileList)
+    UploadArea -> UploadArea: processFiles(files: FileList)
+    
+    loop For each file
+        UploadArea -> Validator: validateStreetViewImage(file)
+        activate Validator
+        note right of Validator
+            **Validation Checks:**
+            ✓ MIME Type (image/jpeg)
+            ✓ File Size (≤ 75 MB)
+            ✓ Dimensions (≥ 3840x1920)
+            ✓ Aspect Ratio (2:1)
+            ✓ JPEG Header Parsing
+        end note
+        
+        alt Valid File
+            Validator --> UploadArea: {isValid: true, errors: []}
+            UploadArea -> UploadArea: Add to validFiles[]
+        else Invalid File
+            Validator --> UploadArea: {isValid: false, errors: [...]}
+            UploadArea -> UploadArea: Add to errors[]
+        end
+        deactivate Validator
+    end
+    
+    alt Has Valid Files
+        UploadArea -> FileState: addFiles(validFiles)
+        UploadArea -> Dialog: closeDialogById(UPLOAD_DIALOG_ID)
+        deactivate Dialog
+    end
+    
+    alt Has Errors
+        UploadArea -> User: alert("Validation Errors...")
+    end
+    deactivate UploadArea
+end
+
+' === Phase 2: Metadata Extraction & UI Update ===
+group #LightYellow Phase 2: Metadata Extraction & UI Rendering
+    FileState -> FileState: Loop: files.add(file)
+    activate FileState #DarkSeaGreen
+    
+    loop For each valid file
+        FileState -> FileState: extractMetadataAsync(file)
+        note right of FileState
+            **Metadata Extraction:**
+            → loadingFiles.add(file)
+            → extractImageMetadata(file)
+            ├─ GPS Coordinates (EXIF)
+            ├─ DateTime
+            ├─ Camera Make/Model
+            ├─ File Size (formatted)
+            └─ Thumbnail (EXIF or Canvas)
+        end note
+        
+        FileState -> FileState: metadata.set(file, ImageMetadata)
+        FileState -> FileState: loadingFiles.delete(file)
+    end
+    
+    FileState ->> Sidebar: Reactive update\n(fileState.fileList)
+    deactivate FileState
+    
+    Sidebar -> UploadList: Re-render list
+    activate UploadList
+    UploadList -> ListItem: Render each file
+    activate ListItem
+    
+    ListItem -> ListItem: Display thumbnail\n& metadata
+    note right of ListItem
+        **UI States:**
+        - Loading Spinner (while processing)
+        - Thumbnail Preview
+        - GPS Coordinates
+        - File Size
+        - Selection Checkbox
+    end note
+    deactivate ListItem
+    deactivate UploadList
+end
+
+' === Phase 3: Map Integration ===
+group #LightGreen Phase 3: Map Integration
+    alt File has GPS data
+        FileState ->> MapState: GPS metadata available
+        activate MapState #LightBlue
+        MapState -> LeafletMap: addMarker(file, lat, lng)
+        activate LeafletMap
+        
+        note right of LeafletMap
+            **Marker Features:**
+            - Custom colored icon
+              (blue = default, green = selected)
+            - Popup with file info
+            - Click to focus
+            - Bidirectional sync with sidebar
+        end note
+        
+        LeafletMap --> MapState: Marker created
+        deactivate LeafletMap
+        deactivate MapState
+    else No GPS data
+        ListItem -> User: Display "No GPS data"\n(red warning)
+    end
+    
+    User -> ListItem: Click on card
+    ListItem -> MapState: focusMarker(file)
+    MapState -> LeafletMap: flyTo(lat, lng) + openPopup()
+    LeafletMap -> ListItem: Highlight card (map-focus)
+end
+
+' === Phase 4: Selection & Publishing (Future) ===
+group #LightPink Phase 4: Selection & Publishing [PLANNED]
+    User -> ListItem: Check selection checkbox
+    ListItem -> FileState: toggleSelection(file)
+    FileState -> Sidebar: Update "Publish (N)" button
+    
+    User -> Sidebar: Click "Publish (N)" button
+    Sidebar -> Dialog: Open publish dialog
+    activate Dialog #LightSalmon
+    
+    User -> Dialog: Confirm publish action
+    Dialog -> GoogleAPI: **[NOT YET IMPLEMENTED]**
+    note right of GoogleAPI
+        **Future Implementation:**
+        1. Upload photo bytes
+        2. Set Photo Sphere metadata
+        3. Link to GPS location
+        4. Publish to Street View
+    end note
+    
+    GoogleAPI --> Dialog: Upload success/failure
+    Dialog -> FileState: Remove published files
+    Dialog --> User: Show result
+    deactivate Dialog
+end
+
+@enduml
