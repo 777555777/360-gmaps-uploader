@@ -1,5 +1,6 @@
 import { SvelteSet, SvelteMap } from 'svelte/reactivity';
 import { extractImageMetadata, type ImageMetadata } from './utils/image-helpers';
+import { mapState } from './map-state.svelte';
 
 class FileState {
 	// Reactive set for storing uploaded files
@@ -121,6 +122,22 @@ class FileState {
 				geoLocation: { latitude, longitude }
 			};
 			this.metadata.set(file, newMetadata);
+
+			// Aktualisiere Marker sofort (synchron) damit er beim Klick verfügbar ist
+			// Der Effect in map.svelte läuft asynchron und könnte zu spät sein
+			if (typeof window !== 'undefined') {
+				import('leaflet').then((Leaflet) => {
+					const isSelected = this.isSelected(file);
+					mapState.updateMarkerPosition(
+						file,
+						latitude,
+						longitude,
+						Leaflet,
+						isSelected,
+						newMetadata.fileSizeFormatted
+					);
+				});
+			}
 		}
 	}
 

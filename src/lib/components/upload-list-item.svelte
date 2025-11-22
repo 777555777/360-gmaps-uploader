@@ -1,33 +1,39 @@
 <script lang="ts">
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
-	import { getThumbnail } from '$lib/utils/image-helpers';
+	import GeoDataChip from './geo-data-chip.svelte';
 	import GeoEditPopover from './geo-edit-popover.svelte';
+	import Thumbnail from './thumbnail.svelte';
 
 	let { file, index } = $props();
 
+	// Derived states - zentrale Quelle für alle Zustände
 	let metadata = $derived(fileState.getMetadata(file));
 	let metadataError = $derived(fileState.getMetadataError(file));
+	let isLoading = $derived(fileState.isLoading(file));
 	let isSelected = $derived(fileState.isSelected(file));
 	let isMapFocused = $derived(mapState.isFocused(file));
-	let thumbUrl = $state<string>('');
-	let isLoadingThumbnail = $state(true);
-	let thumbnailError = $state(false);
-	$inspect(metadata);
+	let hasGeoData = $derived(metadata?.geoLocation !== undefined && metadata?.geoLocation !== null);
 
+	// Computed values für Template
+	let cardClasses = $derived.by(() => {
+		const classes = ['upload-item'];
+		if (hasGeoData) classes.push('has-location');
+		if (isMapFocused) classes.push('map-focus');
+		return classes.join(' ');
+	});
+
+	let canInteract = $derived(hasGeoData);
+	let checkboxClasses = $derived(hasGeoData ? 'clickable-icon' : 'clickable-disabled');
+
+	// Event handlers
 	function handleUpdateGeo(coords: { latitude: number; longitude: number }) {
-		// Ensure we have numbers
 		const lat = Number(coords.latitude);
 		const lng = Number(coords.longitude);
 
 		if (!isNaN(lat) && !isNaN(lng)) {
-			console.log('trogge');
 			fileState.updateGeolocation(file, lat, lng);
 		}
-	}
-
-	function isLoading(file: File) {
-		return fileState.isLoading(file);
 	}
 
 	function handleRemove() {
@@ -39,6 +45,7 @@
 	}
 
 	function handleCardClick(event?: MouseEvent | KeyboardEvent) {
+		// Ignore clicks on interactive elements
 		if (event instanceof MouseEvent) {
 			const target = event.target as HTMLElement | null;
 			if (target?.closest('.publish-checkbox') || target?.closest('.close-btn-overlay')) {
@@ -46,7 +53,8 @@
 			}
 		}
 
-		if (metadata?.geoLocation) {
+		// Focus marker on map if geo data exists
+		if (hasGeoData) {
 			mapState.focusMarker(file);
 		}
 	}
@@ -57,83 +65,24 @@
 			handleCardClick();
 		}
 	}
-
-	// Erstelle Object URL für das Bild und räume auf
-	$effect(() => {
-		getThumbnail(file)
-			.then((url) => {
-				thumbUrl = url;
-				isLoadingThumbnail = false;
-				thumbnailError = false;
-			})
-			.catch((err) => {
-				console.error(`Thumbnail generation failed for ${file.name}:`, err);
-				// Fallback zu data URL placeholder
-				thumbUrl =
-					'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="14"%3ENo Preview%3C/text%3E%3C/svg%3E';
-				isLoadingThumbnail = false;
-				thumbnailError = true;
-			});
-
-		return () => {
-			if (thumbUrl && thumbUrl.startsWith('blob:')) {
-				URL.revokeObjectURL(thumbUrl);
-			}
-		};
-	});
 </script>
 
 <div
-	class="upload-item {metadata?.geoLocation ? 'has-location' : ''} {isMapFocused
-		? 'map-focus'
-		: ''}"
+	class={cardClasses}
 	role="button"
-	tabindex={metadata?.geoLocation ? 0 : -1}
+	tabindex={canInteract ? 0 : -1}
 	onclick={handleCardClick}
 	onkeydown={handleKeyDown}
 >
-	{#if isLoadingThumbnail}
-		<div
-			class="loading-indicator thumbnail-loading-position"
-			style="anchor-name: --image-anchor-{index}"
-		>
-			<span class="spinner"></span>
-			<span>Generating Thumbnail...</span>
-		</div>
-	{:else}
-		<img src={thumbUrl} alt={file.name} style="anchor-name: --image-anchor-{index}" />
-	{/if}
-	<button
-		class="clickable-icon close-btn-overlay"
-		aria-label="Löschen"
-		style="position-anchor: --image-anchor-{index}"
-		onclick={handleRemove}
-	>
-		<!-- close icon -->
-		<svg
-			class="svg-icon"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			viewBox="0 0 28 28"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-		>
-			<line x1="20" y1="8" x2="8" y2="20"></line>
-			<line x1="8" y1="8" x2="20" y2="20"></line>
-		</svg>
-	</button>
+	<Thumbnail {file} {index} onRemove={handleRemove} />
 
 	<div class="card-body">
 		<div>
-			<header>
+			<div class="card-header">
 				<h3>{file.name}</h3>
-			</header>
+			</div>
 
-			<footer>
+			<div class="card-footer">
 				{#if metadataError}
 					<div class="error-state">
 						<svg
@@ -152,75 +101,20 @@
 						</svg>
 						<span>{metadataError}</span>
 					</div>
-				{:else if isLoading(file)}
+				{:else if isLoading}
 					<div class="loading-indicator">
 						<span class="spinner"></span>
 						<span>Loading Metadata...</span>
 					</div>
 				{:else}
-					<button
-						class="geo-data"
-						style="anchor-name: --geo-data-anchor-{index}"
-						popovertarget="geo-popover-{index}"
-					>
-						<!-- map-pin -->
-						<svg
-							class="svg-icon"
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-							<circle cx="12" cy="10" r="3"></circle>
-						</svg>
-						{#if metadata?.geoLocation}
-							<div class="coordinates">
-								<span>{metadata.geoLocation.latitude.toFixed(5)}°</span>
-								<span class="separator">|</span>
-								<span>{metadata.geoLocation.longitude.toFixed(5)}°</span>
-							</div>
-						{:else}
-							<span class="no-data">No GPS data</span>
-						{/if}
-					</button>
-					<div class="file-size">
-						<!-- file icon -->
-						<svg
-							class="svg-icon"
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-							<polyline points="14 2 14 8 20 8"></polyline>
-							<line x1="16" y1="13" x2="8" y2="13"></line>
-							<line x1="16" y1="17" x2="8" y2="17"></line>
-							<line x1="10" y1="9" x2="8" y2="9"></line>
-						</svg>
-
-						<span>{metadata?.fileSizeFormatted || 'N/A'}</span>
-					</div>
+					<GeoDataChip {index} {hasGeoData} {metadata} />
 				{/if}
-			</footer>
+			</div>
 		</div>
-		<label
-			class="publish-checkbox {!metadata?.geoLocation ? 'clickable-disabled' : 'clickable-icon'}"
-		>
+		<label class="publish-checkbox {checkboxClasses}">
 			<input
 				type="checkbox"
-				disabled={!metadata?.geoLocation}
+				disabled={!hasGeoData}
 				checked={isSelected}
 				onchange={handleSelectionToggle}
 			/>
@@ -256,15 +150,6 @@
 			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 		}
 
-		img {
-			display: block;
-			width: 100%;
-			height: 200px;
-			object-fit: cover;
-			border-radius: 8px 8px 0 0;
-			/* anchor-name wird inline per style="{index}" gesetzt */
-		}
-
 		.card-body {
 			display: flex;
 			justify-content: space-between;
@@ -274,7 +159,7 @@
 		}
 	}
 
-	header {
+	.card-header {
 		margin-bottom: 4px;
 
 		h3 {
@@ -293,57 +178,12 @@
 		}
 	}
 
-	footer {
+	.card-footer {
 		display: flex;
 		justify-content: flex-start;
 		gap: 1.5rem;
 		font-size: 0.75rem;
 		color: rgb(95, 99, 104);
-
-		.geo-data {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 6px;
-			padding: 3px 6px;
-			border-radius: 6px;
-			border: 1px solid transparent;
-
-			.svg-icon {
-				flex-shrink: 0;
-				color: rgb(95, 99, 104);
-			}
-
-			.coordinates {
-				display: flex;
-				gap: 0.25rem;
-				font-variant-numeric: tabular-nums;
-			}
-
-			.separator {
-				opacity: 0.5;
-			}
-
-			.no-data {
-				color: rgb(223, 32, 32);
-				opacity: 0.7;
-				font-style: italic;
-			}
-
-			&:has(.no-data) {
-				svg {
-					stroke: rgb(223, 32, 32);
-				}
-			}
-		}
-
-		.file-size {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 6px;
-			font-variant-numeric: tabular-nums;
-		}
 	}
 
 	.publish-checkbox {
@@ -354,31 +194,12 @@
 			width: 18px;
 			height: 18px;
 			cursor: pointer;
-			accent-color: #16b751;
+			/* accent-color: hsl(142, 79%, 40%); */
+			accent-color: hsl(115, 65%, 40%);
 		}
 	}
 
 	/* ====================== */
-
-	.close-btn-overlay {
-		/* CSS Anchor Positioning */
-		position: absolute;
-		/* position-anchor wird inline per style="{index}" gesetzt */
-
-		/* Positionierung: Top-Right mit 8px Abstand */
-		top: anchor(top);
-		right: anchor(right);
-		margin-top: 8px;
-		margin-right: 8px;
-
-		/* Alternative Syntax mit inset-area (neuere API) */
-		/* position-area: top right; */
-		/* inset: 8px 8px auto auto; */
-
-		/* Overlay-spezifisches Styling */
-		background-color: rgba(75, 75, 75, 0.75);
-		color: white;
-	}
 
 	.map-focus {
 		background-color: #0062ff33;
@@ -389,14 +210,6 @@
 	}
 
 	/* ====================== */
-
-	.thumbnail-loading-position {
-		height: 200px;
-		background-color: #d8e6fd;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
 
 	.error-state {
 		display: flex;

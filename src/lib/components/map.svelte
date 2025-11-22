@@ -61,15 +61,18 @@
 		const files = fileState.fileList;
 		const loadingCount = fileState.loadingCount;
 		const selectedCount = fileState.selectedCount; // Track Selection-Änderungen
+		const metadataSize = fileState.metadata.size; // Track Metadata-Änderungen
 
-		// Force re-run when loadingCount or selection changes
+		// Force re-run when loadingCount, selection or metadata changes
 		console.log(
 			'Effect triggered. Files:',
 			files.length,
 			'Loading:',
 			loadingCount,
 			'Selected:',
-			selectedCount
+			selectedCount,
+			'Metadata:',
+			metadataSize
 		);
 
 		(async () => {
@@ -81,9 +84,15 @@
 
 				// Prüfe ob Metadaten geladen sind
 				if (metadata?.geoLocation) {
-					if (!mapState.markers.has(file)) {
-						// Marker existiert noch nicht - erstelle ihn
-						console.log('Adding marker for file:', file.name, metadata.geoLocation);
+					const existingMarker = mapState.markers.get(file);
+					const hasPositionChanged = existingMarker
+						? existingMarker.getLatLng().lat !== metadata.geoLocation.latitude ||
+							existingMarker.getLatLng().lng !== metadata.geoLocation.longitude
+						: false;
+
+					if (!existingMarker || hasPositionChanged) {
+						// Marker existiert noch nicht oder Position hat sich geändert - erstelle/aktualisiere ihn
+						console.log('Adding/updating marker for file:', file.name, metadata.geoLocation);
 						mapState.addMarker(
 							file,
 							metadata.geoLocation.latitude,
@@ -93,7 +102,7 @@
 							metadata.fileSizeFormatted
 						);
 					} else {
-						// Marker existiert - aktualisiere nur die Farbe
+						// Marker existiert und Position unverändert - aktualisiere nur die Farbe
 						mapState.updateMarkerColor(file, isSelected, Leaflet);
 					}
 				}

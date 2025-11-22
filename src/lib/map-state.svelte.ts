@@ -29,7 +29,7 @@ class MapState {
 		Leaflet: typeof import('leaflet'),
 		isSelected: boolean
 	): Leaflet.DivIcon {
-		const color = isSelected ? '#16b751' : '#3b82f6'; // green : blue
+		const color = isSelected ? '#2fa824' : '#3b82f6'; // green : blue
 
 		return Leaflet.divIcon({
 			html: `
@@ -109,6 +109,33 @@ class MapState {
 		}
 	}
 
+	// Aktualisiere Marker-Position (wird synchron aufgerufen bei Geo-Änderungen)
+	updateMarkerPosition(
+		file: File,
+		lat: number,
+		lng: number,
+		Leaflet: typeof import('leaflet'),
+		isSelected: boolean,
+		fileSize?: string
+	): void {
+		if (!this.map) return;
+
+		// Entferne alten Marker und erstelle neuen mit neuer Position
+		const oldMarker = this.markers.get(file);
+		if (oldMarker) {
+			// Prüfe ob sich die Position wirklich geändert hat
+			const oldLatLng = oldMarker.getLatLng();
+			if (oldLatLng.lat === lat && oldLatLng.lng === lng) {
+				// Position unverändert, nur Farbe aktualisieren
+				this.updateMarkerColor(file, isSelected, Leaflet);
+				return;
+			}
+		}
+
+		// Position hat sich geändert oder Marker existiert nicht - neu erstellen
+		this.addMarker(file, lat, lng, Leaflet, isSelected, fileSize);
+	}
+
 	// Entferne einen Marker
 	removeMarker(file: File): void {
 		const marker = this.markers.get(file);
@@ -140,6 +167,10 @@ class MapState {
 			setTimeout(() => {
 				marker.openPopup();
 			}, 100);
+		} else {
+			// Marker existiert noch nicht, aber wir können trotzdem fokussieren
+			// Das passiert z.B. wenn Geodaten gerade erst aktualisiert wurden
+			console.warn('Marker not found for file:', file.name);
 		}
 	}
 
