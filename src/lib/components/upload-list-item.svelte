@@ -2,6 +2,7 @@
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
 	import { getThumbnail } from '$lib/utils/image-helpers';
+	import GeoEditPopover from './geo-edit-popover.svelte';
 
 	let { file, index } = $props();
 
@@ -12,6 +13,18 @@
 	let thumbUrl = $state<string>('');
 	let isLoadingThumbnail = $state(true);
 	let thumbnailError = $state(false);
+	$inspect(metadata);
+
+	function handleUpdateGeo(coords: { latitude: number; longitude: number }) {
+		// Ensure we have numbers
+		const lat = Number(coords.latitude);
+		const lng = Number(coords.longitude);
+
+		if (!isNaN(lat) && !isNaN(lng)) {
+			console.log('trogge');
+			fileState.updateGeolocation(file, lat, lng);
+		}
+	}
 
 	function isLoading(file: File) {
 		return fileState.isLoading(file);
@@ -145,7 +158,11 @@
 						<span>Loading Metadata...</span>
 					</div>
 				{:else}
-					<div class="geo-data">
+					<button
+						class="geo-data"
+						style="anchor-name: --geo-data-anchor-{index}"
+						popovertarget="geo-popover-{index}"
+					>
 						<!-- map-pin -->
 						<svg
 							class="svg-icon"
@@ -171,7 +188,7 @@
 						{:else}
 							<span class="no-data">No GPS data</span>
 						{/if}
-					</div>
+					</button>
 					<div class="file-size">
 						<!-- file icon -->
 						<svg
@@ -211,6 +228,13 @@
 	</div>
 </div>
 
+<GeoEditPopover
+	{index}
+	initialLat={metadata?.geoLocation?.latitude}
+	initialLng={metadata?.geoLocation?.longitude}
+	onSave={handleUpdateGeo}
+/>
+
 <style>
 	.upload-item {
 		border-radius: 8px;
@@ -218,10 +242,6 @@
 		/* Stellt sicher, dass Buttons innerhalb der Card bleiben */
 		overflow: hidden;
 		outline: none;
-
-		/* border-color: #3b82f6;
-		border-style: solid;
-		border-width: 2px; */
 
 		&.has-location {
 			cursor: pointer;
@@ -249,7 +269,7 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			padding-block: 8px;
+			padding-block: 12px;
 			padding-inline: 16px;
 		}
 	}
@@ -285,6 +305,9 @@
 			align-items: center;
 			justify-content: center;
 			gap: 6px;
+			padding: 3px 6px;
+			border-radius: 6px;
+			border: 1px solid transparent;
 
 			.svg-icon {
 				flex-shrink: 0;
@@ -385,6 +408,17 @@
 
 		.svg-icon {
 			flex-shrink: 0;
+		}
+	}
+
+	/* ====================== */
+	.error-state {
+		color: hsl(0, 75%, 50%);
+		border: 1px solid hsl(0, 75%, 50%);
+		background-color: hsl(0, 75%, 50%, 0.125);
+
+		svg {
+			stroke: hsl(0, 75%, 50%);
 		}
 	}
 </style>

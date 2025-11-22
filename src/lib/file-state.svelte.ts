@@ -111,6 +111,19 @@ class FileState {
 		return this.metadataErrors.get(file);
 	}
 
+	// Update Geolocation for a file
+	updateGeolocation(file: File, latitude: number, longitude: number): void {
+		const currentMetadata = this.metadata.get(file);
+		if (currentMetadata) {
+			// Create a new object to ensure reactivity when setting it back to the map
+			const newMetadata = {
+				...currentMetadata,
+				geoLocation: { latitude, longitude }
+			};
+			this.metadata.set(file, newMetadata);
+		}
+	}
+
 	// Getter für Array-Zugriff (z.B. für Loops)
 	get fileList(): File[] {
 		return Array.from(this.files);
