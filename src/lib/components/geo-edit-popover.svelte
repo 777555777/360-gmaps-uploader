@@ -192,6 +192,11 @@
 				color: #3b82f6;
 			}
 
+			&:active {
+				background-color: #3b82f64d;
+				color: #1669bb;
+			}
+
 			&:focus-visible {
 				outline: none;
 				border-color: #3b82f6;
@@ -269,6 +274,10 @@
 			&:focus-visible {
 				outline: none;
 				border-color: #1b7ee6;
+			}
+
+			&:active:not(:disabled) {
+				background: #1669bb;
 			}
 
 			&:disabled {
