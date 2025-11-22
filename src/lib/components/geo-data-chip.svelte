@@ -46,6 +46,7 @@
 		text-overflow: ellipsis;
 		border-radius: 100vmax;
 		cursor: pointer;
+		font-size: 13px;
 
 		background-color: rgba(30, 225, 90, 0.1);
 		color: rgb(35, 190, 85);

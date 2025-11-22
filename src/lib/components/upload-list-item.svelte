@@ -160,21 +160,17 @@
 	}
 
 	.card-header {
-		margin-bottom: 4px;
+		margin-bottom: 3px;
 
 		h3 {
 			max-width: 300px;
-			text-overflow: ellipsis;
-			font-size: 15px;
+			font-size: 14px;
 			font-weight: 500;
 			color: rgb(32, 33, 36);
 			margin: 0;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
-
-			font-size: 16px;
-			color: rgb(32, 33, 36);
 		}
 	}
 

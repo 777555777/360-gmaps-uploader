@@ -138,8 +138,15 @@
 	});
 </script>
 
-<div class="map-container">
+<div class="map-container" style="anchor-name: --map-anchor;">
 	<div bind:this={mapContainer} class="map"></div>
+
+	{#if mapState.isPickingLocation}
+		<div id="picker-popover" class="show" style="position-anchor: --map-anchor;">
+			<span>Click on the map to set location</span>
+			<button class="cancel-btn" onclick={() => mapState.stopPickingLocation()}>Cancel</button>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -238,5 +245,56 @@
 
 	:global(.custom-marker:hover svg) {
 		transform: scale(1.1);
+	}
+
+	/* Picker Mode Popover */
+	#picker-popover {
+		--popover-width: 320px;
+		width: var(--popover-width);
+		position: absolute;
+		bottom: anchor(bottom);
+		right: calc(anchor(center) - var(--popover-width) / 2);
+		margin-bottom: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		padding: 14px 20px;
+
+		background-color: rgb(32, 33, 36);
+		color: white;
+		border-radius: 8px;
+		box-shadow:
+			0 2px 4px rgba(0, 0, 0, 0.2),
+			0 4px 8px rgba(0, 0, 0, 0.15);
+
+		font-size: 14px;
+		font-weight: 400;
+
+		transition:
+			transform 0.3s ease-out,
+			opacity 0.3s ease-out;
+		opacity: 0;
+	}
+
+	#picker-popover.show {
+		opacity: 1;
+	}
+
+	.cancel-btn {
+		flex-shrink: 0;
+		padding: 6px 12px;
+		background-color: rgba(255, 255, 255, 0.15);
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	.cancel-btn:hover {
+		background-color: rgba(255, 255, 255, 0.25);
 	}
 </style>

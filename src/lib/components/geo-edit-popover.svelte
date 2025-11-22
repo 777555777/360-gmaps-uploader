@@ -102,7 +102,10 @@
 					aria-label="Pick location from map"
 					onclick={handlePickFromMap}
 					title="Pick location from map"
+					popovertarget="geo-popover-{index}"
+					popovertargetaction="hide"
 				>
+					<!-- Crosshair icon -->
 					<svg
 						class="svg-icon"
 						xmlns="http://www.w3.org/2000/svg"
@@ -232,7 +235,8 @@
 				border: 1px solid #d1d5db;
 				border-radius: 999px;
 				width: 100%;
-				font-size: 14px;
+				max-width: 10rem;
+				font-size: 13px;
 				font-family: inherit;
 				transition:
 					border-color 0.15s ease,
@@ -260,7 +264,7 @@
 			border-radius: 100vmax;
 			border: 2px solid transparent;
 			cursor: pointer;
-			font-size: 0.875rem;
+			font-size: 13px;
 			flex-shrink: 0;
 			box-shadow:
 				0 2px 3px 0 rgba(60, 64, 67, 0.3),

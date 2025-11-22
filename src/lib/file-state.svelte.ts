@@ -23,6 +23,9 @@ class FileState {
 	// Reactive Map für Metadata-Fehler
 	metadataErrors = new SvelteMap<File, string>();
 
+	// Panorama Viewer State
+	currentPanoramaFile = $state<File | null>(null);
+
 	// Queue-System für throttled Metadata-Extraktion
 	private metadataQueue: File[] = [];
 	private activeExtractions = 0;
@@ -179,6 +182,15 @@ class FileState {
 
 	get selectedFileList(): File[] {
 		return Array.from(this.selectedFiles);
+	}
+
+	// Panorama Viewer Methods
+	openPanorama(file: File): void {
+		this.currentPanoramaFile = file;
+	}
+
+	closePanorama(): void {
+		this.currentPanoramaFile = null;
 	}
 }
 

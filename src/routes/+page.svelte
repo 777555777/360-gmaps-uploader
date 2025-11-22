@@ -4,15 +4,26 @@
 	import Header from '$lib/components/header.svelte';
 	import Sidebar from '$lib/components/sidebar.svelte';
 	import Dialog from '$lib/components/dialog.svelte';
-	import { PUBLISH_DIALOG_ID, UPLOAD_DIALOG_ID } from '$lib/globals';
+	import PanoViewer from '$lib/components/pano-viewer.svelte';
+	import { PUBLISH_DIALOG_ID, UPLOAD_DIALOG_ID, PANO_VIEWER_DIALOG_ID } from '$lib/globals';
 	import UploadArea from '$lib/components/upload-area.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
-	import { closeDialogById } from '$lib/utils/dialog-helpers';
+	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
 	import { authState } from '$lib/auth-state.svelte';
 	import LoginBtn from '$lib/components/login-btn.svelte';
 
 	let selectedFiles = $derived(fileState.selectedFiles);
+	let currentPanoramaFile = $derived(fileState.currentPanoramaFile);
+
+	// Reaktiv den Dialog öffnen/schließen wenn sich currentPanoramaFile ändert
+	$effect(() => {
+		if (currentPanoramaFile) {
+			showDialogById(PANO_VIEWER_DIALOG_ID);
+		} else {
+			closeDialogById(PANO_VIEWER_DIALOG_ID);
+		}
+	});
 
 	function clearUploadedFiles() {
 		const filesToRemove = Array.from(selectedFiles);
@@ -43,8 +54,21 @@
 
 		window.addEventListener('pointerdown', handleGlobalPointerDown);
 
+		// Listener für Dialog-Close-Event um den fileState zu clearen
+		const panoDialog = document.getElementById(PANO_VIEWER_DIALOG_ID);
+		function handleDialogClose() {
+			fileState.closePanorama();
+		}
+
+		if (panoDialog instanceof HTMLDialogElement) {
+			panoDialog.addEventListener('close', handleDialogClose);
+		}
+
 		return () => {
 			window.removeEventListener('pointerdown', handleGlobalPointerDown);
+			if (panoDialog instanceof HTMLDialogElement) {
+				panoDialog.removeEventListener('close', handleDialogClose);
+			}
 		};
 	});
 </script>
@@ -76,6 +100,12 @@
 	</div>
 {/snippet}
 
+{#snippet panoViewerDialogContent()}
+	{#if currentPanoramaFile}
+		<PanoViewer file={currentPanoramaFile} />
+	{/if}
+{/snippet}
+
 <Header />
 
 <main>
@@ -83,6 +113,11 @@
 	<Map />
 	<Dialog dialogId={UPLOAD_DIALOG_ID} title="360 Photo Upload" body={uploadDialogContent} />
 	<Dialog dialogId={PUBLISH_DIALOG_ID} title="Publish Photos" body={publishDialogContent} />
+	<Dialog
+		dialogId={PANO_VIEWER_DIALOG_ID}
+		title={currentPanoramaFile?.name || '360° Panorama'}
+		body={panoViewerDialogContent}
+	/>
 </main>
 
 <style>
@@ -106,6 +141,17 @@
 		place-items: center;
 		gap: 0.75rem;
 		padding-block: 0.75rem;
+	}
+
+	/* Spezielle Styles für den Panorama Viewer Dialog */
+	:global(#pano-viewer-dialog) {
+		max-width: 95vw;
+		width: 1200px;
+		max-height: 90vh;
+	}
+
+	:global(#pano-viewer-dialog .dialog-body) {
+		padding: 0;
 	}
 
 	@media (width < 768px) {
