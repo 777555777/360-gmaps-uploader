@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { mapState } from '$lib/map-state.svelte';
+
 	let { index, initialLat, initialLng, onSave } = $props();
 
 	// Format initial coordinates as "lat, lng" (Google Maps format)
@@ -67,6 +69,15 @@
 		}
 	}
 
+	function handlePickFromMap() {
+		// Starte Picking-Mode mit Callback
+		mapState.startPickingLocation((lat, lng) => {
+			// Setze die Koordinaten und wende sie direkt an
+			const coords = { latitude: lat, longitude: lng };
+			onSave(coords);
+		});
+	}
+
 	// Update input when initial values change
 	$effect(() => {
 		if (initialLat !== undefined && initialLng !== undefined) {
@@ -85,7 +96,13 @@
 	<div class="geo-inputs">
 		<div class="top-row">
 			<div class="input-options">
-				<button class="geo-btn icon-btn" type="button" aria-label="Location icon" disabled>
+				<button
+					class="geo-btn icon-btn"
+					type="button"
+					aria-label="Pick location from map"
+					onclick={handlePickFromMap}
+					title="Pick location from map"
+				>
 					<svg
 						class="svg-icon"
 						xmlns="http://www.w3.org/2000/svg"
@@ -158,7 +175,7 @@
 			align-items: center;
 			justify-content: center;
 			border: none;
-			cursor: default;
+			cursor: pointer;
 			padding: 0;
 			background-color: #fff;
 			border-radius: 100vmax;

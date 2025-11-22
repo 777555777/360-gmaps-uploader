@@ -12,6 +12,10 @@ class MapState {
 	// Aktuell fokussiertes File (für Karten-Hervorhebung)
 	focusedFile = $state<File | null>(null);
 
+	// Koordinaten-Picking-Mode (für Geo-Edit aus Popover)
+	isPickingLocation = $state<boolean>(false);
+	pickingCallback = $state<((lat: number, lng: number) => void) | null>(null);
+
 	clearFocus(closePopup: boolean = true): void {
 		if (closePopup) {
 			this.map?.closePopup();
@@ -185,6 +189,26 @@ class MapState {
 
 	isFocused(file: File): boolean {
 		return this.focusedFile === file;
+	}
+
+	// Aktiviere Koordinaten-Picking-Mode
+	startPickingLocation(callback: (lat: number, lng: number) => void): void {
+		this.isPickingLocation = true;
+		this.pickingCallback = callback;
+	}
+
+	// Deaktiviere Koordinaten-Picking-Mode
+	stopPickingLocation(): void {
+		this.isPickingLocation = false;
+		this.pickingCallback = null;
+	}
+
+	// Führe Picking-Callback aus (wird von Map-Komponente aufgerufen)
+	executePickingCallback(lat: number, lng: number): void {
+		if (this.pickingCallback) {
+			this.pickingCallback(lat, lng);
+			this.stopPickingLocation();
+		}
 	}
 }
 
