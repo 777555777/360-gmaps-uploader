@@ -10,7 +10,7 @@
 			<h2 class="dialog-title">{title}</h2>
 		{/if}
 		<button class="clickable-icon" commandfor={dialogId} command="close" aria-label="Schließen">
-			<X size={20} />
+			<X size={24} />
 		</button>
 	</div>
 

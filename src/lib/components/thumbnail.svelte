@@ -49,21 +49,21 @@
 	{/if}
 
 	<button
-		class="clickable-icon close-btn-overlay delete-btn"
+		class="clickable-icon btn-overlay delete-btn"
 		style="position-anchor: --image-anchor-{index}"
 		aria-label="Löschen"
 		onclick={onRemove}
 	>
-		<Trash2 size={20} />
+		<Trash2 size={22} />
 	</button>
 
 	<button
-		class="clickable-icon close-btn-overlay view-btn"
+		class="clickable-icon btn-overlay view-btn"
 		style="position-anchor: --image-anchor-{index}"
 		aria-label="View as 360 panorama"
 		onclick={() => fileState.openPanorama(file)}
 	>
-		<ImagePlay size={20} />
+		<ImagePlay size={22} />
 	</button>
 </div>
 
@@ -110,10 +110,18 @@
 		color: rgb(95, 99, 104);
 	}
 
-	.close-btn-overlay {
+	.btn-overlay {
 		/* Overlay-spezifisches Styling */
 		background-color: rgba(75, 75, 75, 0.75);
-		color: white;
+		color: #fff;
+
+		&:hover {
+			background-color: rgba(60, 60, 60, 0.9);
+		}
+
+		&:active {
+			background-color: rgba(50, 50, 50, 0.9);
+		}
 	}
 
 	.spinner {
