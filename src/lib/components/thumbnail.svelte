@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getThumbnail } from '$lib/utils/image-helpers';
 	import { fileState } from '$lib/file-state.svelte';
-	import { ImagePlay, Trash2, X } from '@lucide/svelte';
+	import { ImagePlay, Trash2 } from '@lucide/svelte';
 
 	let { file, index, onRemove } = $props<{
 		file: File;
@@ -48,37 +48,44 @@
 		<img src={thumbUrl} alt={file.name} style="anchor-name: --image-anchor-{index}" />
 	{/if}
 
-	<div class="thumbnail-actions" style="position-anchor: --image-anchor-{index}">
-		<button class="clickable-icon close-btn-overlay" aria-label="Löschen" onclick={onRemove}>
-			<Trash2 size={20} />
-		</button>
+	<button
+		class="clickable-icon close-btn-overlay delete-btn"
+		style="position-anchor: --image-anchor-{index}"
+		aria-label="Löschen"
+		onclick={onRemove}
+	>
+		<Trash2 size={20} />
+	</button>
 
-		<button
-			class="clickable-icon close-btn-overlay"
-			aria-label="View as 360 panorama"
-			onclick={() => fileState.openPanorama(file)}
-		>
-			<ImagePlay size={20} />
-		</button>
-	</div>
+	<button
+		class="clickable-icon close-btn-overlay view-btn"
+		style="position-anchor: --image-anchor-{index}"
+		aria-label="View as 360 panorama"
+		onclick={() => fileState.openPanorama(file)}
+	>
+		<ImagePlay size={20} />
+	</button>
 </div>
 
 <style>
-	.thumbnail-actions {
-		/* CSS Anchor Positioning */
-		position: absolute;
-		/* position-anchor wird inline per style="{index}" gesetzt */
+	.thumbnail-container {
+		button {
+			position: absolute;
+			top: anchor(top);
+			margin-top: 8px;
+		}
 
-		/* Positionierung: Top-Right mit 8px Abstand */
-		top: anchor(top);
-		right: anchor(right);
-		margin-top: 8px;
-		margin-right: 8px;
+		.delete-btn {
+			left: anchor(left);
+			margin-inline: 8px;
+		}
 
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
+		.view-btn {
+			right: anchor(right);
+			margin-inline: 8px;
+		}
 	}
+
 	.thumbnail-container {
 		position: relative;
 	}

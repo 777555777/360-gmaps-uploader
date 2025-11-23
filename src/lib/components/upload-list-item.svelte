@@ -212,9 +212,5 @@
 		color: hsl(0, 75%, 50%);
 		border: 1px solid hsl(0, 75%, 50%);
 		background-color: hsl(0, 75%, 50%, 0.125);
-
-		svg {
-			stroke: hsl(0, 75%, 50%);
-		}
 	}
 </style>
