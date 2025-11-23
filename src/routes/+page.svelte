@@ -3,7 +3,7 @@
 	import Map from '$lib/components/map.svelte';
 	import Header from '$lib/components/header.svelte';
 	import Sidebar from '$lib/components/sidebar.svelte';
-	import Dialog from '$lib/components/dialog.svelte';
+	import Dialog from '$lib/components/util/dialog.svelte';
 	import PanoViewer from '$lib/components/pano-viewer.svelte';
 	import {
 		PUBLISH_DIALOG_ID,
@@ -11,12 +11,12 @@
 		PANO_VIEWER_DIALOG_ID,
 		MAX_FILES_UPLOAD
 	} from '$lib/globals';
-	import UploadArea from '$lib/components/upload-area.svelte';
+	import UploadArea from '$lib/components/upload-list/upload-area.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
 	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
 	import { authState } from '$lib/auth-state.svelte';
-	import LoginBtn from '$lib/components/login-btn.svelte';
+	import LoginBtn from '$lib/components/auth/login-btn.svelte';
 
 	let selectedFiles = $derived(fileState.selectedFiles);
 	let currentPanoramaFile = $derived(fileState.currentPanoramaFile);

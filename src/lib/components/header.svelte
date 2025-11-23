@@ -2,8 +2,8 @@
 	import { onMount } from 'svelte';
 	import { authState } from '$lib/auth-state.svelte';
 	import logo from '$lib/assets/icon-32x32.png';
-	import LoginBtn from './login-btn.svelte';
-	import LogoutBtn from './logout-btn.svelte';
+	import LoginBtn from './auth/login-btn.svelte';
+	import LogoutBtn from './auth/logout-btn.svelte';
 
 	const GOOGLE_CLIENT_ID =
 		'366080807482-blfdpr7mcl9filupgplomhfpajur01iu.apps.googleusercontent.com';

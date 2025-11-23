@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PUBLISH_DIALOG_ID, UPLOAD_DIALOG_ID } from '$lib/globals';
-	import UploadList from './upload-list.svelte';
+	import UploadList from './upload-list/upload-list.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { Plus, Upload } from '@lucide/svelte';
 
