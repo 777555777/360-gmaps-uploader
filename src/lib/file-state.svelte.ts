@@ -131,14 +131,7 @@ class FileState {
 			if (typeof window !== 'undefined') {
 				import('leaflet').then((Leaflet) => {
 					const isSelected = this.isSelected(file);
-					mapState.updateMarkerPosition(
-						file,
-						latitude,
-						longitude,
-						Leaflet,
-						isSelected,
-						newMetadata.fileSizeFormatted
-					);
+					mapState.updateMarkerPosition(file, Leaflet, isSelected, newMetadata);
 				});
 			}
 		}

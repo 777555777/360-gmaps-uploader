@@ -46,14 +46,7 @@
 				const metadata = fileState.getMetadata(file);
 				if (metadata?.geoLocation) {
 					const isSelected = fileState.isSelected(file);
-					mapState.addMarker(
-						file,
-						metadata.geoLocation.latitude,
-						metadata.geoLocation.longitude,
-						Leaflet,
-						isSelected,
-						metadata.fileSizeFormatted
-					);
+					mapState.addMarker(file, Leaflet, isSelected, metadata);
 				}
 			}
 		})();
@@ -117,14 +110,7 @@
 					if (!existingMarker || hasPositionChanged) {
 						// Marker existiert noch nicht oder Position hat sich geändert - erstelle/aktualisiere ihn
 						console.log('Adding/updating marker for file:', file.name, metadata.geoLocation);
-						mapState.addMarker(
-							file,
-							metadata.geoLocation.latitude,
-							metadata.geoLocation.longitude,
-							Leaflet,
-							isSelected,
-							metadata.fileSizeFormatted
-						);
+						mapState.addMarker(file, Leaflet, isSelected, metadata);
 					} else {
 						// Marker existiert und Position unverändert - aktualisiere nur die Farbe
 						mapState.updateMarkerColor(file, isSelected, Leaflet);
@@ -213,7 +199,9 @@
 	}
 
 	:global(.popup-geo-data),
-	:global(.popup-file-size) {
+	:global(.popup-file-size),
+	:global(.popup-datetime),
+	:global(.popup-camera) {
 		display: flex;
 		align-items: center;
 		gap: 6px;

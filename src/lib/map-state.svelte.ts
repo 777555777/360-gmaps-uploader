@@ -1,6 +1,7 @@
 import type * as Leaflet from 'leaflet';
 import { SvelteMap } from 'svelte/reactivity';
 import { createMarkerPopupHTML } from './utils/marker-popup';
+import type { ImageMetadata } from './utils/image-helpers';
 
 class MapState {
 	// Leaflet Map Instanz
@@ -63,13 +64,13 @@ class MapState {
 	// Füge einen Marker für ein File hinzu
 	addMarker(
 		file: File,
-		lat: number,
-		lng: number,
 		Leaflet: typeof import('leaflet'),
-		isSelected: boolean = false,
-		fileSize?: string
+		isSelected: boolean,
+		metadata: ImageMetadata
 	): void {
-		if (!this.map) return;
+		if (!this.map || !metadata.geoLocation) return;
+
+		const { latitude, longitude } = metadata.geoLocation;
 
 		// Entferne existierenden Marker falls vorhanden
 		this.removeMarker(file);
@@ -78,13 +79,15 @@ class MapState {
 		const icon = this.createMarkerIcon(Leaflet, isSelected);
 
 		// Erstelle formatierten Popup-Content
-		const popupContent = createMarkerPopupHTML(file.name, lat, lng, fileSize);
+		const popupContent = createMarkerPopupHTML(metadata);
 
 		// Erstelle neuen Marker
-		const marker = Leaflet.marker([lat, lng], { icon }).addTo(this.map).bindPopup(popupContent, {
-			maxWidth: 300,
-			className: 'custom-popup'
-		});
+		const marker = Leaflet.marker([latitude, longitude], { icon })
+			.addTo(this.map)
+			.bindPopup(popupContent, {
+				maxWidth: 300,
+				className: 'custom-popup'
+			});
 
 		marker.on('click', (event: Leaflet.LeafletMouseEvent) => {
 			event.originalEvent?.stopPropagation?.();
@@ -116,20 +119,20 @@ class MapState {
 	// Aktualisiere Marker-Position (wird synchron aufgerufen bei Geo-Änderungen)
 	updateMarkerPosition(
 		file: File,
-		lat: number,
-		lng: number,
 		Leaflet: typeof import('leaflet'),
 		isSelected: boolean,
-		fileSize?: string
+		metadata: ImageMetadata
 	): void {
-		if (!this.map) return;
+		if (!this.map || !metadata.geoLocation) return;
+
+		const { latitude, longitude } = metadata.geoLocation;
 
 		// Entferne alten Marker und erstelle neuen mit neuer Position
 		const oldMarker = this.markers.get(file);
 		if (oldMarker) {
 			// Prüfe ob sich die Position wirklich geändert hat
 			const oldLatLng = oldMarker.getLatLng();
-			if (oldLatLng.lat === lat && oldLatLng.lng === lng) {
+			if (oldLatLng.lat === latitude && oldLatLng.lng === longitude) {
 				// Position unverändert, nur Farbe aktualisieren
 				this.updateMarkerColor(file, isSelected, Leaflet);
 				return;
@@ -137,7 +140,7 @@ class MapState {
 		}
 
 		// Position hat sich geändert oder Marker existiert nicht - neu erstellen
-		this.addMarker(file, lat, lng, Leaflet, isSelected, fileSize);
+		this.addMarker(file, Leaflet, isSelected, metadata);
 	}
 
 	// Entferne einen Marker
@@ -165,7 +168,7 @@ class MapState {
 		if (marker && this.map) {
 			this.focusedFile = file;
 			const latLng = marker.getLatLng();
-			this.focusLocation(latLng.lat, latLng.lng, 18);
+			this.focusLocation(latLng.lat, latLng.lng);
 
 			// Öffne Popup nach kurzer Verzögerung (für smooth animation)
 			setTimeout(() => {
