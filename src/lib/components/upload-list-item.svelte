@@ -84,7 +84,7 @@
 			</div>
 			<div class="card-footer">
 				{#if metadataError}
-					<div class="error-state">
+					<div class="metadata-chip-error-state">
 						<ShieldAlert size={18} />
 						<span>{metadataError}</span>
 					</div>
@@ -194,23 +194,22 @@
 
 	/* ====================== */
 
-	.error-state {
+	.metadata-chip-error-state {
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		gap: 6px;
+		padding: 4px 8px;
+		border-radius: 6px;
+		border: none;
+		max-width: 14rem;
+		text-overflow: ellipsis;
+		border-radius: 100vmax;
+		cursor: pointer;
+		font-size: 13px;
+		line-height: normal;
+
+		background-color: rgba(223, 32, 32, 0.1);
 		color: rgb(223, 32, 32);
-		font-size: 0.75rem;
-		font-style: italic;
-
-		.svg-icon {
-			flex-shrink: 0;
-		}
-	}
-
-	/* ====================== */
-	.error-state {
-		color: hsl(0, 75%, 50%);
-		border: 1px solid hsl(0, 75%, 50%);
-		background-color: hsl(0, 75%, 50%, 0.125);
 	}
 </style>

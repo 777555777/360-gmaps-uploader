@@ -64,8 +64,8 @@ class FileState {
 					this.metadataErrors.delete(file);
 				})
 				.catch((error) => {
-					console.error(`Metadata extraction failed for ${file.name}:`, error);
-					this.metadataErrors.set(file, 'Metadaten konnten nicht geladen werden');
+					console.error(`Could not read metadata for ${file.name}:`, error);
+					this.metadataErrors.set(file, 'Could not read metadata');
 				})
 				.finally(() => {
 					this.activeExtractions--;

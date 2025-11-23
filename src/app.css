@@ -32,8 +32,21 @@ body {
 	src: url('/open_sans/open-sans-italic-vf.woff2') format('woff2');
 }
 
-body {
+:root,
+html {
 	font-family: 'Open Sans', sans-serif;
+}
+
+body,
+button,
+input,
+optgroup,
+select,
+textarea {
+	font-family: inherit;
+}
+
+body {
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
 	display: flex;

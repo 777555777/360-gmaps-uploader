@@ -35,13 +35,10 @@
 		border-radius: 100vmax;
 		cursor: pointer;
 		font-size: 13px;
+		line-height: normal;
 
 		background-color: rgba(30, 225, 90, 0.1);
 		color: rgb(35, 190, 85);
-
-		svg {
-			stroke: rgb(35, 190, 85);
-		}
 
 		&:hover {
 			background-color: rgba(30, 225, 90, 0.15);
@@ -53,11 +50,6 @@
 
 		&:focus-visible {
 			outline: 2px solid rgb(35, 190, 85);
-		}
-
-		.svg-icon {
-			flex-shrink: 0;
-			color: rgb(95, 99, 104);
 		}
 
 		.coordinates {
@@ -74,10 +66,6 @@
 	.geo-data:has(.no-data) {
 		background-color: rgba(223, 32, 32, 0.1);
 		color: rgb(223, 32, 32);
-
-		svg {
-			stroke: rgb(223, 32, 32);
-		}
 
 		&:hover {
 			background-color: rgba(223, 32, 32, 0.15);
