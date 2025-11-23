@@ -1,3 +1,6 @@
+const markerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>`;
+const fileSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text-icon lucide-file-text"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`;
+
 /**
  * Erstellt HTML für ein Leaflet Marker-Popup im gleichen Stil wie die Upload-Card
  */
@@ -14,54 +17,14 @@ export function createMarkerPopupHTML(
 			</div>
 			<div class="popup-body" style="align-items: center;">
 				<div class="popup-geo-data">
-					<svg
-						class="popup-icon"
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-						<circle cx="12" cy="10" r="3"></circle>
-					</svg>
+				${markerSvg}
 					<div class="popup-coordinates">
 						<span>${latitude.toFixed(5)}°</span>
 						<span class="popup-separator">|</span>
 						<span>${longitude.toFixed(5)}°</span>
 					</div>
 				</div>
-				${
-					fileSize
-						? `
-				<div class="popup-file-size">
-					<svg
-						class="popup-icon"
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-						<polyline points="14 2 14 8 20 8"></polyline>
-						<line x1="16" y1="13" x2="8" y2="13"></line>
-						<line x1="16" y1="17" x2="8" y2="17"></line>
-						<line x1="10" y1="9" x2="8" y2="9"></line>
-					</svg>
-					<span>${fileSize}</span>
-				</div>
-				`
-						: ''
-				}
+				${fileSize ? `<div class="popup-file-size">${fileSvg}<span>${fileSize}</span></div>` : ''}
 			</div>
 		</div>
 	`;

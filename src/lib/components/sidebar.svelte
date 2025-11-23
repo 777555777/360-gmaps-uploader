@@ -2,6 +2,7 @@
 	import { PUBLISH_DIALOG_ID, UPLOAD_DIALOG_ID } from '$lib/globals';
 	import UploadList from './upload-list.svelte';
 	import { fileState } from '$lib/file-state.svelte';
+	import { Plus, Upload } from '@lucide/svelte';
 
 	let hasSelection = $derived(fileState.hasSelection);
 	let selectedFiles = $derived(fileState.selectedFiles);
@@ -10,21 +11,7 @@
 <aside>
 	<div class="sidebar-option-header">
 		<button class="upload-btn" commandfor={UPLOAD_DIALOG_ID} command="show-modal">
-			<!-- plus icon -->
-			<svg
-				class="svg-icon"
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 28 28"
-				fill="none"
-				stroke="currentColor"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<line x1="14" y1="7" x2="14" y2="21"></line>
-				<line x1="7" y1="14" x2="21" y2="14"></line>
-			</svg>
+			<Plus size={20} />
 			<span>Add 360-Photo</span>
 		</button>
 
@@ -34,23 +21,7 @@
 			commandfor={PUBLISH_DIALOG_ID}
 			command="show-modal"
 		>
-			<!-- publish icon -->
-			<svg
-				class="svg-icon"
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-				<polyline points="17 8 12 3 7 8"></polyline>
-				<line x1="12" y1="3" x2="12" y2="15"></line>
-			</svg>
-
+			<Upload size={20} />
 			<span>Publish ({selectedFiles.size})</span>
 		</button>
 	</div>
@@ -112,13 +83,6 @@
 					margin-left: 16px;
 				}
 
-				.svg-icon {
-					width: 24px;
-					height: 24px;
-					flex-shrink: 0;
-					stroke-width: 2;
-				}
-
 				span {
 					margin-right: 6px;
 					line-height: 1;
@@ -127,10 +91,6 @@
 				&:hover {
 					background-color: #3b82f633;
 					color: #3b82f6;
-
-					.svg-icon {
-						color: #3b82f6;
-					}
 				}
 
 				&:focus-visible {
@@ -144,10 +104,6 @@
 					box-shadow:
 						0 1px 3px 0 rgba(60, 64, 67, 0.3),
 						0 4px 8px 3px rgba(60, 64, 67, 0.15);
-
-					.svg-icon {
-						color: #3b82f6;
-					}
 				}
 
 				&:active {
@@ -160,10 +116,6 @@
 					box-shadow:
 						0 4px 4px 0 rgba(60, 64, 67, 0.3),
 						0 8px 12px 6px rgba(60, 64, 67, 0.15);
-
-					.svg-icon {
-						color: #3b82f6;
-					}
 				}
 
 				&:disabled {

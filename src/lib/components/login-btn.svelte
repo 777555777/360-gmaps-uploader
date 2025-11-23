@@ -8,6 +8,7 @@
 
 <button class="google-btn" onclick={handleSignIn} aria-label="Sign in with Google">
 	<div class="google-btn-icon">
+		<!-- Google Logo -->
 		<svg viewBox="0 0 24 24" class="google-svg">
 			<path
 				fill="#4285F4"

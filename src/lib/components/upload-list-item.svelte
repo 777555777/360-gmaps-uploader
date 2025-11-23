@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
+	import { ShieldAlert } from '@lucide/svelte';
 	import GeoDataChip from './geo-data-chip.svelte';
 	import GeoEditPopover from './geo-edit-popover.svelte';
 	import Thumbnail from './thumbnail.svelte';
@@ -81,24 +82,10 @@
 			<div class="card-header">
 				<h3>{file.name}</h3>
 			</div>
-
 			<div class="card-footer">
 				{#if metadataError}
 					<div class="error-state">
-						<svg
-							class="svg-icon"
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-						>
-							<circle cx="12" cy="12" r="10"></circle>
-							<line x1="12" y1="8" x2="12" y2="12"></line>
-							<line x1="12" y1="16" x2="12.01" y2="16"></line>
-						</svg>
+						<ShieldAlert size={18} />
 						<span>{metadataError}</span>
 					</div>
 				{:else if isLoading}

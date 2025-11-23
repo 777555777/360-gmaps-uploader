@@ -3,6 +3,7 @@
 	import { MAX_FILES_UPLOAD, UPLOAD_DIALOG_ID } from '$lib/globals';
 	import { closeDialogById } from '$lib/utils/dialog-helpers';
 	import { validateStreetViewImage } from '$lib/utils/image-helpers';
+	import { Upload } from '@lucide/svelte';
 
 	let isDragging = $state(false);
 	let fileInput: HTMLInputElement | undefined;
@@ -94,21 +95,7 @@
 	tabindex="0"
 	onkeydown={(e) => e.key === 'Enter' && handleClick()}
 >
-	<!-- publish icon -->
-	<svg
-		class="svg-icon"
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		stroke-width="2"
-		stroke-linecap="round"
-		stroke-linejoin="round"
-	>
-		<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-		<polyline points="17 8 12 3 7 8"></polyline>
-		<line x1="12" y1="3" x2="12" y2="15"></line>
-	</svg>
+	<Upload size={48} />
 
 	<p class="upload-title">Bilder hier ablegen oder klicken zum Hochladen</p>
 	<p class="upload-hint">Unterstützte Formate: JPG, PNG, WebP</p>
@@ -137,33 +124,19 @@
 		cursor: pointer;
 		transition: all 0.2s ease;
 		min-height: 240px;
+		color: var(--text-color);
 	}
 
-	.upload-area:hover {
+	.upload-area:hover,
+	.upload-area.dragging {
 		border-color: #94a3b8;
 		background-color: #f1f5f9;
+		color: #3b82f6;
 	}
 
 	.upload-area:focus {
 		outline: 2px solid #3b82f6;
 		outline-offset: 2px;
-	}
-
-	.upload-area.dragging {
-		border-color: #3b82f6;
-		background-color: #eff6ff;
-	}
-
-	.svg-icon {
-		width: 48px;
-		height: 48px;
-		color: #64748b;
-		transition: color 0.2s ease;
-	}
-
-	.upload-area:hover .svg-icon,
-	.upload-area.dragging .svg-icon {
-		color: #3b82f6;
 	}
 
 	.upload-title {
