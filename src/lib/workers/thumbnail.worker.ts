@@ -1,7 +1,7 @@
 /**
  * Thumbnail Worker
- * Generiert Thumbnails in einem separaten Thread
- * um den Main Thread nicht zu blockieren.
+ * Generates thumbnails in a separate thread
+ * to avoid blocking the main thread.
  */
 
 export interface ThumbnailRequest {
@@ -14,7 +14,7 @@ export interface ThumbnailRequest {
 export interface ThumbnailResponse {
 	id: string;
 	success: boolean;
-	thumbnail?: ArrayBuffer; // JPEG Blob als ArrayBuffer
+	thumbnail?: ArrayBuffer; // JPEG Blob as ArrayBuffer
 	error?: string;
 }
 
@@ -22,51 +22,51 @@ self.onmessage = async (event: MessageEvent<ThumbnailRequest>) => {
 	const { id, fileData, maxSize } = event.data;
 
 	try {
-		// 1. Erstelle Blob aus ArrayBuffer
+		// 1. Create blob from ArrayBuffer
 		const blob = new Blob([fileData], { type: 'image/jpeg' });
 
-		// 2. Erstelle ImageBitmap (effizient, kein DOM)
+		// 2. Create ImageBitmap (efficient, no DOM)
 		const bitmap = await createImageBitmap(blob);
 
-		// 3. Berechne Skalierung
+		// 3. Calculate scaling
 		const scale = Math.min(maxSize / bitmap.width, maxSize / bitmap.height);
 		const width = Math.floor(bitmap.width * scale);
 		const height = Math.floor(bitmap.height * scale);
 
-		// 4. Erstelle OffscreenCanvas (Worker-kompatibel)
+		// 4. Create OffscreenCanvas (worker-compatible)
 		const canvas = new OffscreenCanvas(width, height);
 		const ctx = canvas.getContext('2d');
 
 		if (!ctx) {
-			throw new Error('Canvas context nicht verfügbar');
+			throw new Error('Canvas context not available');
 		}
 
-		// 5. Zeichne Thumbnail
+		// 5. Draw thumbnail
 		ctx.drawImage(bitmap, 0, 0, width, height);
 
-		// 6. Cleanup Bitmap
+		// 6. Cleanup bitmap
 		bitmap.close();
 
-		// 7. Konvertiere zu Blob (JPEG komprimiert)
+		// 7. Convert to Blob (JPEG compressed)
 		const thumbnailBlob = await canvas.convertToBlob({
 			type: 'image/jpeg',
 			quality: 0.85
 		});
 
-		// 8. Konvertiere Blob zu ArrayBuffer (effizienter Transfer)
+		// 8. Convert Blob to ArrayBuffer (more efficient transfer)
 		const arrayBuffer = await thumbnailBlob.arrayBuffer();
 
-		// 9. Sende Response mit Transferable (Ownership-Transfer)
+		// 9. Send response with Transferable (ownership transfer)
 		const response: ThumbnailResponse = {
 			id,
 			success: true,
 			thumbnail: arrayBuffer
 		};
 
-		// Transfer ArrayBuffer zurück (Zero-Copy)
+		// Transfer ArrayBuffer back (Zero-Copy)
 		self.postMessage(response, { transfer: [arrayBuffer] });
 	} catch (error) {
-		// Sende Fehler-Response
+		// Send error response
 		const response: ThumbnailResponse = {
 			id,
 			success: false,

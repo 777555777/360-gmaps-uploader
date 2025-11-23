@@ -13,7 +13,7 @@
 	let isLoading = $state(true);
 	let hasError = $state(false);
 
-	// Erstelle Object URL für das Bild und räume auf
+	// Create object URL for the image and clean up
 	$effect(() => {
 		getThumbnail(file)
 			.then((url) => {
@@ -51,7 +51,7 @@
 	<button
 		class="clickable-icon btn-overlay delete-btn"
 		style="position-anchor: --image-anchor-{index}"
-		aria-label="Löschen"
+		aria-label="Delete"
 		onclick={onRemove}
 	>
 		<Trash2 size={22} />
@@ -96,7 +96,7 @@
 		height: 180px;
 		object-fit: cover;
 		border-radius: 8px 8px 0 0;
-		/* anchor-name wird inline per style="{index}" gesetzt */
+		/* anchor-name is set inline via style="{index}" */
 	}
 
 	.loading-indicator {
@@ -111,7 +111,6 @@
 	}
 
 	.btn-overlay {
-		/* Overlay-spezifisches Styling */
 		background-color: rgba(75, 75, 75, 0.75);
 		color: #fff;
 

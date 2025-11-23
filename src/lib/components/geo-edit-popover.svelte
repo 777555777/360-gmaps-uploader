@@ -71,9 +71,9 @@
 	}
 
 	function handlePickFromMap() {
-		// Starte Picking-Mode mit Callback
+		// Start Picking-Mode with callback
 		mapState.startPickingLocation((lat, lng) => {
-			// Setze die Koordinaten und wende sie direkt an
+			// Set coordinates and apply them directly
 			const coords = { latitude: lat, longitude: lng };
 			onSave(coords);
 		});

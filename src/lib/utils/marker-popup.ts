@@ -6,7 +6,9 @@ const cameraSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18
 import type { ImageMetadata } from './image-helpers';
 
 /**
- * Formatiert ein Date-Objekt zu einem lesbaren String
+ * Format Date Object to readable string
+ * @param date - Date object to format
+ * @returns Formatted date string
  */
 function formatDateTime(date: Date): string {
 	const options: Intl.DateTimeFormatOptions = {
@@ -20,7 +22,9 @@ function formatDateTime(date: Date): string {
 }
 
 /**
- * Erstellt HTML für ein Leaflet Marker-Popup im gleichen Stil wie die Upload-Card
+ * Creates HTML for a Leaflet Marker Popup in the same style as the Upload Card
+ * @param metadata - Image metadata
+ * @returns HTML string for the popup
  */
 export function createMarkerPopupHTML(metadata: ImageMetadata): string {
 	if (!metadata.geoLocation) {
@@ -30,7 +34,7 @@ export function createMarkerPopupHTML(metadata: ImageMetadata): string {
 	const { latitude, longitude } = metadata.geoLocation;
 	const parts: string[] = [];
 
-	// GPS-Koordinaten (immer vorhanden)
+	// GPS coordinates (always present)
 	parts.push(`
 		<div class="popup-geo-data">
 			${markerSvg}
@@ -42,7 +46,7 @@ export function createMarkerPopupHTML(metadata: ImageMetadata): string {
 		</div>
 	`);
 
-	// Dateigröße
+	// File size
 	if (metadata.fileSizeFormatted) {
 		parts.push(`
 			<div class="popup-file-size">
@@ -52,7 +56,7 @@ export function createMarkerPopupHTML(metadata: ImageMetadata): string {
 		`);
 	}
 
-	// Aufnahmedatum
+	// Capture date
 	if (metadata.dateTime) {
 		parts.push(`
 			<div class="popup-datetime">
@@ -62,7 +66,7 @@ export function createMarkerPopupHTML(metadata: ImageMetadata): string {
 		`);
 	}
 
-	// Kamera-Information
+	// Camera information
 	if (metadata.make || metadata.model) {
 		const cameraInfo = [metadata.make, metadata.model].filter(Boolean).join(' ');
 		parts.push(`

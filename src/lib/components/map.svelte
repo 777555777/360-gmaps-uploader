@@ -10,14 +10,14 @@
 	`);
 
 	onMount(() => {
-		// Dynamischer Import von Leaflet (Client-side only)
+		// Dynamic import of Leaflet (client-side only)
 		(async () => {
 			const Leaflet = await import('leaflet');
 
-			// Leaflet CSS importieren
+			// Import Leaflet CSS
 			await import('leaflet/dist/leaflet.css');
 
-			// Erstelle Map mit Standardposition (Deutschland)
+			// Create map with default position (Germany)
 			const map = Leaflet.map(mapContainer).setView([50.6401, 8.5926], 13);
 
 			// OpenStreetMap Tiles
@@ -27,21 +27,21 @@
 				maxZoom: 19
 			}).addTo(map);
 
-			// Setze Map-Instanz im State
+			// Set map instance in state
 			mapState.setMap(map);
 
 			map.on('click', (e) => {
-				// Wenn wir im Picking-Mode sind, führe Callback aus
+				// If we're in picking mode, execute callback
 				if (mapState.isPickingLocation) {
 					mapState.executePickingCallback(e.latlng.lat, e.latlng.lng);
 					return;
 				}
 
-				// Ansonsten normales Verhalten
+				// Otherwise normal behavior
 				mapState.clearFocus();
 			});
 
-			// Füge Marker für alle existierenden Files mit GPS-Daten hinzu
+			// Add markers for all existing files with GPS data
 			for (const file of fileState.fileList) {
 				const metadata = fileState.getMetadata(file);
 				if (metadata?.geoLocation) {
@@ -59,7 +59,7 @@
 		};
 	});
 
-	// Reaktiv: Ändere Cursor wenn Picking-Mode aktiviert ist
+	// Reactive: Change cursor when picking mode is activated
 	$effect(() => {
 		const isPickingLocation = mapState.isPickingLocation;
 
@@ -72,7 +72,7 @@
 		}
 	});
 
-	// Reaktiv: Füge Marker hinzu wenn neue Files mit GPS-Daten geladen werden
+	// Reactive: Add markers when new files with GPS data are loaded
 	$effect(() => {
 		// Track sowohl fileList als auch loadingFiles, um auf Metadaten-Änderungen zu reagieren
 		const files = fileState.fileList;
@@ -99,7 +99,7 @@
 				const metadata = fileState.getMetadata(file);
 				const isSelected = fileState.isSelected(file);
 
-				// Prüfe ob Metadaten geladen sind
+				// Check if metadata is loaded
 				if (metadata?.geoLocation) {
 					const existingMarker = mapState.markers.get(file);
 					const hasPositionChanged = existingMarker
@@ -108,17 +108,17 @@
 						: false;
 
 					if (!existingMarker || hasPositionChanged) {
-						// Marker existiert noch nicht oder Position hat sich geändert - erstelle/aktualisiere ihn
+						// Marker doesn't exist yet or position has changed - create/update it
 						console.log('Adding/updating marker for file:', file.name, metadata.geoLocation);
 						mapState.addMarker(file, Leaflet, isSelected, metadata);
 					} else {
-						// Marker existiert und Position unverändert - aktualisiere nur die Farbe
+						// Marker exists and position unchanged - only update color
 						mapState.updateMarkerColor(file, isSelected, Leaflet);
 					}
 				}
 			}
 
-			// Entferne Marker für gelöschte Files
+			// Remove markers for deleted files
 			for (const [file] of mapState.markers) {
 				if (!fileState.hasFile(file)) {
 					mapState.removeMarker(file);
@@ -159,7 +159,7 @@
 		z-index: 0;
 	}
 
-	/* Leaflet Popup Styling anpassen */
+	/* Leaflet Popup */
 	:global(.leaflet-popup-content-wrapper) {
 		border-radius: 8px;
 		font-family: 'Open Sans', sans-serif;
@@ -171,7 +171,7 @@
 		font-size: 14px;
 	}
 
-	/* Custom Popup Content Styling */
+	/* Custom Popup Content */
 	:global(.marker-popup) {
 		min-width: 200px;
 	}
@@ -224,7 +224,7 @@
 		opacity: 0.5;
 	}
 
-	/* Custom Marker Styling */
+	/* Custom Marker */
 	:global(.custom-marker) {
 		background: none;
 		border: none;

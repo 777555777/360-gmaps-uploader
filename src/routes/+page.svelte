@@ -5,7 +5,12 @@
 	import Sidebar from '$lib/components/sidebar.svelte';
 	import Dialog from '$lib/components/dialog.svelte';
 	import PanoViewer from '$lib/components/pano-viewer.svelte';
-	import { PUBLISH_DIALOG_ID, UPLOAD_DIALOG_ID, PANO_VIEWER_DIALOG_ID } from '$lib/globals';
+	import {
+		PUBLISH_DIALOG_ID,
+		UPLOAD_DIALOG_ID,
+		PANO_VIEWER_DIALOG_ID,
+		MAX_FILES_UPLOAD
+	} from '$lib/globals';
 	import UploadArea from '$lib/components/upload-area.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
@@ -77,10 +82,10 @@
 	<div class="upload-area-container">
 		<div class="upload-instructions">
 			<p>
-				Upload a 360° image via drag and drop or click. Images with GPS metadata appear
-				automatically on the map. If location data is missing, you will need to select a position
-				manually in the next step.
+				Add between 1 and {MAX_FILES_UPLOAD} 360° panorama images. Images must be in equirectangular
+				format with a 2:1 aspect ratio.
 			</p>
+			<p>If an image has no GPS metadata, you can add it manually later.</p>
 		</div>
 
 		<UploadArea />
@@ -111,7 +116,7 @@
 <main>
 	<Sidebar />
 	<Map />
-	<Dialog dialogId={UPLOAD_DIALOG_ID} title="360 Photo Upload" body={uploadDialogContent} />
+	<Dialog dialogId={UPLOAD_DIALOG_ID} title="Add 360 Photos" body={uploadDialogContent} />
 	<Dialog dialogId={PUBLISH_DIALOG_ID} title="Publish Photos" body={publishDialogContent} />
 	<Dialog
 		dialogId={PANO_VIEWER_DIALOG_ID}

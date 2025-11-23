@@ -46,7 +46,7 @@
 
 		if (files.length > MAX_FILES_UPLOAD) {
 			alert(
-				`Sie können maximal ${MAX_FILES_UPLOAD} Dateien auf einmal hochladen. Bitte wählen Sie weniger Dateien aus.`
+				`You can upload a maximum of ${MAX_FILES_UPLOAD} files at once. Please select fewer files.`
 			);
 			return;
 		}
@@ -70,7 +70,7 @@
 		}
 
 		if (errors.length > 0) {
-			alert(`Einige Dateien konnten nicht hinzugefügt werden:\n\n${errors.join('\n\n')}`);
+			alert(`Some files could not be added:\n\n${errors.join('\n\n')}`);
 		}
 
 		if (fileInput) {
@@ -97,13 +97,17 @@
 >
 	<Upload size={48} />
 
-	<p class="upload-title">Bilder hier ablegen oder klicken zum Hochladen</p>
-	<p class="upload-hint">Unterstützte Formate: JPG, PNG, WebP</p>
+	<p class="upload-title">Add images by clicking or dragging them here</p>
+	<p class="upload-hint">
+		Your images are processed locally until you publish them to Google
+		<br />
+		Supported formats: JPG
+	</p>
 
 	<input
 		bind:this={fileInput}
 		type="file"
-		accept="image/jpeg,image/jpg,image/png,image/webp"
+		accept="image/jpeg,image/jpg"
 		multiple
 		onchange={handleFileSelect}
 		class="file-input"
@@ -150,6 +154,7 @@
 		margin: 0;
 		font-size: 14px;
 		color: #64748b;
+		text-align: center;
 	}
 
 	.file-input {

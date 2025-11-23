@@ -8,7 +8,6 @@
 
 	let { file, index } = $props();
 
-	// Derived states - zentrale Quelle für alle Zustände
 	let metadata = $derived(fileState.getMetadata(file));
 	let metadataError = $derived(fileState.getMetadataError(file));
 	let isLoading = $derived(fileState.isLoading(file));
@@ -16,7 +15,6 @@
 	let isMapFocused = $derived(mapState.isFocused(file));
 	let hasGeoData = $derived(metadata?.geoLocation !== undefined && metadata?.geoLocation !== null);
 
-	// Computed values für Template
 	let cardClasses = $derived.by(() => {
 		const classes = ['upload-item'];
 		if (hasGeoData) classes.push('has-location');
@@ -120,7 +118,7 @@
 	.upload-item {
 		border-radius: 8px;
 		border: 1px solid var(--border-accent-color);
-		/* Stellt sicher, dass Buttons innerhalb der Card bleiben */
+		/* Ensures that buttons stay within the card */
 		overflow: hidden;
 		outline: none;
 

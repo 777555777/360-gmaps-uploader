@@ -55,7 +55,6 @@
 <style>
 	.dropdown-toggle {
 		/* anchor-name is set via dynamic inline style */
-
 		border: none;
 		cursor: pointer;
 		background-color: transparent;

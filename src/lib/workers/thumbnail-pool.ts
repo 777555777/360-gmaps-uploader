@@ -1,13 +1,13 @@
 /**
  * Thumbnail Worker Pool
- * Verwaltet einen Pool von Web Workers für parallele Thumbnail-Generierung.
+ * Manages a pool of web workers for parallel thumbnail generation.
  *
  * Features:
- * - Automatisches Worker-Management
- * - Queue-basierte Job-Verteilung
- * - Promise-basierte API
- * - Graceful Shutdown
- * - Error Handling
+ * - Automatic worker management
+ * - Queue-based job distribution
+ * - Promise-based API
+ * - Graceful shutdown
+ * - Error handling
  */
 
 import type { ThumbnailRequest, ThumbnailResponse } from './thumbnail.worker';
@@ -32,31 +32,31 @@ export class ThumbnailWorkerPool {
 	private isInitialized = false;
 
 	constructor(poolSize: number = Math.min(navigator.hardwareConcurrency || 2, 4)) {
-		// Begrenze Pool-Größe (min 2, max 4 für Stabilität)
-		// Mehr Workers = mehr Overhead durch Context Switching
+		// Limit pool size (min 2, max 4 for stability)
+		// More workers = more overhead from context switching
 		this.poolSize = Math.min(Math.max(poolSize, 2), 4);
 		this.workerPath = new URL('./thumbnail.worker.ts', import.meta.url).href;
 	}
 
 	/**
-	 * Initialisiert den Worker Pool
+	 * Initializes the worker pool
 	 */
 	async init(): Promise<void> {
 		if (this.isInitialized) return;
 
 		console.log(`🔧 Initializing Thumbnail Worker Pool (${this.poolSize} workers)...`);
 
-		// Erstelle Workers
+		// Create workers
 		for (let i = 0; i < this.poolSize; i++) {
 			try {
 				const worker = new Worker(this.workerPath, { type: 'module' });
 
-				// Setup Message Handler
+				// Setup message handler
 				worker.onmessage = (event: MessageEvent<ThumbnailResponse>) => {
 					this.handleWorkerMessage(worker, event.data);
 				};
 
-				// Setup Error Handler
+				// Setup error handler
 				worker.onerror = (error) => {
 					console.error(`Worker ${i} error:`, error);
 				};
@@ -73,10 +73,10 @@ export class ThumbnailWorkerPool {
 	}
 
 	/**
-	 * Generiert ein Thumbnail für eine Datei
-	 * @param file - Die Bilddatei
-	 * @param maxSize - Maximale Größe (Breite/Höhe)
-	 * @returns Promise mit Base64-encoded Thumbnail
+	 * Generates a thumbnail for a file
+	 * @param file - The image file
+	 * @param maxSize - Maximum size (width/height)
+	 * @returns Promise with base64-encoded thumbnail
 	 */
 	async generateThumbnail(file: File, maxSize: number = 512): Promise<string> {
 		if (!this.isInitialized) {
@@ -90,13 +90,13 @@ export class ThumbnailWorkerPool {
 			this.pendingJobs.set(id, job);
 			this.jobQueue.push(job);
 
-			// Versuche Job sofort zu verarbeiten
+			// Try to process job immediately
 			this.processQueue();
 		});
 	}
 
 	/**
-	 * Verarbeitet die Job-Queue
+	 * Processes the job queue
 	 */
 	private processQueue(): void {
 		while (this.availableWorkers.length > 0 && this.jobQueue.length > 0) {
@@ -108,14 +108,14 @@ export class ThumbnailWorkerPool {
 	}
 
 	/**
-	 * Führt einen Job in einem Worker aus
+	 * Executes a job in a worker
 	 */
 	private async executeJob(worker: Worker, job: ThumbnailJob): Promise<void> {
 		try {
-			// Lese Datei als ArrayBuffer
+			// Read file as ArrayBuffer
 			const arrayBuffer = await job.file.arrayBuffer();
 
-			// Erstelle Request
+			// Create request
 			const request: ThumbnailRequest = {
 				id: job.id,
 				fileData: arrayBuffer,
@@ -123,11 +123,11 @@ export class ThumbnailWorkerPool {
 				maxSize: job.maxSize
 			};
 
-			// Sende an Worker (OHNE Transfer, kopiert stattdessen)
-			// Verhindert "object no longer usable" Fehler in Firefox
+			// Send to worker (WITHOUT transfer, copies instead)
+			// Prevents "object no longer usable" error in Firefox
 			worker.postMessage(request);
 		} catch (error) {
-			// Fehler beim Lesen der Datei
+			// Error reading file
 			this.handleJobError(
 				worker,
 				job.id,
@@ -137,7 +137,7 @@ export class ThumbnailWorkerPool {
 	}
 
 	/**
-	 * Behandelt Worker-Antworten
+	 * Handles worker responses
 	 */
 	private handleWorkerMessage(worker: Worker, response: ThumbnailResponse): void {
 		const job = this.pendingJobs.get(response.id);
@@ -148,12 +148,12 @@ export class ThumbnailWorkerPool {
 			return;
 		}
 
-		// Entferne Job aus Pending-Map
+		// Remove job from pending map
 		this.pendingJobs.delete(response.id);
 
-		// Resolve oder Reject
+		// Resolve or reject
 		if (response.success && response.thumbnail) {
-			// Konvertiere ArrayBuffer zu Blob URL (im Main Thread)
+			// Convert ArrayBuffer to Blob URL (in main thread)
 			const blob = new Blob([response.thumbnail], { type: 'image/jpeg' });
 			const blobUrl = URL.createObjectURL(blob);
 			job.resolve(blobUrl);
@@ -161,15 +161,15 @@ export class ThumbnailWorkerPool {
 			job.reject(new Error(response.error || 'Thumbnail generation failed'));
 		}
 
-		// Worker ist wieder verfügbar
+		// Worker is available again
 		this.availableWorkers.push(worker);
 
-		// Verarbeite nächsten Job
+		// Process next job
 		this.processQueue();
 	}
 
 	/**
-	 * Behandelt Job-Fehler
+	 * Handles job errors
 	 */
 	private handleJobError(worker: Worker, jobId: string, error: Error): void {
 		const job = this.pendingJobs.get(jobId);
@@ -179,32 +179,32 @@ export class ThumbnailWorkerPool {
 			job.reject(error);
 		}
 
-		// Worker ist wieder verfügbar
+		// Worker is available again
 		this.availableWorkers.push(worker);
 		this.processQueue();
 	}
 
 	/**
-	 * Gibt die Anzahl der aktiven Jobs zurück
+	 * Returns the number of active jobs
 	 */
 	get activeJobCount(): number {
 		return this.pendingJobs.size;
 	}
 
 	/**
-	 * Gibt die Anzahl der wartenden Jobs zurück
+	 * Returns the number of queued jobs
 	 */
 	get queuedJobCount(): number {
 		return this.jobQueue.length;
 	}
 
 	/**
-	 * Beendet alle Workers (Cleanup)
+	 * Terminates all workers (cleanup)
 	 */
 	async terminate(): Promise<void> {
 		console.log('🛑 Terminating Worker Pool...');
 
-		// Lehne alle pending Jobs ab
+		// Reject all pending jobs
 		for (const job of this.pendingJobs.values()) {
 			job.reject(new Error('Worker pool terminated'));
 		}
@@ -212,7 +212,7 @@ export class ThumbnailWorkerPool {
 		this.pendingJobs.clear();
 		this.jobQueue = [];
 
-		// Beende alle Workers
+		// Terminate all workers
 		for (const worker of this.workers) {
 			worker.terminate();
 		}
@@ -229,7 +229,7 @@ export class ThumbnailWorkerPool {
 let poolInstance: ThumbnailWorkerPool | null = null;
 
 /**
- * Gibt die Singleton-Instanz des Worker Pools zurück
+ * Returns the singleton instance of the worker pool
  */
 export function getThumbnailWorkerPool(): ThumbnailWorkerPool {
 	if (!poolInstance) {
@@ -239,7 +239,7 @@ export function getThumbnailWorkerPool(): ThumbnailWorkerPool {
 }
 
 /**
- * Cleanup-Funktion für App-Shutdown
+ * Cleanup function for app shutdown
  */
 export async function terminateThumbnailWorkerPool(): Promise<void> {
 	if (poolInstance) {

@@ -11,8 +11,8 @@ export interface ImageMetadata {
 	fileSizeFormatted: string;
 	geoLocation?: GeoCoordinates;
 	dateTime?: Date;
-	make?: string; // Kamera-Hersteller
-	model?: string; // Kamera-Modell
+	make?: string; // Camera manufacturer
+	model?: string; // Camera model
 }
 
 export interface ValidationResult {
@@ -21,10 +21,10 @@ export interface ValidationResult {
 }
 
 /**
- * Formatiert eine Dateigröße in Bytes zu einer menschenlesbaren Zeichenkette
- * @param bytes - Die Dateigröße in Bytes
- * @param decimals - Anzahl der Dezimalstellen (Standard: 2)
- * @returns Formatierte Dateigröße (z.B. "1.5 MB")
+ * Formats a file size in bytes to a human-readable string
+ * @param bytes - The file size in bytes
+ * @param decimals - Number of decimal places (default: 2)
+ * @returns Formatted file size (e.g. "1.5 MB")
  */
 export function formatFileSize(bytes: number, decimals: number = 2): string {
 	if (bytes === 0) return '0 Bytes';
@@ -39,9 +39,9 @@ export function formatFileSize(bytes: number, decimals: number = 2): string {
 }
 
 /**
- * Extrahiert GPS-Koordinaten aus einem Bild
- * @param file - Die Bilddatei
- * @returns GPS-Koordinaten oder undefined, wenn keine vorhanden sind
+ * Extracts GPS coordinates from an image
+ * @param file - The image file
+ * @returns GPS coordinates or undefined if none exist
  */
 export async function extractGeoLocation(file: File): Promise<GeoCoordinates | undefined> {
 	try {
@@ -60,15 +60,15 @@ export async function extractGeoLocation(file: File): Promise<GeoCoordinates | u
 			longitude: exifData.longitude
 		};
 	} catch (error) {
-		console.warn('Fehler beim Extrahieren der GPS-Daten:', error);
+		console.warn('Error extracting GPS data:', error);
 		return undefined;
 	}
 }
 
 /**
- * Extrahiert alle verfügbaren Metadaten aus einem Bild
- * @param file - Die Bilddatei
- * @returns Vollständige Metadaten des Bildes
+ * Extracts all available metadata from an image
+ * @param file - The image file
+ * @returns Complete metadata of the image
  */
 export async function extractImageMetadata(file: File): Promise<ImageMetadata> {
 	const metadata: ImageMetadata = {
@@ -112,16 +112,16 @@ export async function extractImageMetadata(file: File): Promise<ImageMetadata> {
 			}
 		}
 	} catch (error) {
-		console.warn('Fehler beim Extrahieren der Metadaten:', error);
+		console.warn('Error extracting metadata:', error);
 	}
 
 	return metadata;
 }
 
 /**
- * Prüft, ob ein Bild GPS-Koordinaten enthält
- * @param file - Die Bilddatei
- * @returns true, wenn GPS-Daten vorhanden sind
+ * Checks if an image contains GPS coordinates
+ * @param file - The image file
+ * @returns true if GPS data is present
  */
 export async function hasGeoLocation(file: File): Promise<boolean> {
 	const geoLocation = await extractGeoLocation(file);
@@ -129,9 +129,9 @@ export async function hasGeoLocation(file: File): Promise<boolean> {
 }
 
 /**
- * Batch-Verarbeitung: Extrahiert Metadaten von mehreren Bildern
- * @param files - Array oder FileList von Bilddateien
- * @returns Array mit allen Metadaten
+ * Batch processing: Extracts metadata from multiple images
+ * @param files - Array or FileList of image files
+ * @returns Array with all metadata
  */
 export async function extractBatchMetadata(files: File[] | FileList): Promise<ImageMetadata[]> {
 	const fileArray = Array.from(files);
@@ -179,14 +179,14 @@ async function createThumbnailMainThread(file: File, maxSize = 512): Promise<str
 // =========================================
 
 /**
- * Validiert ein 360°-Bild für die Street View API.
- * Anforderungen:
+ * Validates a 360° image for the Street View API.
+ * Requirements:
  * JPEG
  * max. 75 MB
- * Mindestauflösung (3840x1920)
- * Seitenverhältnis 2:1
+ * Minimum resolution (3840x1920)
+ * Aspect ratio 2:1
  *
- * Nutzt schnellen JPEG-Header-Parser (kein decode!).
+ * Uses fast JPEG header parser (no decode!).
  */
 export async function validateStreetViewImage(file: File): Promise<ValidationResult> {
 	const errors: string[] = [];
@@ -195,35 +195,35 @@ export async function validateStreetViewImage(file: File): Promise<ValidationRes
 	const MIN_WIDTH = 3840;
 	const MIN_HEIGHT = 1920;
 
-	// --- 1. MIME-Typ prüfen ---
+	// --- 1. Check MIME type ---
 	if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
-		errors.push('Datei muss ein JPEG-Bild sein.');
+		errors.push('File must be a JPEG image.');
 	}
 
-	// --- 2. Dateigröße prüfen ---
+	// --- 2. Check file size ---
 	if (file.size > MAX_FILE_SIZE) {
-		errors.push(`Dateigröße überschreitet das Limit von 75 MB.`);
+		errors.push(`File size exceeds the limit of 75 MB.`);
 	}
 
-	// --- 3. JPEG-Dimensionen schnell aus Header auslesen ---
+	// --- 3. Read JPEG dimensions quickly from header ---
 	try {
 		const { width, height } = await getJpegSize(file);
 
-		// Mindestauflösung
+		// Minimum resolution
 		if (width < MIN_WIDTH || height < MIN_HEIGHT) {
 			errors.push(
-				`Auflösung zu niedrig. Mindestens ${MIN_WIDTH}×${MIN_HEIGHT} erforderlich (Aktuell: ${width}×${height}).`
+				`Resolution too low. At least ${MIN_WIDTH}×${MIN_HEIGHT} required (Current: ${width}×${height}).`
 			);
 		}
 
-		// Seitenverhältnis 2:1
+		// Aspect ratio 2:1
 		const ratio = width / height;
 		if (Math.abs(ratio - 2) > 0.01) {
-			errors.push(`Seitenverhältnis muss 2:1 sein (Aktuell: ${ratio.toFixed(2)}:1).`);
+			errors.push(`Aspect ratio must be 2:1 (Current: ${ratio.toFixed(2)}:1).`);
 		}
 	} catch (err) {
 		console.log('err', err);
-		errors.push('Konnte JPEG-Dimensionen nicht lesen. Ist die Datei beschädigt?');
+		errors.push('Could not read JPEG dimensions. Is the file corrupted?');
 	}
 
 	return {
@@ -233,37 +233,37 @@ export async function validateStreetViewImage(file: File): Promise<ValidationRes
 }
 
 /**
- * Liest JPEG-Breite und -Höhe sehr schnell aus dem SOF-Segment.
- * Nutzt nur die ersten 1 MB der Datei.
+ * Reads JPEG width and height very quickly from the SOF segment.
+ * Only uses the first 1 MB of the file.
  */
 async function getJpegSize(file: File): Promise<{ width: number; height: number }> {
 	const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB reichen locker
 	const buffer = await file.slice(0, CHUNK_SIZE).arrayBuffer();
 	const view = new DataView(buffer);
 
-	let offset = 2; // JPEG beginnt mit 0xFFD8
+	let offset = 2; // JPEG starts with 0xFFD8
 
 	while (offset < view.byteLength) {
 		if (view.getUint8(offset) !== 0xff) {
-			throw new Error('Ungültiges JPEG (fehlender Marker).');
+			throw new Error('Invalid JPEG (missing marker).');
 		}
 
 		const marker = view.getUint8(offset + 1);
 		offset += 2;
 
-		// SOF0, SOF2 enthalten Breite/Höhe
+		// SOF0, SOF2 contain width/height
 		if (marker >= 0xc0 && marker <= 0xc3) {
-			offset += 3; // Segmentlänge + Präzision überspringen
+			offset += 3; // Skip segment length + precision
 			const height = view.getUint16(offset);
 			offset += 2;
 			const width = view.getUint16(offset);
 			return { width, height };
 		}
 
-		// Andere Segmente überspringen
+		// Skip other segments
 		const length = view.getUint16(offset);
 		offset += length;
 	}
 
-	throw new Error('SOF-Marker nicht gefunden (kein gültiges JPEG?).');
+	throw new Error('SOF marker not found (not a valid JPEG?).');
 }

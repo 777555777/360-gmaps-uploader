@@ -4,16 +4,16 @@ import { createMarkerPopupHTML } from './utils/marker-popup';
 import type { ImageMetadata } from './utils/image-helpers';
 
 class MapState {
-	// Leaflet Map Instanz
+	// Leaflet Map instance
 	map = $state<Leaflet.Map | null>(null);
 
-	// Marker für jedes File mit GPS-Daten
+	// Marker for each file with GPS data
 	markers = new SvelteMap<File, Leaflet.Marker>();
 
-	// Aktuell fokussiertes File (für Karten-Hervorhebung)
+	// Currently focused file (for map highlighting)
 	focusedFile = $state<File | null>(null);
 
-	// Koordinaten-Picking-Mode (für Geo-Edit aus Popover)
+	// Coordinate picking mode (for geo edit from popover)
 	isPickingLocation = $state<boolean>(false);
 	pickingCallback = $state<((lat: number, lng: number) => void) | null>(null);
 
@@ -24,12 +24,12 @@ class MapState {
 		this.focusedFile = null;
 	}
 
-	// Setze die Map-Instanz
+	// Set the map instance
 	setMap(mapInstance: Leaflet.Map): void {
 		this.map = mapInstance;
 	}
 
-	// Erstelle ein custom Marker-Icon (grün für selected, blau für default)
+	// Create a custom marker icon (green for selected, blue for default)
 	private createMarkerIcon(
 		Leaflet: typeof import('leaflet'),
 		isSelected: boolean
@@ -51,17 +51,17 @@ class MapState {
 		});
 	}
 
-	// Fokussiere auf eine bestimmte Position
+	// Focus on a specific position
 	focusLocation(lat: number, lng: number, zoom: number = 17): void {
 		if (!this.map) return;
 
-		// flyTo für smoothere Animation und besseres Centering
+		// flyTo for smoother animation and better centering
 		this.map.flyTo([lat, lng], zoom, {
 			duration: 0.8
 		});
 	}
 
-	// Füge einen Marker für ein File hinzu
+	// Add a marker for a file
 	addMarker(
 		file: File,
 		Leaflet: typeof import('leaflet'),
@@ -72,16 +72,16 @@ class MapState {
 
 		const { latitude, longitude } = metadata.geoLocation;
 
-		// Entferne existierenden Marker falls vorhanden
+		// Remove existing marker if present
 		this.removeMarker(file);
 
-		// Erstelle custom Icon basierend auf Selection-State
+		// Create custom icon based on selection state
 		const icon = this.createMarkerIcon(Leaflet, isSelected);
 
-		// Erstelle formatierten Popup-Content
+		// Create formatted popup content
 		const popupContent = createMarkerPopupHTML(metadata);
 
-		// Erstelle neuen Marker
+		// Create new marker
 		const marker = Leaflet.marker([latitude, longitude], { icon })
 			.addTo(this.map)
 			.bindPopup(popupContent, {
@@ -107,7 +107,7 @@ class MapState {
 		this.markers.set(file, marker);
 	}
 
-	// Aktualisiere Marker-Farbe basierend auf Selection-State
+	// Update marker color based on selection state
 	updateMarkerColor(file: File, isSelected: boolean, Leaflet: typeof import('leaflet')): void {
 		const marker = this.markers.get(file);
 		if (marker) {
@@ -116,7 +116,7 @@ class MapState {
 		}
 	}
 
-	// Aktualisiere Marker-Position (wird synchron aufgerufen bei Geo-Änderungen)
+	// Update marker position (called synchronously on geo changes)
 	updateMarkerPosition(
 		file: File,
 		Leaflet: typeof import('leaflet'),
@@ -127,23 +127,23 @@ class MapState {
 
 		const { latitude, longitude } = metadata.geoLocation;
 
-		// Entferne alten Marker und erstelle neuen mit neuer Position
+		// Remove old marker and create new one with new position
 		const oldMarker = this.markers.get(file);
 		if (oldMarker) {
-			// Prüfe ob sich die Position wirklich geändert hat
+			// Check if position really changed
 			const oldLatLng = oldMarker.getLatLng();
 			if (oldLatLng.lat === latitude && oldLatLng.lng === longitude) {
-				// Position unverändert, nur Farbe aktualisieren
+				// Position unchanged, only update color
 				this.updateMarkerColor(file, isSelected, Leaflet);
 				return;
 			}
 		}
 
-		// Position hat sich geändert oder Marker existiert nicht - neu erstellen
+		// Position has changed or marker doesn't exist - create new one
 		this.addMarker(file, Leaflet, isSelected, metadata);
 	}
 
-	// Entferne einen Marker
+	// Remove a marker
 	removeMarker(file: File): void {
 		const marker = this.markers.get(file);
 		if (marker) {
@@ -155,14 +155,14 @@ class MapState {
 		}
 	}
 
-	// Entferne alle Marker
+	// Remove all markers
 	clearMarkers(): void {
 		this.markers.forEach((marker) => marker.remove());
 		this.markers.clear();
 		this.clearFocus(false);
 	}
 
-	// Fokussiere auf einen Marker und öffne Popup
+	// Focus on a marker and open popup
 	focusMarker(file: File): void {
 		const marker = this.markers.get(file);
 		if (marker && this.map) {
@@ -170,13 +170,13 @@ class MapState {
 			const latLng = marker.getLatLng();
 			this.focusLocation(latLng.lat, latLng.lng);
 
-			// Öffne Popup nach kurzer Verzögerung (für smooth animation)
+			// Open popup after short delay (for smooth animation)
 			setTimeout(() => {
 				marker.openPopup();
 			}, 100);
 		} else {
-			// Marker existiert noch nicht, aber wir können trotzdem fokussieren
-			// Das passiert z.B. wenn Geodaten gerade erst aktualisiert wurden
+			// Marker doesn't exist yet, but we can still focus
+			// This happens e.g. when geodata was just updated
 			console.warn('Marker not found for file:', file.name);
 		}
 	}
@@ -194,19 +194,19 @@ class MapState {
 		return this.focusedFile === file;
 	}
 
-	// Aktiviere Koordinaten-Picking-Mode
+	// Activate coordinate picking mode
 	startPickingLocation(callback: (lat: number, lng: number) => void): void {
 		this.isPickingLocation = true;
 		this.pickingCallback = callback;
 	}
 
-	// Deaktiviere Koordinaten-Picking-Mode
+	// Deactivate coordinate picking mode
 	stopPickingLocation(): void {
 		this.isPickingLocation = false;
 		this.pickingCallback = null;
 	}
 
-	// Führe Picking-Callback aus (wird von Map-Komponente aufgerufen)
+	// Execute picking callback (called by map component)
 	executePickingCallback(lat: number, lng: number): void {
 		if (this.pickingCallback) {
 			this.pickingCallback(lat, lng);

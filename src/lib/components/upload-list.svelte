@@ -21,7 +21,6 @@
 
 		li {
 			margin-bottom: 16px;
-			/* Wichtig: Erstellt einen Clipping-Kontext für die absolute positionierten Buttons */
 			position: relative;
 			overflow: clip;
 

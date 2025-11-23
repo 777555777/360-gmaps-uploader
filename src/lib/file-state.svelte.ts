@@ -4,32 +4,32 @@ import { mapState } from './map-state.svelte';
 
 class FileState {
 	// Reactive set for storing uploaded files
-	// SvelteSet ist besser als normales Set, weil:
-	// - .add(), .delete(), .clear() automatisch reactiv sind
-	// - Duplikate automatisch verhindert werden
-	// - Perfekt für Batch-Upload von einzelnen Bildern
+	// SvelteSet is better than normal Set because:
+	// - .add(), .delete(), .clear() are automatically reactive
+	// - Duplicates are automatically prevented
+	// - Perfect for batch upload of individual images
 	files = new SvelteSet<File>();
 
-	// Reactive Map für Metadaten (File -> ImageMetadata)
-	// Wird asynchron gefüllt, während die Files sofort verfügbar sind
+	// Reactive Map for metadata (File -> ImageMetadata)
+	// Filled asynchronously, while files are available immediately
 	metadata = new SvelteMap<File, ImageMetadata>();
 
-	// Reactive Set für Files, die gerade verarbeitet werden
+	// Reactive Set for files currently being processed
 	loadingFiles = new SvelteSet<File>();
 
-	// Reactive Set für ausgewählte Files (für Publish-Funktionalität)
+	// Reactive Set for selected files (for publish functionality)
 	selectedFiles = new SvelteSet<File>();
 
-	// Reactive Map für Metadata-Fehler
+	// Reactive Map for metadata errors
 	metadataErrors = new SvelteMap<File, string>();
 
 	// Panorama Viewer State
 	currentPanoramaFile = $state<File | null>(null);
 
-	// Queue-System für throttled Metadata-Extraktion
+	// Queue system for throttled metadata extraction
 	private metadataQueue: File[] = [];
 	private activeExtractions = 0;
-	private readonly MAX_CONCURRENT = 3; // Max 3 parallele Extraktionen
+	private readonly MAX_CONCURRENT = 3; // Max 3 parallel extractions
 
 	addFile(file: File): void {
 		this.files.add(file);
@@ -37,21 +37,21 @@ class FileState {
 	}
 
 	addFiles(files: File[] | FileList): void {
-		// Svelte 5 Best Practice: Synchron hinzufügen für sofortiges UI-Feedback
-		// Metadaten asynchron im Hintergrund laden
+		// Svelte 5 Best Practice: Add synchronously for immediate UI feedback
+		// Load metadata asynchronously in the background
 		for (const file of files) {
 			this.files.add(file);
 			this.extractMetadataAsync(file);
 		}
 	}
 
-	// Private Methode für asynchrone Metadaten-Extraktion mit Queue
+	// Private method for asynchronous metadata extraction with queue
 	private extractMetadataAsync(file: File): void {
 		this.metadataQueue.push(file);
 		this.processQueue();
 	}
 
-	// Verarbeite Queue mit Concurrency-Limit
+	// Process queue with concurrency limit
 	private processQueue(): void {
 		while (this.activeExtractions < this.MAX_CONCURRENT && this.metadataQueue.length > 0) {
 			const file = this.metadataQueue.shift()!;
@@ -95,22 +95,22 @@ class FileState {
 		return this.files.has(file);
 	}
 
-	// Prüfe, ob Metadaten für ein File geladen sind
+	// Check if metadata is loaded for a file
 	hasMetadata(file: File): boolean {
 		return this.metadata.has(file);
 	}
 
-	// Hole Metadaten für ein File (oder undefined)
+	// Get metadata for a file (or undefined)
 	getMetadata(file: File): ImageMetadata | undefined {
 		return this.metadata.get(file);
 	}
 
-	// Prüfe, ob ein File gerade verarbeitet wird
+	// Check if a file is currently being processed
 	isLoading(file: File): boolean {
 		return this.loadingFiles.has(file);
 	}
 
-	// Hole Metadata-Fehler für ein File (oder undefined)
+	// Get metadata error for a file (or undefined)
 	getMetadataError(file: File): string | undefined {
 		return this.metadataErrors.get(file);
 	}
@@ -126,8 +126,8 @@ class FileState {
 			};
 			this.metadata.set(file, newMetadata);
 
-			// Aktualisiere Marker sofort (synchron) damit er beim Klick verfügbar ist
-			// Der Effect in map.svelte läuft asynchron und könnte zu spät sein
+			// Update marker immediately (synchronously) so it's available on click
+			// The effect in map.svelte runs asynchronously and might be too late
 			if (typeof window !== 'undefined') {
 				import('leaflet').then((Leaflet) => {
 					const isSelected = this.isSelected(file);
@@ -137,17 +137,17 @@ class FileState {
 		}
 	}
 
-	// Getter für Array-Zugriff (z.B. für Loops)
+	// Getter for array access (e.g. for loops)
 	get fileList(): File[] {
 		return Array.from(this.files);
 	}
 
-	// Getter für die Anzahl
+	// Getter for count
 	get count(): number {
 		return this.files.size;
 	}
 
-	// Getter für die Anzahl der noch ladenden Files
+	// Getter for count of still loading files
 	get loadingCount(): number {
 		return this.loadingFiles.size;
 	}
