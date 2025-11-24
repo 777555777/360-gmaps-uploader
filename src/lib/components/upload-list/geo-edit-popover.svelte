@@ -116,6 +116,7 @@
 					value={coordinatesInput}
 					oninput={handleInput}
 					aria-label="Coordinates in Google Maps format"
+					title="Enter coordinates in Google Maps format"
 				/>
 			</div>
 
@@ -125,6 +126,7 @@
 				disabled={!parsedCoords || parseError !== ''}
 				popovertarget="geo-popover-{index}"
 				popovertargetaction="hide"
+				title="Apply GPS Data to Photo"
 			>
 				Apply
 			</button>

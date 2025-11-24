@@ -134,7 +134,11 @@
 	{#if mapState.isPickingLocation}
 		<div id="picker-popover" class="show" style="position-anchor: --map-anchor;">
 			<span>Click on the map to set location</span>
-			<button class="cancel-btn" onclick={() => mapState.stopPickingLocation()}>Cancel</button>
+			<button
+				class="cancel-btn"
+				onclick={() => mapState.stopPickingLocation()}
+				title="Cancel Picking Location">Cancel</button
+			>
 		</div>
 	{/if}
 </div>

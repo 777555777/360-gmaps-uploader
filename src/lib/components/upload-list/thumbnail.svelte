@@ -51,8 +51,9 @@
 	<button
 		class="clickable-icon btn-overlay delete-btn"
 		style="position-anchor: --image-anchor-{index}"
-		aria-label="Delete"
+		aria-label="Remove Photo"
 		onclick={onRemove}
+		title="Remove Photo"
 	>
 		<Trash2 size={22} />
 	</button>
@@ -62,6 +63,7 @@
 		style="position-anchor: --image-anchor-{index}"
 		aria-label="View as 360 panorama"
 		onclick={() => fileState.openPanorama(file)}
+		title="View as 360 panorama"
 	>
 		<ImagePlay size={22} />
 	</button>

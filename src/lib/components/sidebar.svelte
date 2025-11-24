@@ -10,7 +10,12 @@
 
 <aside>
 	<div class="sidebar-option-header">
-		<button class="upload-btn" commandfor={UPLOAD_DIALOG_ID} command="show-modal">
+		<button
+			class="upload-btn"
+			commandfor={UPLOAD_DIALOG_ID}
+			command="show-modal"
+			title="Add 360-Photo"
+		>
 			<Plus size={20} />
 			<span>Add 360-Photo</span>
 		</button>
@@ -20,6 +25,7 @@
 			disabled={!hasSelection}
 			commandfor={PUBLISH_DIALOG_ID}
 			command="show-modal"
+			title="Publish Selected Photos to Google Maps"
 		>
 			<Upload size={20} />
 			<span>Publish ({selectedFiles.size})</span>

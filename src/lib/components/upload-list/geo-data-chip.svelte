@@ -8,6 +8,7 @@
 	class="geo-data"
 	style="anchor-name: --geo-data-anchor-{index};"
 	popovertarget="geo-popover-{index}"
+	title="Edit GPS Data"
 >
 	<MapPin size={18} />
 	{#if hasGeoData && metadata?.geoLocation}

@@ -96,7 +96,7 @@
 				{/if}
 			</div>
 		</div>
-		<label class="publish-checkbox {checkboxClasses}">
+		<label class="publish-checkbox {checkboxClasses}" title="Select Photo for Publishing">
 			<input
 				type="checkbox"
 				disabled={!hasGeoData}
