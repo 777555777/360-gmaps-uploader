@@ -5,8 +5,7 @@
 	import LoginBtn from './auth/login-btn.svelte';
 	import LogoutBtn from './auth/logout-btn.svelte';
 
-	const GOOGLE_CLIENT_ID =
-		'366080807482-blfdpr7mcl9filupgplomhfpajur01iu.apps.googleusercontent.com';
+	const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 	// Scopes for Street View Publish API
 	// Documentation: https://developers.google.com/streetview/publish/first-app

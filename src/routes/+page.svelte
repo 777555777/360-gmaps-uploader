@@ -5,6 +5,7 @@
 	import Sidebar from '$lib/components/sidebar.svelte';
 	import Dialog from '$lib/components/util/dialog.svelte';
 	import PanoViewer from '$lib/components/pano-viewer.svelte';
+	import PublishDialog from '$lib/components/publish-dialog.svelte';
 	import {
 		PUBLISH_DIALOG_ID,
 		UPLOAD_DIALOG_ID,
@@ -15,11 +16,13 @@
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
 	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
-	import { authState } from '$lib/auth-state.svelte';
-	import LoginBtn from '$lib/components/auth/login-btn.svelte';
 
-	let selectedFiles = $derived(fileState.selectedFiles);
 	let currentPanoramaFile = $derived(fileState.currentPanoramaFile);
+	let publishDialogRef: PublishDialog | undefined = $state();
+
+	function handlePublishDialogClose() {
+		publishDialogRef?.onDialogClose();
+	}
 
 	// Reaktiv den Dialog öffnen/schließen wenn sich currentPanoramaFile ändert
 	$effect(() => {
@@ -29,19 +32,6 @@
 			closeDialogById(PANO_VIEWER_DIALOG_ID);
 		}
 	});
-
-	function clearUploadedFiles() {
-		const filesToRemove = Array.from(selectedFiles);
-		if (!filesToRemove.length) {
-			return;
-		}
-
-		for (const selectedFile of filesToRemove) {
-			fileState.removeFile(selectedFile);
-		}
-
-		closeDialogById(PUBLISH_DIALOG_ID);
-	}
 
 	onMount(() => {
 		function handleGlobalPointerDown(event: PointerEvent) {
@@ -82,8 +72,8 @@
 	<div class="upload-area-container">
 		<div class="upload-instructions">
 			<p>
-				Add between 1 and {MAX_FILES_UPLOAD} 360° panorama images. Images must be in equirectangular
-				format with a 2:1 aspect ratio.
+				Add between 1 and {MAX_FILES_UPLOAD} 360° panorama images.<br /> The Image format must be equirectangular
+				with a 2:1 aspect ratio.
 			</p>
 			<p>If an image has no GPS metadata, you can add it manually later.</p>
 		</div>
@@ -93,16 +83,7 @@
 {/snippet}
 
 {#snippet publishDialogContent()}
-	<div class="publish-area-container">
-		{#if !authState.isAuthenticated}
-			<p>To Publish your photos to Google Maps you need to sign in with Google.</p>
-			<LoginBtn />
-		{:else}
-			<p>Publishing functionality coming soon!</p>
-			<!-- Dummy Button -->
-			<button onclick={() => clearUploadedFiles()}>Clear Items</button>
-		{/if}
-	</div>
+	<PublishDialog bind:this={publishDialogRef} />
 {/snippet}
 
 {#snippet panoViewerDialogContent()}
@@ -117,7 +98,12 @@
 	<Sidebar />
 	<Map />
 	<Dialog dialogId={UPLOAD_DIALOG_ID} title="Add 360 Photos" body={uploadDialogContent} />
-	<Dialog dialogId={PUBLISH_DIALOG_ID} title="Publish Photos" body={publishDialogContent} />
+	<Dialog
+		dialogId={PUBLISH_DIALOG_ID}
+		title="Publish Photos"
+		body={publishDialogContent}
+		onClose={handlePublishDialogClose}
+	/>
 	<Dialog
 		dialogId={PANO_VIEWER_DIALOG_ID}
 		title={currentPanoramaFile?.name || '360° Panorama'}
@@ -139,13 +125,6 @@
 		font-size: 14px;
 		color: var(--text-secondary-color);
 		text-align: center;
-	}
-
-	.publish-area-container {
-		display: grid;
-		place-items: center;
-		gap: 0.75rem;
-		padding-block: 0.75rem;
 	}
 
 	/* Spezielle Styles für den Panorama Viewer Dialog */

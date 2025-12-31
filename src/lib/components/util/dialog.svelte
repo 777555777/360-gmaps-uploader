@@ -1,10 +1,19 @@
 <script lang="ts">
 	import { X } from '@lucide/svelte';
 
-	let { dialogId = 'dialog', title, body } = $props();
+	let {
+		dialogId = 'dialog',
+		title,
+		body,
+		onClose
+	}: { dialogId?: string; title?: string; body: () => any; onClose?: () => void } = $props();
+
+	function handleClose() {
+		onClose?.();
+	}
 </script>
 
-<dialog id={dialogId}>
+<dialog id={dialogId} onclose={handleClose}>
 	<div class="dialog-header">
 		{#if title}
 			<h2 class="dialog-title">{title}</h2>

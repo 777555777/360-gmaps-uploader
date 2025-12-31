@@ -20,6 +20,9 @@ class FileState {
 	// Reactive Set for selected files (for publish functionality)
 	selectedFiles = new SvelteSet<File>();
 
+	// Reactive Set for files that have been successfully published
+	publishedFiles = new SvelteSet<File>();
+
 	// Reactive Map for metadata errors
 	metadataErrors = new SvelteMap<File, string>();
 
@@ -81,6 +84,7 @@ class FileState {
 		this.metadataErrors.delete(file);
 		this.loadingFiles.delete(file);
 		this.selectedFiles.delete(file);
+		this.publishedFiles.delete(file);
 	}
 
 	clearFiles(): void {
@@ -89,6 +93,7 @@ class FileState {
 		this.metadataErrors.clear();
 		this.loadingFiles.clear();
 		this.selectedFiles.clear();
+		this.publishedFiles.clear();
 	}
 
 	hasFile(file: File): boolean {
@@ -175,6 +180,20 @@ class FileState {
 
 	get selectedFileList(): File[] {
 		return Array.from(this.selectedFiles);
+	}
+
+	// Published Files Management
+	markAsPublished(file: File): void {
+		this.publishedFiles.add(file);
+		this.selectedFiles.delete(file); // Auto-deselect after publishing
+	}
+
+	isPublished(file: File): boolean {
+		return this.publishedFiles.has(file);
+	}
+
+	get publishedCount(): number {
+		return this.publishedFiles.size;
 	}
 
 	// Panorama Viewer Methods

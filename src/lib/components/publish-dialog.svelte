@@ -1,0 +1,466 @@
+<script lang="ts">
+	import { fileState } from '$lib/file-state.svelte';
+	import { authState } from '$lib/auth-state.svelte';
+	import { PUBLISH_DIALOG_ID } from '$lib/globals';
+	import { closeDialogById } from '$lib/utils/dialog-helpers';
+	import { uploadPhoto, type UploadProgress, type UploadResult } from '$lib/utils/streetview-api';
+	import { dateToUnixSeconds } from '$lib/utils/publish-helpers';
+	import LoginBtn from '$lib/components/auth/login-btn.svelte';
+	import {
+		FlaskConical,
+		Image,
+		Link,
+		Upload,
+		Globe,
+		CircleCheck,
+		CircleX,
+		Clock,
+		TriangleAlert
+	} from '@lucide/svelte';
+
+	// ENV-based dry-run mode (forced in dev, disabled in prod)
+	const ENV_DRY_RUN = import.meta.env.VITE_DRY_RUN === 'true';
+
+	// Settings - if ENV_DRY_RUN is true, always use dry-run mode
+	let dryRunMode = $state(ENV_DRY_RUN ? true : false);
+
+	// Upload state
+	let isUploading = $state(false);
+	let currentFileIndex = $state(0);
+	let currentProgress = $state<UploadProgress>({ step: 'idle', message: '' });
+	let results = $state<UploadResult[]>([]);
+
+	// Frozen list of files for upload (stays stable during/after upload)
+	let frozenFiles = $state<File[]>([]);
+
+	// Derived
+	let selectedFiles = $derived(fileState.selectedFileList);
+	let totalFiles = $derived(selectedFiles.length);
+
+	// Files ready for upload (have valid geolocation)
+	let uploadableFiles = $derived(
+		selectedFiles.filter((file) => {
+			const meta = fileState.getMetadata(file);
+			return meta?.geoLocation != null;
+		})
+	);
+
+	let filesWithoutGeo = $derived(
+		selectedFiles.filter((file) => {
+			const meta = fileState.getMetadata(file);
+			return meta?.geoLocation == null;
+		})
+	);
+
+	// Use frozen list during/after upload, otherwise use live list
+	let displayFiles = $derived(frozenFiles.length > 0 ? frozenFiles : uploadableFiles);
+	let displayTotal = $derived(frozenFiles.length > 0 ? frozenFiles.length : totalFiles);
+
+	function handleProgress(progress: UploadProgress) {
+		currentProgress = progress;
+	}
+
+	async function startUpload() {
+		if (!authState.accessToken || uploadableFiles.length === 0) return;
+
+		// Freeze the current file list so it stays stable during upload
+		frozenFiles = [...uploadableFiles];
+
+		isUploading = true;
+		results = [];
+		currentFileIndex = 0;
+
+		// Keep track of files to mark as published after upload completes
+		const filesToPublish: File[] = [];
+
+		for (let i = 0; i < frozenFiles.length; i++) {
+			currentFileIndex = i;
+			const file = frozenFiles[i];
+			const meta = fileState.getMetadata(file);
+
+			if (!meta?.geoLocation) continue;
+
+			const result = await uploadPhoto({
+				accessToken: authState.accessToken,
+				file,
+				latitude: meta.geoLocation.latitude,
+				longitude: meta.geoLocation.longitude,
+				heading: 0, // TODO: could add heading editing later
+				captureTimeSeconds: meta.dateTime
+					? dateToUnixSeconds(meta.dateTime)
+					: Math.floor(Date.now() / 1000),
+				dryRun: dryRunMode,
+				onProgress: handleProgress
+			});
+
+			results = [...results, result];
+
+			// Track successful uploads
+			if (result.success) {
+				filesToPublish.push(file);
+			}
+		}
+
+		// Mark all successfully published files (deselects them automatically)
+		for (const file of filesToPublish) {
+			fileState.markAsPublished(file);
+		}
+
+		isUploading = false;
+		currentProgress = { step: 'done', message: 'All uploads completed!' };
+	}
+
+	function resetState() {
+		isUploading = false;
+		currentFileIndex = 0;
+		currentProgress = { step: 'idle', message: '' };
+		results = [];
+		frozenFiles = [];
+	}
+
+	function resetAndClose() {
+		resetState();
+		closeDialogById(PUBLISH_DIALOG_ID);
+	}
+
+	// Export reset function for dialog close callback
+	export function onDialogClose() {
+		resetState();
+	}
+
+	// Icon types for file status
+	type IconType = 'image' | 'link' | 'upload' | 'globe' | 'check' | 'error' | 'clock';
+
+	// Get status info for a file at a given index
+	function getFileStatus(index: number): { icon: IconType; label: string; class: string } {
+		const result = results[index];
+
+		// Already has a result
+		if (result) {
+			if (result.success) {
+				return { icon: 'check', label: result.dryRun ? 'dry-run' : 'published', class: 'success' };
+			} else {
+				return { icon: 'error', label: 'failed', class: 'error' };
+			}
+		}
+
+		// Currently uploading this file
+		if (isUploading && currentFileIndex === index) {
+			const step = currentProgress.step;
+			const iconMap: Record<string, IconType> = {
+				startUpload: 'link',
+				uploadBytes: 'upload',
+				publish: 'globe',
+				done: 'check',
+				error: 'error'
+			};
+			return { icon: iconMap[step] || 'clock', label: step, class: 'uploading' };
+		}
+
+		// Waiting in queue
+		if (isUploading && currentFileIndex < index) {
+			return { icon: 'clock', label: 'waiting', class: 'waiting' };
+		}
+
+		// Ready to upload (not started yet)
+		return { icon: 'image', label: 'ready', class: 'ready' };
+	}
+
+	// Count successes/failures
+	let successCount = $derived(results.filter((r) => r.success).length);
+	let failCount = $derived(results.filter((r) => !r.success).length);
+</script>
+
+<div class="publish-container">
+	{#if !authState.isAuthenticated}
+		<p class="auth-hint">To publish your photos to Google Maps you need to sign in with Google.</p>
+		<div class="login-btn-container">
+			<LoginBtn />
+		</div>
+	{:else if displayTotal === 0}
+		<p>No photos selected. Please select photos from the list first.</p>
+	{:else}
+		<!-- Dry-Run Indicator (when forced by ENV) -->
+		{#if ENV_DRY_RUN}
+			<div class="dry-run-indicator">
+				<p>DRY-RUN MODE ACTIVE</p>
+				<small>Photos will be uploaded but not published to Google Maps</small>
+			</div>
+		{/if}
+
+		<!-- File Summary -->
+		<div class="file-summary">
+			<p>
+				<strong>{displayFiles.length}</strong> of {displayTotal} photos ready for upload
+				{#if isUploading}
+					<span class="upload-progress"
+						>- Uploading {currentFileIndex + 1} of {displayFiles.length}...</span
+					>
+				{:else if results.length > 0}
+					<span class="upload-complete">- {successCount} success, {failCount} failed</span>
+				{/if}
+			</p>
+			{#if filesWithoutGeo.length > 0 && frozenFiles.length === 0}
+				<p class="warning">
+					<TriangleAlert size={14} />
+					{filesWithoutGeo.length} photo(s) skipped (missing GPS data):
+					{filesWithoutGeo.map((f) => f.name).join(', ')}
+				</p>
+			{/if}
+		</div>
+
+		<!-- File List (always visible) -->
+		<ul class="file-list">
+			{#each displayFiles as file, i (file.name)}
+				{@const status = getFileStatus(i)}
+				<li class="file-item {status.class}">
+					<span class="file-icon">
+						{#if status.icon === 'image'}
+							<Image size={16} />
+						{:else if status.icon === 'link'}
+							<Link size={16} />
+						{:else if status.icon === 'upload'}
+							<Upload size={16} />
+						{:else if status.icon === 'globe'}
+							<Globe size={16} />
+						{:else if status.icon === 'check'}
+							<CircleCheck size={16} />
+						{:else if status.icon === 'error'}
+							<CircleX size={16} />
+						{:else}
+							<Clock size={16} />
+						{/if}
+					</span>
+					<span class="file-name">{file.name}</span>
+					<span class="file-status badge {status.class}">{status.label}</span>
+				</li>
+			{/each}
+		</ul>
+
+		<!-- Actions -->
+		<div class="actions">
+			{#if !isUploading && results.length === 0}
+				<button class="btn-primary" onclick={startUpload} disabled={displayFiles.length === 0}>
+					{#if dryRunMode}
+						<FlaskConical size={16} /> Start Dry-Run
+					{:else}
+						<Globe size={16} /> Publish to Google Maps
+					{/if}
+				</button>
+			{:else if !isUploading}
+				<button class="btn-secondary" onclick={resetAndClose}> Close </button>
+			{:else}
+				<button class="btn-secondary" disabled> Uploading... </button>
+			{/if}
+		</div>
+	{/if}
+</div>
+
+<style>
+	.publish-container {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+
+		.auth-hint {
+			text-align: center;
+		}
+	}
+
+	.login-btn-container {
+		margin: 0 auto;
+	}
+
+	.dry-run-indicator {
+		background: #fef2f2;
+		border: 1px solid #dc2626;
+		color: #dc2626;
+		padding: 0.75rem;
+		border-radius: 4px;
+		font-weight: 600;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+
+		p {
+			color: #dc2626;
+		}
+
+		:global(svg) {
+			display: inline-block;
+			vertical-align: middle;
+			margin-right: 0.25rem;
+		}
+	}
+
+	.dry-run-indicator small {
+		font-weight: 400;
+		font-size: 12px;
+	}
+
+	.file-summary {
+		padding: 0.75rem;
+		background: #f5f5f5;
+		border-radius: 4px;
+	}
+
+	.file-summary p {
+		margin: 0;
+	}
+
+	.warning {
+		color: #b45309;
+		font-size: 12px;
+		margin-top: 0.5rem !important;
+		display: flex;
+		align-items: flex-start;
+		gap: 0.25rem;
+
+		:global(svg) {
+			flex-shrink: 0;
+			margin-top: 1px;
+		}
+	}
+
+	.upload-progress {
+		color: #4285f4;
+		font-weight: normal;
+	}
+
+	.upload-complete {
+		color: #16a34a;
+		font-weight: normal;
+	}
+
+	.file-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		border-radius: 4px;
+		max-height: 200px;
+		overflow-y: auto;
+	}
+
+	.file-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		font-size: 13px;
+		border-bottom: 1px solid #f0f0f0;
+	}
+
+	.file-item:last-child {
+		border-bottom: none;
+	}
+
+	.file-item.uploading {
+		background: #eff6ff;
+	}
+
+	.file-icon {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.file-name {
+		flex: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.file-status {
+		flex-shrink: 0;
+	}
+
+	.badge {
+		padding: 0.125rem 0.5rem;
+		border-radius: 4px;
+		font-size: 11px;
+		text-transform: uppercase;
+		font-weight: 500;
+	}
+
+	.badge.ready {
+		background: #f0f0f0;
+		color: #666;
+	}
+
+	.badge.waiting {
+		background: #fef3c7;
+		color: #92400e;
+	}
+
+	.badge.uploading {
+		background: #dbeafe;
+		color: #1d4ed8;
+	}
+
+	.badge.success {
+		background: #dcfce7;
+		color: #16a34a;
+	}
+
+	.badge.error {
+		background: #fef2f2;
+		color: #dc2626;
+	}
+
+	.actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding-top: 1rem;
+		border-top: 1px solid #e0e0e0;
+	}
+
+	.btn-primary,
+	.btn-secondary {
+		padding: 0 1rem;
+		border-radius: 100vmax;
+		font-size: 14px;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		line-height: 36px;
+	}
+
+	.btn-primary {
+		background: #4285f4;
+		color: white;
+		border: none;
+	}
+
+	.btn-primary:hover:not(:disabled) {
+		background: #3367d6;
+	}
+
+	.btn-primary:active:not(:disabled) {
+		background: #254ea1;
+	}
+
+	.btn-primary:disabled {
+		background: #ccc;
+		cursor: not-allowed;
+	}
+
+	.btn-secondary {
+		background: white;
+		border: 1px solid #e0e0e0;
+	}
+
+	.btn-secondary:hover:not(:disabled) {
+		background: #f5f5f5;
+	}
+
+	.btn-secondary:disabled {
+		color: #999;
+		cursor: not-allowed;
+	}
+</style>

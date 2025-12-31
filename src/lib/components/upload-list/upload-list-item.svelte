@@ -4,6 +4,7 @@
 	import { ShieldAlert } from '@lucide/svelte';
 	import GeoDataChip from './geo-data-chip.svelte';
 	import GeoEditPopover from './geo-edit-popover.svelte';
+	import PublishedChip from './published-chip.svelte';
 	import Thumbnail from './thumbnail.svelte';
 
 	let { file, index } = $props();
@@ -12,6 +13,7 @@
 	let metadataError = $derived(fileState.getMetadataError(file));
 	let isLoading = $derived(fileState.isLoading(file));
 	let isSelected = $derived(fileState.isSelected(file));
+	let isPublished = $derived(fileState.isPublished(file));
 	let isMapFocused = $derived(mapState.isFocused(file));
 	let hasGeoData = $derived(metadata?.geoLocation !== undefined && metadata?.geoLocation !== null);
 
@@ -93,6 +95,9 @@
 					</div>
 				{:else}
 					<GeoDataChip {index} {hasGeoData} {metadata} />
+					{#if isPublished}
+						<PublishedChip />
+					{/if}
 				{/if}
 			</div>
 		</div>
@@ -162,7 +167,7 @@
 	.card-footer {
 		display: flex;
 		justify-content: flex-start;
-		gap: 1.5rem;
+		gap: 0.5rem;
 		font-size: 0.75rem;
 		color: rgb(95, 99, 104);
 	}
