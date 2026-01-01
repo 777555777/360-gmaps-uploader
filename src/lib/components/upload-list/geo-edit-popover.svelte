@@ -5,9 +5,8 @@
 	let { index, initialLat, initialLng, onSave } = $props();
 
 	// Format initial coordinates as "lat, lng" (Google Maps format)
-	let coordinatesInput = $state<string>(
-		initialLat !== undefined && initialLng !== undefined ? `${initialLat}, ${initialLng}` : ''
-	);
+	// Initialized by $effect below when initialLat/initialLng are available
+	let coordinatesInput = $state<string>('');
 
 	let parseError = $state<string>('');
 	let parsedCoords = $state<{ latitude: number; longitude: number } | null>(null);
