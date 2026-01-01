@@ -4,6 +4,8 @@
 	import logo from '$lib/assets/icon-32x32.png';
 	import LoginBtn from './auth/login-btn.svelte';
 	import LogoutBtn from './auth/logout-btn.svelte';
+	import GithubLink from './header/github-link.svelte';
+	import InfoLink from './header/info-link.svelte';
 
 	const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -39,6 +41,8 @@
 		<span>360 Image Uploader</span>
 	</div>
 	<div class="g-container">
+		<InfoLink />
+		<GithubLink />
 		<div class="g-profile">
 			{#if isAuthenticated && user}
 				<LogoutBtn />
@@ -74,6 +78,7 @@
 				line-height: 48px;
 				color: var(--logo-text-color);
 				text-rendering: optimizeLegibility;
+				letter-spacing: -0.025em;
 			}
 		}
 
@@ -84,7 +89,7 @@
 			gap: 0.375rem;
 
 			padding: 0 4px;
-			padding-left: 30px;
+			padding-left: 20px;
 
 			.g-profile {
 				padding: 6px;
@@ -97,9 +102,19 @@
 			}
 		}
 
-		@media (width < 376px) {
+		@media (width < 476px) {
+			.g-container {
+				padding-left: 16px;
+				gap: 0;
+			}
 			.logo-container span {
 				font-size: 16px;
+			}
+		}
+
+		@media (width < 424px) {
+			.logo-container span {
+				display: none;
 			}
 		}
 	}

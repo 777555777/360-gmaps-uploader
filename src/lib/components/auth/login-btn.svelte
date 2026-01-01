@@ -28,7 +28,7 @@
 			/>
 		</svg>
 	</div>
-	<span>Sign in with Google</span>
+	<span>Sign in</span><span>&nbsp;with Google</span>
 </button>
 
 <style>
@@ -89,6 +89,12 @@
 			letter-spacing: 0.25px;
 			text-align: center;
 			white-space: nowrap;
+		}
+	}
+
+	@media (width < 576px) {
+		.google-btn span:last-of-type {
+			display: none;
 		}
 	}
 </style>
