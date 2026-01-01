@@ -151,3 +151,65 @@ body {
 	flex-shrink: 0;
 	opacity: 0.5;
 }
+
+.primary-btn {
+	--primary-color: #3b82f6;
+	--primary-hover-color: #1b7ee6;
+	--primary-active-color: #1669bb;
+
+	background: var(--primary-color);
+
+	&:hover:not(:disabled) {
+		background: var(--primary-hover-color);
+	}
+
+	&:active:not(:disabled) {
+		background: var(--primary-active-color);
+	}
+}
+
+.secondary-btn {
+	--secondary-color: #6b7280;
+	--secondary-hover-color: #4b5563;
+	--secondary-active-color: #374151;
+
+	background: var(--secondary-color);
+
+	&:hover:not(:disabled) {
+		background: var(--secondary-hover-color);
+	}
+
+	&:active:not(:disabled) {
+		background: var(--secondary-active-color);
+	}
+}
+
+.primary-btn,
+.secondary-btn {
+	height: 36px;
+	padding: 0 20px;
+	color: #fff;
+	border-radius: 100vmax;
+	border: 2px solid transparent;
+	cursor: pointer;
+	font-size: 13px;
+	flex-shrink: 0;
+	box-shadow:
+		0 2px 3px 0 rgba(60, 64, 67, 0.3),
+		0 6px 10px 4px rgba(60, 64, 67, 0.15);
+	transition: all 0.2s ease;
+
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+
+	&:focus-visible {
+		outline: none;
+		border-color: #fff;
+	}
+
+	&:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+}

@@ -97,7 +97,7 @@
 		<div class="top-row">
 			<div class="input-options">
 				<button
-					class="geo-btn icon-btn"
+					class="icon-btn"
 					type="button"
 					aria-label="Pick location from map"
 					onclick={handlePickFromMap}
@@ -120,7 +120,7 @@
 			</div>
 
 			<button
-				class="geo-btn apply-btn"
+				class="primary-btn"
 				onclick={handleSave}
 				disabled={!parsedCoords || parseError !== ''}
 				popovertarget="geo-popover-{index}"
@@ -237,40 +237,6 @@
 					color: #9ca3af;
 					font-style: italic;
 				}
-			}
-		}
-
-		.apply-btn {
-			height: 34px;
-			padding: 0 20px;
-			background: #3b82f6;
-			color: #fff;
-			border-radius: 100vmax;
-			border: 2px solid transparent;
-			cursor: pointer;
-			font-size: 13px;
-			flex-shrink: 0;
-			box-shadow:
-				0 2px 3px 0 rgba(60, 64, 67, 0.3),
-				0 6px 10px 4px rgba(60, 64, 67, 0.15);
-			transition: all 0.2s ease;
-
-			&:hover:not(:disabled) {
-				background: #1b7ee6;
-			}
-
-			&:focus-visible {
-				outline: none;
-				border-color: #1b7ee6;
-			}
-
-			&:active:not(:disabled) {
-				background: #1669bb;
-			}
-
-			&:disabled {
-				opacity: 0.45;
-				cursor: not-allowed;
 			}
 		}
 	}

@@ -240,7 +240,7 @@
 		<!-- Actions -->
 		<div class="actions">
 			{#if !isUploading && results.length === 0}
-				<button class="btn-primary" onclick={startUpload} disabled={displayFiles.length === 0}>
+				<button class="primary-btn" onclick={startUpload} disabled={displayFiles.length === 0}>
 					{#if dryRunMode}
 						<FlaskConical size={16} /> Start Dry-Run
 					{:else}
@@ -248,9 +248,9 @@
 					{/if}
 				</button>
 			{:else if !isUploading}
-				<button class="btn-secondary" onclick={resetAndClose}> Close </button>
+				<button class="secondary-btn" onclick={resetAndClose}> Close </button>
 			{:else}
-				<button class="btn-secondary" disabled> Uploading... </button>
+				<button class="secondary-btn" disabled> Uploading... </button>
 			{/if}
 		</div>
 	{/if}
@@ -293,11 +293,6 @@
 			vertical-align: middle;
 			margin-right: 0.25rem;
 		}
-	}
-
-	.dry-run-indicator small {
-		font-weight: 400;
-		font-size: 12px;
 	}
 
 	.file-summary {
@@ -417,50 +412,5 @@
 		gap: 0.5rem;
 		padding-top: 1rem;
 		border-top: 1px solid #e0e0e0;
-	}
-
-	.btn-primary,
-	.btn-secondary {
-		padding: 0 1rem;
-		border-radius: 100vmax;
-		font-size: 14px;
-		cursor: pointer;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.375rem;
-		line-height: 36px;
-	}
-
-	.btn-primary {
-		background: #4285f4;
-		color: white;
-		border: none;
-	}
-
-	.btn-primary:hover:not(:disabled) {
-		background: #3367d6;
-	}
-
-	.btn-primary:active:not(:disabled) {
-		background: #254ea1;
-	}
-
-	.btn-primary:disabled {
-		background: #ccc;
-		cursor: not-allowed;
-	}
-
-	.btn-secondary {
-		background: white;
-		border: 1px solid #e0e0e0;
-	}
-
-	.btn-secondary:hover:not(:disabled) {
-		background: #f5f5f5;
-	}
-
-	.btn-secondary:disabled {
-		color: #999;
-		cursor: not-allowed;
 	}
 </style>
