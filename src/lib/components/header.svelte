@@ -59,7 +59,7 @@
 		padding: 0.5rem;
 		display: flex;
 		justify-content: space-between;
-		background-color: var(--header-color);
+		background-color: var(--surface-base);
 
 		.logo-container {
 			padding-left: 12px;
@@ -76,7 +76,7 @@
 				font-family: 'Product Sans', Arial, sans-serif;
 				font-size: 22px;
 				line-height: 48px;
-				color: var(--logo-text-color);
+				color: var(--text-muted);
 				text-rendering: optimizeLegibility;
 				letter-spacing: -0.025em;
 			}

@@ -122,13 +122,13 @@
 		justify-content: center;
 		gap: 12px;
 		padding: 48px 24px;
-		border: 2px dashed #cbd5e1;
+		border: 2px dashed var(--border-default);
 		border-radius: 8px;
-		background-color: #f8fafc;
+		background-color: var(--surface-subtle);
 		cursor: pointer;
 		transition: all 0.2s ease;
 		min-height: 240px;
-		color: var(--text-color);
+		color: var(--text-muted);
 	}
 
 	.upload-area:hover,
@@ -147,13 +147,13 @@
 		margin: 0;
 		font-size: 16px;
 		font-weight: 500;
-		color: #334155;
+		color: var(--text-default);
 	}
 
 	.upload-hint {
 		margin: 0;
 		font-size: 14px;
-		color: #64748b;
+		color: var(--text-subtle);
 		text-align: center;
 	}
 

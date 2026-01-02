@@ -20,7 +20,6 @@
 
 	let cardClasses = $derived.by(() => {
 		const classes = ['upload-item'];
-		if (hasGeoData) classes.push('has-location');
 		if (isMapFocused) classes.push('map-focus');
 		return classes.join(' ');
 	});
@@ -124,23 +123,10 @@
 <style>
 	.upload-item {
 		border-radius: 8px;
-		border: 1px solid var(--border-accent-color);
+		border: 1px solid var(--border-subtle);
 		/* Ensures that buttons stay within the card */
 		overflow: hidden;
 		outline: none;
-
-		&.has-location {
-			cursor: pointer;
-			transition: box-shadow 0.2s ease;
-		}
-
-		&.has-location:hover {
-			box-shadow: 0 0 10px rgb(218, 220, 224);
-		}
-
-		&.has-location:focus-visible {
-			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
-		}
 
 		.card-body {
 			display: flex;
@@ -158,7 +144,6 @@
 			max-width: 300px;
 			font-size: 14px;
 			font-weight: 500;
-			color: rgb(32, 33, 36);
 			margin: 0;
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -170,8 +155,6 @@
 		display: flex;
 		justify-content: flex-start;
 		gap: 0.5rem;
-		font-size: 0.75rem;
-		color: rgb(95, 99, 104);
 	}
 
 	.publish-checkbox {
@@ -182,8 +165,7 @@
 			width: 18px;
 			height: 18px;
 			cursor: pointer;
-			/* accent-color: hsl(142, 79%, 40%); */
-			accent-color: hsl(115, 65%, 40%);
+			accent-color: var(--checkbox-accent);
 		}
 	}
 

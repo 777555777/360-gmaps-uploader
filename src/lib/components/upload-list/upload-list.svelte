@@ -30,7 +30,7 @@
 
 			&:hover {
 				border-radius: 8px;
-				box-shadow: 0 0 10px rgb(218, 220, 224);
+				box-shadow: 0 0 10px var(--shadow-outer);
 				cursor: pointer;
 			}
 		}

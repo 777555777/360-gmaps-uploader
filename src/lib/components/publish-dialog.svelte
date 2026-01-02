@@ -329,7 +329,7 @@
 		gap: 0.5rem;
 		padding: 0.5rem 0.75rem;
 		font-size: 13px;
-		border-bottom: 1px solid #f0f0f0;
+		border-bottom: 1px solid var(--border-subtle);
 	}
 
 	.file-item:last-child {
@@ -359,6 +359,6 @@
 		justify-content: flex-end;
 		gap: 0.5rem;
 		padding-top: 1rem;
-		border-top: 1px solid #e0e0e0;
+		border-top: 1px solid var(--border-subtle);
 	}
 </style>

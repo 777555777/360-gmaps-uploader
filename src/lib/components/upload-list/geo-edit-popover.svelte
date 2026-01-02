@@ -142,10 +142,10 @@
 		align-items: center;
 		gap: 1rem;
 		padding: 0.75rem 1rem;
-		background: #fff;
+		background: var(--surface-base);
 		border-radius: 12px;
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-		border: 1px solid var(--border-accent-color);
+		box-shadow: 0 4px 16px var(--shadow-outer);
+		border: 1px solid var(--border-subtle);
 		position: fixed;
 		position-try-fallbacks: flip-block, flip-inline;
 		margin: 0;
@@ -166,12 +166,12 @@
 			padding: 0;
 			background-color: #fff;
 			border-radius: 100vmax;
-			color: var(--text-color);
+			color: var(--text-default);
 			flex-shrink: 0;
 			border: 2px solid transparent;
 			box-shadow:
-				0 2px 3px 0 rgba(60, 64, 67, 0.3),
-				0 6px 10px 4px rgba(60, 64, 67, 0.15);
+				0 2px 3px 0 var(--shadow-inner),
+				0 6px 10px 4px var(--shadow-outer);
 			transition: all 0.2s ease;
 
 			&:hover,
@@ -212,7 +212,7 @@
 				height: 30px;
 				line-height: 30px;
 				padding-inline: 12px;
-				border: 1px solid #d1d5db;
+				border: 1px solid var(--border-default);
 				border-radius: 999px;
 				width: 100%;
 				max-width: 10rem;
@@ -228,7 +228,7 @@
 				}
 
 				&::placeholder {
-					color: #9ca3af;
+					color: var(--text-subtle);
 					font-style: italic;
 				}
 			}

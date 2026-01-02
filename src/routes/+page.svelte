@@ -162,14 +162,13 @@
 		display: flex;
 		flex: 1;
 		overflow: hidden;
-		background-color: var(--main-bg-color);
+		background-color: var(--surface-subtle);
 		padding-top: 16px;
 	}
 
 	.upload-instructions {
 		margin-bottom: 24px;
 		font-size: 14px;
-		color: var(--text-secondary-color);
 		text-align: center;
 	}
 
@@ -205,22 +204,21 @@
 			font-size: 16px;
 			font-weight: 600;
 			margin: 0 0 0.75rem 0;
-			color: var(--text-primary-color);
 		}
 
 		p {
 			margin: 0 0 0.75rem 0;
-			color: var(--text-secondary-color);
+			color: var(--text-muted);
 		}
 
 		ul {
 			margin: 0.5rem 0 0.75rem 1.5rem;
 			padding: 0;
-			color: var(--text-secondary-color);
 		}
 
 		li {
 			margin-bottom: 0.25rem;
+			color: var(--text-muted);
 		}
 
 		a {

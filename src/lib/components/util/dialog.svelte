@@ -41,13 +41,13 @@
 		border-radius: 8px;
 		border: none;
 		box-shadow:
-			0 1px 3px 0 rgba(60, 64, 67, 0.3),
-			0 4px 8px 3px rgba(60, 64, 67, 0.15);
-		background-color: #ffffff;
+			0 1px 3px 0 var(--shadow-inner),
+			0 4px 8px 3px var(--shadow-outer);
+		background-color: var(--surface-base);
 	}
 
 	dialog::backdrop {
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: var(--backdrop-color);
 		backdrop-filter: blur(2px);
 	}
 
@@ -56,14 +56,14 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 16px 16px 16px 24px;
-		border-bottom: 1px solid #e0e0e0;
+		border-bottom: 1px solid var(--border-subtle);
 	}
 
 	.dialog-title {
 		margin: 0;
 		font-size: 20px;
 		font-weight: 500;
-		color: #1f2937;
+		color: var(--text-default);
 		line-height: 1.5;
 	}
 
@@ -74,7 +74,6 @@
 	dialog :global(p) {
 		line-height: 1.5;
 		font-size: 14px;
-		color: #5f6368;
 		margin: 0 0 16px 0;
 	}
 

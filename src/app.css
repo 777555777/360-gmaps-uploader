@@ -10,7 +10,7 @@
 html,
 body {
 	height: 100%;
-	background-color: var(--main-bg-color);
+	background-color: var(--surface-subtle);
 }
 
 /* ====================================================== */
@@ -53,18 +53,14 @@ body {
 	flex-direction: column;
 }
 
-:root {
-	/* Current App Colors */
-	--main-color: #f1f3f4;
-	--main-bg-color: #f1f3f4;
-
-	--header-color: #fff;
-	--content-bg-color: #fff;
-
-	--logo-text-color: #5f6368;
-	--text-color: #5b5b5b;
-
-	--border-accent-color: rgb(218, 220, 224);
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: var(--text-default);
 }
 
 /*  =========================================  */
@@ -73,15 +69,15 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	color: rgb(95, 99, 104);
+	color: var(--text-subtle);
 	font-size: 0.75rem;
 
 	.spinner {
 		display: inline-block;
 		width: 14px;
 		height: 14px;
-		border: 2px solid rgba(95, 99, 104, 0.2);
-		border-top-color: rgb(95, 99, 104);
+		border: 2px solid var(--spinner-secondary);
+		border-top-color: var(--spinner-primary);
 		border-radius: 50%;
 		animation: spin 0.6s linear infinite;
 	}
@@ -103,18 +99,17 @@ body {
 	border: none;
 	border-radius: 50%;
 	background-color: transparent;
-	color: #5f6368;
+	color: var(--text-default);
 	cursor: pointer;
 	transition: all 0.2s ease;
 	flex-shrink: 0;
 
 	&:hover {
-		background-color: #f1f3f4;
-		color: #202124;
+		background-color: var(--surface-subtle);
 	}
 
 	&:active {
-		background-color: #e8eaed;
+		background-color: var(--surface-strong);
 	}
 
 	&:focus-visible {
@@ -133,7 +128,7 @@ body {
 	border: none;
 	border-radius: 50%;
 	background-color: transparent;
-	color: #5f6368;
+	color: var(--text-subtle);
 	cursor: pointer;
 	transition: all 0.2s ease;
 	flex-shrink: 0;
@@ -168,15 +163,15 @@ body {
 .secondary-btn {
 	height: 36px;
 	padding: 0 20px;
-	color: #fff;
+	color: var(--text-white);
 	border-radius: 100vmax;
 	border: 2px solid transparent;
 	cursor: pointer;
 	font-size: 13px;
 	flex-shrink: 0;
 	box-shadow:
-		0 2px 3px 0 rgba(60, 64, 67, 0.3),
-		0 6px 10px 4px rgba(60, 64, 67, 0.15);
+		0 2px 3px 0 var(--shadow-inner),
+		0 6px 10px 4px var(--shadow-outer);
 	transition: all 0.2s ease;
 
 	display: inline-flex;
@@ -185,7 +180,7 @@ body {
 
 	&:focus-visible {
 		outline: none;
-		border-color: #fff;
+		border-color: var(--text-white);
 	}
 
 	&:disabled {

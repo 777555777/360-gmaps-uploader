@@ -33,6 +33,12 @@
 
 <style>
 	.google-btn {
+		--google-logo-bg: #fff;
+		--google-sign-in-text: #e8eaed;
+		--google-btn-bg: #202124;
+		--google-btn-bg-hover: #555658;
+		--google-btn-bg-active: #1a1a1b;
+
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -41,7 +47,7 @@
 		max-width: fit-content;
 		height: 40px;
 		padding: 0 12px;
-		background: #202124;
+		background: var(--google-btn-bg);
 		border: none;
 		border-radius: 100vmax;
 		cursor: pointer;
@@ -50,11 +56,11 @@
 			border-color 0.2s;
 
 		&:hover {
-			background-color: #555658;
+			background-color: var(--google-btn-bg-hover);
 		}
 
 		&:active {
-			background-color: #1a1a1b;
+			background-color: var(--google-btn-bg-active);
 			outline: 2px solid var(--button-primary);
 		}
 
@@ -73,7 +79,7 @@
 			justify-content: center;
 			align-items: center;
 
-			background-color: #fff;
+			background-color: var(--google-logo-bg);
 			border-radius: 18px;
 
 			svg.google-svg {
@@ -84,7 +90,7 @@
 		}
 
 		span {
-			color: #e8eaed;
+			color: var(--google-sign-in-text);
 			font-size: 14px;
 			letter-spacing: 0.25px;
 			text-align: center;

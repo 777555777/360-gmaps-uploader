@@ -1,10 +1,11 @@
 :root {
-	--neutral-base: oklch(0.21 0.01 260);
-	--neutral-0: oklch(from var(--neutral-base) 1 0 h); /* white */
+	--neutral-base: oklch(0.21 0 260);
+	--neutral-0: oklch(1 0 0); /* white */
 	--neutral-50: oklch(from var(--neutral-base) 0.97 c h);
 	--neutral-100: oklch(from var(--neutral-base) 0.93 c h);
 	--neutral-200: oklch(from var(--neutral-base) 0.88 c h);
 	--neutral-300: oklch(from var(--neutral-base) 0.75 c h);
+	--neutral-350: oklch(from var(--neutral-base) 0.65 c h);
 	--neutral-400: oklch(from var(--neutral-base) 0.55 c h);
 	--neutral-500: oklch(from var(--neutral-base) 0.42 c h);
 	--neutral-600: oklch(from var(--neutral-base) 0.32 c h);
@@ -33,25 +34,41 @@
 	--danger-500: var(--danger-base);
 	--danger-700: oklch(from var(--danger-base) 0.52 c h);
 
-	--border-subtle: oklch(from var(--neutral-base) 0.85 c h);
-	--border-default: oklch(from var(--neutral-base) 0.75 c h);
-	--border-strong: oklch(from var(--neutral-base) 0.55 c h);
+	/* ========================================================================= */
+	/* Borders */
+	--border-subtle: var(--neutral-200);
+	--border-default: var(--neutral-300);
+	--border-strong: var(--neutral-400);
 
-	/* --color-bg: var(--neutral-50);
-	--color-surface: var(--neutral-0);
-	--color-text: var(--neutral-800);
-	--color-text-muted: var(--neutral-500);
-
-	--color-primary: var(--primary-500);
-	--color-success: var(--success-500);
-	--color-warning: var(--warn-500);
-	--color-danger: var(--danger-500);
-     */
+	/* Surfaces */
+	--surface-base: var(--neutral-0);
+	--surface-subtle: var(--neutral-50);
+	--surface-strong: var(--neutral-100);
+	--surface-dark: var(--neutral-800);
 
 	/* Text Colors */
 	--link-color: var(--primary-500);
-	--text-dark: var(--neutral-800);
-	--text-light: var(--neutral-600);
+	--text-default: var(--neutral-800);
+	--text-muted: var(--neutral-600);
+	--text-subtle: var(--neutral-350);
+	--text-light: var(--neutral-100);
+	--text-white: var(--neutral-0);
+
+	/* Backdrop */
+	--backdrop-color: oklch(from var(--neutral-900) 0.15 c h / 0.35);
+
+	/* Spinner */
+	--spinner-primary: var(--primary-500);
+	--spinner-secondary: var(--neutral-300);
+
+	/* Map Marker / Checkbox */
+	--marker-default: var(--primary-500);
+	--marker-selected: var(--success-700);
+	--checkbox-accent: var(--success-700);
+
+	/* Shadows */
+	--shadow-inner: oklch(from var(--neutral-900) 0.1 c h / 0.15);
+	--shadow-outer: oklch(from var(--neutral-900) 0.15 c h / 0.1);
 
 	/* Chip/Badge colors */
 	--chip-success-bg: oklch(from var(--success-base) 0.92 calc(c * 0.25) h);
@@ -87,4 +104,13 @@
 	--button-success: var(--success-500);
 	--button-success-hover: var(--success-300);
 	--button-success-active: var(--success-700);
+
+	--button-dark-overlay: oklch(from var(--neutral-900) l c h / 0.6);
+	--button-dark-overlay-hover: oklch(from var(--neutral-700) l c h / 0.6);
+	--button-dark-overlay-active: oklch(from var(--neutral-500) l c h / 0.6);
+
+	/* Dropdown colors */
+	--dropdown-bg: var(--surface-base);
+	--dropdown-bg-hover: var(--surface-subtle);
+	--dropdown-bg-active: var(--surface-strong);
 }

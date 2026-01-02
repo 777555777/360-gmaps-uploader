@@ -54,6 +54,10 @@
 
 <style>
 	.dropdown-toggle {
+		--google-logout-btn-hover: rgba(0, 0, 0, 0.05);
+		--google-logout-btn-active: rgba(0, 0, 0, 0.1);
+		--google-logout-btn-text: #fff;
+
 		/* anchor-name is set via dynamic inline style */
 		border: none;
 		cursor: pointer;
@@ -81,7 +85,7 @@
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				color: white;
+				color: var(--google-logout-btn-text);
 				font-family: 'Open Sans', sans-serif;
 				font-size: 12px;
 				font-weight: 500;
@@ -91,11 +95,11 @@
 		}
 
 		&:hover {
-			background-color: rgba(0, 0, 0, 0.05);
+			background-color: var(--google-logout-btn-hover);
 		}
 
 		&:active {
-			background-color: rgba(0, 0, 0, 0.1);
+			background-color: var(--google-logout-btn-active);
 		}
 
 		&:focus-visible {
@@ -107,16 +111,6 @@
 	.dropdown-menu {
 		--dropdown-menu-offset-x: 0px;
 		--dropdown-menu-offset-y: 2px;
-		--dropdown-bg-color: #fff;
-		--dropdown-border-color: #e5e5e5;
-
-		--dropdown-header-text-color: #777;
-		--dropdown-item-text-color: #333;
-
-		--dropdown-item-hover-bg-color: #dfdfdf;
-		--dropdown-item-hover-text-color: #000;
-
-		--dropdown-item-active-bg-color: #eee;
 
 		/* Dropdown positioning using Anchor */
 		/* position-anchor is set via dynamic inline style */
@@ -130,12 +124,12 @@
 
 		text-align: left;
 		padding: 0.5rem;
-		background-color: var(--dropdown-bg-color);
-		border: 1px solid var(--dropdown-border-color);
+		background-color: var(--dropdown-bg);
+		border: 1px solid var(--border-subtle);
 		border-radius: 8px;
 		box-shadow:
-			0 10px 15px -3px rgba(0, 0, 0, 0.1),
-			0 4px 6px -2px rgba(0, 0, 0, 0.05);
+			0 10px 15px -3px var(--shadow-inner),
+			0 4px 6px -2px var(--shadow-outer);
 
 		h3 {
 			font-size: 0.875rem; /* 14px */
@@ -143,21 +137,20 @@
 			margin: 0;
 			margin-right: 1rem; /* Added spacing to give the dropdown more width while being based on the content */
 			padding: 0.5rem 0.75rem;
-			color: var(--dropdown-header-text-color);
 			padding-bottom: 0;
 		}
 
 		p {
 			font-size: 0.75rem;
 			text-align: left;
-			color: #888;
+			color: var(--text-subtle);
 			margin-right: 1rem;
 			padding-left: 0.75rem;
 		}
 
 		hr.separator {
 			border: none;
-			border-top: 1px solid var(--dropdown-border-color);
+			border-top: 1px solid var(--border-subtle);
 			margin-block: 0.5rem;
 			margin-inline: 0.25rem;
 		}
@@ -175,7 +168,7 @@
 				transition: background-color 0.15s ease;
 
 				&:hover {
-					background-color: var(--dropdown-item-hover-bg-color);
+					background-color: var(--dropdown-bg-hover);
 				}
 
 				a {
@@ -184,24 +177,19 @@
 					padding: 0.5rem 0.75rem;
 					background-color: transparent;
 					text-decoration: none;
-					color: var(--dropdown-item-text-color);
+					color: var(--text-default);
 					font-size: 0.875rem; /* 14px */
 					transition: color 0.15s ease;
 
-					&:hover {
-						color: var(--dropdown-item-hover-text-color);
-					}
-
 					&:active {
 						border-radius: 4px;
-						background-color: var(--dropdown-item-active-bg-color);
+						background-color: var(--dropdown-bg-active);
 					}
 
 					&:focus-visible {
 						outline: none;
 						border-radius: 4px;
-						color: var(--dropdown-item-hover-text-color);
-						background-color: var(--dropdown-item-hover-bg-color);
+						background-color: var(--dropdown-bg-hover);
 					}
 				}
 			}

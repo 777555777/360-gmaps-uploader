@@ -135,7 +135,7 @@
 		<div id="picker-popover" class="show" style="position-anchor: --map-anchor;">
 			<span>Click on the map to set location</span>
 			<button
-				class="cancel-btn"
+				class="secondary-btn"
 				onclick={() => mapState.stopPickingLocation()}
 				title="Cancel Picking Location">Cancel</button
 			>
@@ -150,8 +150,8 @@
 
 		flex: 1;
 
-		border: 1px solid var(--border-accent-color);
-		background-color: var(--content-bg-color);
+		border: 1px solid var(--border-subtle);
+		background-color: var(--surface-base);
 		border-radius: 8px 8px 0 0;
 		overflow: hidden;
 	}
@@ -182,14 +182,13 @@
 
 	:global(.popup-header) {
 		padding: 12px;
-		border-bottom: 1px solid var(--border-accent-color);
+		border-bottom: 1px solid var(--border-subtle);
 	}
 
 	:global(.popup-header h4) {
 		margin: 0;
 		font-size: 15px;
 		font-weight: 500;
-		color: rgb(32, 33, 36);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -210,12 +209,7 @@
 		align-items: center;
 		gap: 6px;
 		font-size: 0.75rem;
-		color: rgb(95, 99, 104);
-	}
-
-	:global(.popup-icon) {
-		flex-shrink: 0;
-		color: rgb(95, 99, 104);
+		color: var(--text-muted);
 	}
 
 	:global(.popup-coordinates) {
@@ -235,7 +229,6 @@
 	}
 
 	:global(.custom-marker svg) {
-		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 		transition: transform 0.2s ease;
 	}
 
@@ -245,7 +238,7 @@
 
 	/* Picker Mode Popover */
 	#picker-popover {
-		--popover-width: 320px;
+		--popover-width: 340px;
 		width: var(--popover-width);
 		position: absolute;
 		bottom: anchor(bottom);
@@ -257,12 +250,12 @@
 		gap: 8px;
 		padding: 14px 20px;
 
-		background-color: rgb(32, 33, 36);
-		color: white;
+		background-color: var(--surface-dark);
+		color: var(--text-white);
 		border-radius: 8px;
 		box-shadow:
-			0 2px 4px rgba(0, 0, 0, 0.2),
-			0 4px 8px rgba(0, 0, 0, 0.15);
+			0 2px 4px var(--shadow-inner),
+			0 4px 8px var(--shadow-outer);
 
 		font-size: 14px;
 		font-weight: 400;
@@ -275,22 +268,5 @@
 
 	#picker-popover.show {
 		opacity: 1;
-	}
-
-	.cancel-btn {
-		flex-shrink: 0;
-		padding: 6px 12px;
-		background-color: rgba(255, 255, 255, 0.15);
-		color: white;
-		border: none;
-		border-radius: 4px;
-		font-size: 13px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.cancel-btn:hover {
-		background-color: rgba(255, 255, 255, 0.25);
 	}
 </style>

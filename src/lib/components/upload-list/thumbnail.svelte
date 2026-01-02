@@ -103,36 +103,26 @@
 
 	.loading-indicator {
 		height: 180px;
-		background-color: #d8e6fd;
+		background-color: var(--surface-subtle);
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		gap: 8px;
+		gap: 0.5rem;
 		font-size: 0.875rem;
-		color: rgb(95, 99, 104);
+		color: var(--text-default);
 	}
 
 	.btn-overlay {
-		background-color: rgba(75, 75, 75, 0.75);
-		color: #fff;
+		background-color: var(--button-dark-overlay);
+		color: var(--text-white);
 
 		&:hover {
-			background-color: rgba(60, 60, 60, 0.9);
+			background-color: var(--button-dark-overlay-hover);
 		}
 
 		&:active {
-			background-color: rgba(50, 50, 50, 0.9);
+			background-color: var(--button-dark-overlay-active);
 		}
-	}
-
-	.spinner {
-		display: inline-block;
-		width: 16px;
-		height: 16px;
-		border: 2px solid rgba(95, 99, 104, 0.3);
-		border-top-color: rgb(95, 99, 104);
-		border-radius: 50%;
-		animation: spin 0.8s linear infinite;
 	}
 
 	@keyframes spin {
