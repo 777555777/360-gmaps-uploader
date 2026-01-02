@@ -70,6 +70,9 @@
 	--shadow-inner: oklch(from var(--neutral-900) 0.1 c h / 0.15);
 	--shadow-outer: oklch(from var(--neutral-900) 0.15 c h / 0.1);
 
+	/* Cards */
+	--card-bg: var(--surface-base);
+
 	/* Chip/Badge colors */
 	--chip-success-bg: oklch(from var(--success-base) 0.92 calc(c * 0.25) h);
 	--chip-success-fg: oklch(from var(--success-base) 0.45 c h);

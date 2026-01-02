@@ -49,7 +49,11 @@
 		// Ignore clicks on interactive elements
 		if (event instanceof MouseEvent) {
 			const target = event.target as HTMLElement | null;
-			if (target?.closest('.publish-checkbox') || target?.closest('.close-btn-overlay')) {
+			if (
+				target?.closest('.publish-checkbox') ||
+				target?.closest('.close-btn-overlay') ||
+				target?.closest('.geo-data')
+			) {
 				return;
 			}
 		}
@@ -127,6 +131,7 @@
 		/* Ensures that buttons stay within the card */
 		overflow: hidden;
 		outline: none;
+		background-color: var(--card-bg);
 
 		.card-body {
 			display: flex;
