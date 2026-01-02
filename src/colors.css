@@ -64,6 +64,7 @@
 	/* Map Marker / Checkbox */
 	--marker-default: var(--primary-500);
 	--marker-selected: var(--success-700);
+	--marker-published: var(--neutral-400);
 	--checkbox-accent: var(--success-700);
 
 	/* Shadows */

@@ -46,7 +46,8 @@
 				const metadata = fileState.getMetadata(file);
 				if (metadata?.geoLocation) {
 					const isSelected = fileState.isSelected(file);
-					mapState.addMarker(file, Leaflet, isSelected, metadata);
+					const isPublished = fileState.isPublished(file);
+					mapState.addMarker(file, Leaflet, isSelected, metadata, isPublished);
 				}
 			}
 		})();
@@ -78,9 +79,10 @@
 		const files = fileState.fileList;
 		const loadingCount = fileState.loadingCount;
 		const selectedCount = fileState.selectedCount; // Track Selection-Änderungen
+		const publishedCount = fileState.publishedCount; // Track Published-Änderungen
 		const metadataSize = fileState.metadata.size; // Track Metadata-Änderungen
 
-		// Force re-run when loadingCount, selection or metadata changes
+		// Force re-run when loadingCount, selection, published or metadata changes
 		console.log(
 			'Effect triggered. Files:',
 			files.length,
@@ -88,6 +90,8 @@
 			loadingCount,
 			'Selected:',
 			selectedCount,
+			'Published:',
+			publishedCount,
 			'Metadata:',
 			metadataSize
 		);
@@ -98,6 +102,7 @@
 			for (const file of files) {
 				const metadata = fileState.getMetadata(file);
 				const isSelected = fileState.isSelected(file);
+				const isPublished = fileState.isPublished(file);
 
 				// Check if metadata is loaded
 				if (metadata?.geoLocation) {
@@ -110,10 +115,10 @@
 					if (!existingMarker || hasPositionChanged) {
 						// Marker doesn't exist yet or position has changed - create/update it
 						console.log('Adding/updating marker for file:', file.name, metadata.geoLocation);
-						mapState.addMarker(file, Leaflet, isSelected, metadata);
+						mapState.addMarker(file, Leaflet, isSelected, metadata, isPublished);
 					} else {
 						// Marker exists and position unchanged - only update color
-						mapState.updateMarkerColor(file, isSelected, Leaflet);
+						mapState.updateMarkerColor(file, isSelected, Leaflet, isPublished);
 					}
 				}
 			}

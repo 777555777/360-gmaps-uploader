@@ -29,12 +29,17 @@ class MapState {
 		this.map = mapInstance;
 	}
 
-	// Create a custom marker icon (green for selected, blue for default)
+	// Create a custom marker icon (green for selected, blue for default, gray for published)
 	private createMarkerIcon(
 		Leaflet: typeof import('leaflet'),
-		isSelected: boolean
+		isSelected: boolean,
+		isPublished: boolean = false
 	): Leaflet.DivIcon {
-		const color = isSelected ? 'var(--marker-selected)' : 'var(--marker-default)'; // green : blue
+		const color = isPublished
+			? 'var(--marker-published)'
+			: isSelected
+				? 'var(--marker-selected)'
+				: 'var(--marker-default)'; // gray : green : blue
 
 		return Leaflet.divIcon({
 			html: `
@@ -66,7 +71,8 @@ class MapState {
 		file: File,
 		Leaflet: typeof import('leaflet'),
 		isSelected: boolean,
-		metadata: ImageMetadata
+		metadata: ImageMetadata,
+		isPublished: boolean = false
 	): void {
 		if (!this.map || !metadata.geoLocation) return;
 
@@ -75,8 +81,8 @@ class MapState {
 		// Remove existing marker if present
 		this.removeMarker(file);
 
-		// Create custom icon based on selection state
-		const icon = this.createMarkerIcon(Leaflet, isSelected);
+		// Create custom icon based on selection and published state
+		const icon = this.createMarkerIcon(Leaflet, isSelected, isPublished);
 
 		// Create formatted popup content
 		const popupContent = createMarkerPopupHTML(metadata);
@@ -108,10 +114,15 @@ class MapState {
 	}
 
 	// Update marker color based on selection state
-	updateMarkerColor(file: File, isSelected: boolean, Leaflet: typeof import('leaflet')): void {
+	updateMarkerColor(
+		file: File,
+		isSelected: boolean,
+		Leaflet: typeof import('leaflet'),
+		isPublished: boolean = false
+	): void {
 		const marker = this.markers.get(file);
 		if (marker) {
-			const icon = this.createMarkerIcon(Leaflet, isSelected);
+			const icon = this.createMarkerIcon(Leaflet, isSelected, isPublished);
 			marker.setIcon(icon);
 		}
 	}
@@ -121,7 +132,8 @@ class MapState {
 		file: File,
 		Leaflet: typeof import('leaflet'),
 		isSelected: boolean,
-		metadata: ImageMetadata
+		metadata: ImageMetadata,
+		isPublished: boolean = false
 	): void {
 		if (!this.map || !metadata.geoLocation) return;
 
@@ -134,13 +146,13 @@ class MapState {
 			const oldLatLng = oldMarker.getLatLng();
 			if (oldLatLng.lat === latitude && oldLatLng.lng === longitude) {
 				// Position unchanged, only update color
-				this.updateMarkerColor(file, isSelected, Leaflet);
+				this.updateMarkerColor(file, isSelected, Leaflet, isPublished);
 				return;
 			}
 		}
 
 		// Position has changed or marker doesn't exist - create new one
-		this.addMarker(file, Leaflet, isSelected, metadata);
+		this.addMarker(file, Leaflet, isSelected, metadata, isPublished);
 	}
 
 	// Remove a marker

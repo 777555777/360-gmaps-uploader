@@ -25,7 +25,8 @@
 	});
 
 	let canInteract = $derived(hasGeoData);
-	let checkboxClasses = $derived(hasGeoData ? 'clickable-icon' : 'clickable-disabled');
+	let canSelect = $derived(hasGeoData && !isPublished);
+	let checkboxClasses = $derived(canSelect ? 'clickable-icon' : 'clickable-disabled');
 
 	// Event handlers
 	function handleUpdateGeo(coords: { latitude: number; longitude: number }) {
@@ -106,10 +107,13 @@
 				{/if}
 			</div>
 		</div>
-		<label class="publish-checkbox {checkboxClasses}" title="Select Photo for Publishing">
+		<label
+			class="publish-checkbox {checkboxClasses}"
+			title={isPublished ? 'Already Published' : 'Select Photo for Publishing'}
+		>
 			<input
 				type="checkbox"
-				disabled={!hasGeoData}
+				disabled={!canSelect}
 				checked={isSelected}
 				onchange={handleSelectionToggle}
 			/>
