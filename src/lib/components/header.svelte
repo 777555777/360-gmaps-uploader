@@ -38,7 +38,7 @@
 <header>
 	<div class="logo-container">
 		<img src={logo} alt="Logo" height="32" />
-		<span>360 Image Uploader</span>
+		<span>Pano Publisher</span>
 	</div>
 	<div class="g-container">
 		<InfoLink />
@@ -73,7 +73,6 @@
 
 			span {
 				display: block;
-				font-family: 'Product Sans', Arial, sans-serif;
 				font-size: 22px;
 				line-height: 48px;
 				color: var(--text-muted);
@@ -107,14 +106,25 @@
 				padding-left: 16px;
 				gap: 0;
 			}
-			.logo-container span {
-				font-size: 16px;
+		}
+
+		@media (width < 400px) {
+			.logo-container {
+				img {
+					display: none;
+				}
 			}
 		}
 
-		@media (width < 424px) {
-			.logo-container span {
-				display: none;
+		@media (width < 365px) {
+			.logo-container {
+				span {
+					display: none;
+				}
+
+				img {
+					display: block;
+				}
 			}
 		}
 	}
