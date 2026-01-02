@@ -100,7 +100,7 @@
 
 		&:focus-visible {
 			outline: none;
-			box-shadow: 0 0 0 2px #3b82f6;
+			box-shadow: 0 0 0 2px var(--button-primary);
 		}
 	}
 

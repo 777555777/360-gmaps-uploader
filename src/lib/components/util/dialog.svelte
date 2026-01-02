@@ -43,7 +43,7 @@
 		box-shadow:
 			0 1px 3px 0 rgba(60, 64, 67, 0.3),
 			0 4px 8px 3px rgba(60, 64, 67, 0.15);
-		background-color: #fff;
+		background-color: #ffffff;
 	}
 
 	dialog::backdrop {

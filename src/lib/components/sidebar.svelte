@@ -95,15 +95,15 @@
 				}
 
 				&:hover {
-					background-color: #3b82f633;
-					color: #3b82f6;
+					background-color: var(--button-primary-bg);
+					color: var(--button-primary);
 				}
 
 				&:focus-visible {
 					outline: none;
-					background-color: #3b82f633;
-					color: #3b82f6;
-					border-color: #3b82f6;
+					background-color: var(--button-primary-bg);
+					color: var(--button-primary);
+					border-color: var(--button-primary);
 					border-style: solid;
 					border-width: 2px;
 
@@ -113,9 +113,9 @@
 				}
 
 				&:active {
-					background-color: #0062ff33;
-					color: #3b82f6;
-					border-color: #3b82f6;
+					background-color: var(--button-primary-bg);
+					color: var(--button-primary);
+					border-color: var(--button-primary);
 					border-style: solid;
 					border-width: 2px;
 

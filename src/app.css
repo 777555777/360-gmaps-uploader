@@ -65,18 +65,6 @@ body {
 	--text-color: #5b5b5b;
 
 	--border-accent-color: rgb(218, 220, 224);
-
-	/*  =========================================  */
-	/* 
-	--main-color: #ff0000;
-	--main-bg-color: #0000ff;
-
-	--header-color: #00ffff;
-	--content-bg-color: #00ff00;
-
-	--logo-text-color: #ff00ff;
-
-	--border-accent-color: #ffff00; */
 }
 
 /*  =========================================  */
@@ -130,7 +118,7 @@ body {
 	}
 
 	&:focus-visible {
-		outline: 2px solid #3b82f6;
+		outline: 2px solid var(--button-primary);
 		outline-offset: 2px;
 	}
 }
@@ -153,34 +141,26 @@ body {
 }
 
 .primary-btn {
-	--primary-color: #3b82f6;
-	--primary-hover-color: #1b7ee6;
-	--primary-active-color: #1669bb;
-
-	background: var(--primary-color);
+	background-color: var(--button-primary);
 
 	&:hover:not(:disabled) {
-		background: var(--primary-hover-color);
+		background-color: var(--button-primary-hover);
 	}
 
 	&:active:not(:disabled) {
-		background: var(--primary-active-color);
+		background-color: var(--button-primary-active);
 	}
 }
 
 .secondary-btn {
-	--secondary-color: #6b7280;
-	--secondary-hover-color: #4b5563;
-	--secondary-active-color: #374151;
-
-	background: var(--secondary-color);
+	background-color: var(--button-secondary);
 
 	&:hover:not(:disabled) {
-		background: var(--secondary-hover-color);
+		background-color: var(--button-secondary-hover);
 	}
 
 	&:active:not(:disabled) {
-		background: var(--secondary-active-color);
+		background-color: var(--button-secondary-active);
 	}
 }
 

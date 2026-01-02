@@ -55,11 +55,11 @@
 
 		&:active {
 			background-color: #1a1a1b;
-			outline: 2px solid #3b82f6;
+			outline: 2px solid var(--button-primary);
 		}
 
 		&:focus-visible {
-			outline: 2px solid #3b82f6;
+			outline: 2px solid var(--button-primary);
 		}
 
 		.google-btn-icon {

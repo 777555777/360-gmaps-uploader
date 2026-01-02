@@ -34,7 +34,7 @@ class MapState {
 		Leaflet: typeof import('leaflet'),
 		isSelected: boolean
 	): Leaflet.DivIcon {
-		const color = isSelected ? '#2fa824' : '#3b82f6'; // green : blue
+		const color = isSelected ? 'var(--button-success)' : 'var(--button-primary)'; // green : blue
 
 		return Leaflet.divIcon({
 			html: `

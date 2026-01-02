@@ -13,7 +13,8 @@
 		justify-content: center;
 		padding: 4px 5px;
 		border-radius: 100vmax;
-		background-color: rgba(66, 133, 244, 0.1);
-		color: rgb(66, 133, 244);
+
+		background-color: var(--chip-neutral-bg);
+		color: var(--chip-neutral-fg);
 	}
 </style>

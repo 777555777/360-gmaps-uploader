@@ -1,0 +1,90 @@
+:root {
+	--neutral-base: oklch(0.21 0.01 260);
+	--neutral-0: oklch(from var(--neutral-base) 1 0 h); /* white */
+	--neutral-50: oklch(from var(--neutral-base) 0.97 c h);
+	--neutral-100: oklch(from var(--neutral-base) 0.93 c h);
+	--neutral-200: oklch(from var(--neutral-base) 0.88 c h);
+	--neutral-300: oklch(from var(--neutral-base) 0.75 c h);
+	--neutral-400: oklch(from var(--neutral-base) 0.55 c h);
+	--neutral-500: oklch(from var(--neutral-base) 0.42 c h);
+	--neutral-600: oklch(from var(--neutral-base) 0.32 c h);
+	--neutral-700: oklch(from var(--neutral-base) 0.26 c h);
+	--neutral-800: oklch(from var(--neutral-base) 0.21 c h);
+	--neutral-900: oklch(from var(--neutral-base) 0.15 c h);
+
+	--primary-base: oklch(0.62 0.21 255);
+	/* --primary-base: oklch(57.433% 0.29201 304.021); */
+	--primary-300: oklch(from var(--primary-base) 0.75 c h);
+	--primary-500: var(--primary-base);
+	--primary-700: oklch(from var(--primary-base) 0.52 c h);
+
+	--success-base: oklch(0.72 0.19 145);
+	--success-300: oklch(from var(--success-base) 0.82 c h);
+	--success-500: var(--success-base);
+	--success-700: oklch(from var(--success-base) 0.55 c h);
+
+	--warn-base: oklch(0.78 0.16 86);
+	--warn-300: oklch(from var(--warn-base) 0.88 c h);
+	--warn-500: var(--warn-base);
+	--warn-700: oklch(from var(--warn-base) 0.6 c h);
+
+	--danger-base: oklch(0.62 0.23 27);
+	--danger-300: oklch(from var(--danger-base) 0.75 c h);
+	--danger-500: var(--danger-base);
+	--danger-700: oklch(from var(--danger-base) 0.52 c h);
+
+	--border-subtle: oklch(from var(--neutral-base) 0.85 c h);
+	--border-default: oklch(from var(--neutral-base) 0.75 c h);
+	--border-strong: oklch(from var(--neutral-base) 0.55 c h);
+
+	/* --color-bg: var(--neutral-50);
+	--color-surface: var(--neutral-0);
+	--color-text: var(--neutral-800);
+	--color-text-muted: var(--neutral-500);
+
+	--color-primary: var(--primary-500);
+	--color-success: var(--success-500);
+	--color-warning: var(--warn-500);
+	--color-danger: var(--danger-500);
+     */
+
+	/* Text Colors */
+	--link-color: var(--primary-500);
+	--text-dark: var(--neutral-800);
+	--text-light: var(--neutral-600);
+
+	/* Chip/Badge colors */
+	--chip-success-bg: oklch(from var(--success-base) 0.92 calc(c * 0.25) h);
+	--chip-success-fg: oklch(from var(--success-base) 0.45 c h);
+	--chip-success-hover-bg: oklch(from var(--success-base) 0.88 calc(c * 0.25) h);
+	--chip-success-active-bg: oklch(from var(--success-base) 0.84 calc(c * 0.25) h);
+
+	--chip-warn-bg: oklch(from var(--warn-base) 0.92 calc(c * 0.25) h);
+	--chip-warn-fg: oklch(from var(--warn-base) 0.45 c h);
+
+	--chip-danger-bg: oklch(from var(--danger-base) 0.92 calc(c * 0.25) h);
+	--chip-danger-fg: oklch(from var(--danger-base) 0.45 c h);
+	--chip-danger-hover-bg: oklch(from var(--danger-base) 0.88 calc(c * 0.25) h);
+	--chip-danger-active-bg: oklch(from var(--danger-base) 0.84 calc(c * 0.25) h);
+
+	--chip-primary-bg: oklch(from var(--primary-base) 0.92 calc(c * 0.25) h);
+	--chip-primary-fg: oklch(from var(--primary-base) 0.45 c h);
+	--chip-primary-bg-light: oklch(from var(--primary-base) 0.97 calc(c * 0.15) h);
+
+	--chip-neutral-bg: var(--neutral-50);
+	--chip-neutral-fg: var(--neutral-600);
+
+	/* Button colors */
+	--button-primary: var(--primary-500);
+	--button-primary-bg: oklch(from var(--primary-base) 0.92 calc(c * 0.25) h);
+	--button-primary-hover: var(--primary-300);
+	--button-primary-active: var(--primary-700);
+
+	--button-secondary: var(--neutral-500);
+	--button-secondary-hover: var(--neutral-300);
+	--button-secondary-active: var(--neutral-700);
+
+	--button-success: var(--success-500);
+	--button-success-hover: var(--success-300);
+	--button-success-active: var(--success-700);
+}

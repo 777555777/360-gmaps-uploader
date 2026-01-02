@@ -224,7 +224,7 @@
 		}
 
 		a {
-			color: #4285f4;
+			color: var(--link-color);
 			text-decoration: none;
 
 			&:hover {

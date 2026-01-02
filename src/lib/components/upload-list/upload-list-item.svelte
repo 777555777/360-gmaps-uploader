@@ -6,6 +6,7 @@
 	import GeoEditPopover from './geo-edit-popover.svelte';
 	import PublishedChip from './published-chip.svelte';
 	import Thumbnail from './thumbnail.svelte';
+	import ErrorChip from '../util/error-chip.svelte';
 
 	let { file, index } = $props();
 
@@ -84,10 +85,11 @@
 			</div>
 			<div class="card-footer">
 				{#if metadataError}
-					<div class="metadata-chip-error-state">
-						<ShieldAlert size={18} />
-						<span>{metadataError}</span>
-					</div>
+					<ErrorChip message={metadataError}>
+						{#snippet icon()}
+							<ShieldAlert size={18} />
+						{/snippet}
+					</ErrorChip>
 				{:else if isLoading}
 					<div class="loading-indicator">
 						<span class="spinner"></span>
@@ -188,31 +190,10 @@
 	/* ====================== */
 
 	.map-focus {
-		background-color: #0062ff33;
-		color: #3b82f6;
-		border-color: #3b82f6;
+		background-color: var(--chip-primary-bg);
+		color: var(--chip-primary-fg);
+		border-color: var(--chip-primary-fg);
 		border-style: solid;
 		border-width: 1px;
-	}
-
-	/* ====================== */
-
-	.metadata-chip-error-state {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
-		padding: 4px 8px;
-		border-radius: 6px;
-		border: none;
-		max-width: 14rem;
-		text-overflow: ellipsis;
-		border-radius: 100vmax;
-		cursor: pointer;
-		font-size: 13px;
-		line-height: normal;
-
-		background-color: rgba(223, 32, 32, 0.1);
-		color: rgb(223, 32, 32);
 	}
 </style>

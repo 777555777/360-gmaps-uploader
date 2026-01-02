@@ -133,13 +133,13 @@
 
 	.upload-area:hover,
 	.upload-area.dragging {
-		border-color: #94a3b8;
-		background-color: #f1f5f9;
-		color: #3b82f6;
+		border-color: var(--button-primary);
+		background-color: var(--button-primary-bg);
+		color: var(--button-primary);
 	}
 
 	.upload-area:focus {
-		outline: 2px solid #3b82f6;
+		outline: 2px solid var(--button-primary);
 		outline-offset: 2px;
 	}
 

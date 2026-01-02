@@ -6,6 +6,7 @@
 	import { uploadPhoto, type UploadProgress, type UploadResult } from '$lib/utils/streetview-api';
 	import { dateToUnixSeconds } from '$lib/utils/publish-helpers';
 	import LoginBtn from '$lib/components/auth/login-btn.svelte';
+	import StatusBadge from '$lib/components/util/status-badge.svelte';
 	import {
 		FlaskConical,
 		Image,
@@ -14,8 +15,7 @@
 		Globe,
 		CircleCheck,
 		CircleX,
-		Clock,
-		TriangleAlert
+		Clock
 	} from '@lucide/svelte';
 
 	// ENV-based dry-run mode (forced in dev, disabled in prod)
@@ -191,19 +191,28 @@
 		<!-- File Summary -->
 		<div class="file-summary">
 			<p>
-				<strong>{displayFiles.length}</strong> of {displayTotal} photos ready for upload
-				{#if isUploading}
-					<span class="upload-progress"
-						>- Uploading {currentFileIndex + 1} of {displayFiles.length}...</span
+				{#if results.length > 0 && !isUploading}
+					<!-- After upload completed -->
+					<strong>{displayFiles.length}</strong>
+					{displayFiles.length === 1 ? 'photo' : 'photos'} uploaded:
+					<span class="upload-complete"
+						>{successCount} success{#if failCount > 0}, {failCount} failed{/if}</span
 					>
-				{:else if results.length > 0}
-					<span class="upload-complete">- {successCount} success, {failCount} failed</span>
+				{:else}
+					<!-- Before or during upload -->
+					<strong>{displayFiles.length}</strong> of {displayTotal}
+					{displayFiles.length === 1 ? 'photo' : 'photos'} ready for upload
+					{#if isUploading}
+						<span class="upload-progress"
+							>- Uploading {currentFileIndex + 1} of {displayFiles.length}...</span
+						>
+					{/if}
 				{/if}
 			</p>
+
 			{#if filesWithoutGeo.length > 0 && frozenFiles.length === 0}
 				<p class="warning">
-					<TriangleAlert size={14} />
-					{filesWithoutGeo.length} photo(s) skipped (missing GPS data):
+					Skipped {filesWithoutGeo.length} photo(s) because of missing GPS data:
 					{filesWithoutGeo.map((f) => f.name).join(', ')}
 				</p>
 			{/if}
@@ -232,7 +241,7 @@
 						{/if}
 					</span>
 					<span class="file-name">{file.name}</span>
-					<span class="file-status badge {status.class}">{status.label}</span>
+					<StatusBadge statusClass={status.class} label={status.label} />
 				</li>
 			{/each}
 		</ul>
@@ -272,11 +281,11 @@
 	}
 
 	.dry-run-indicator {
-		background: #fef2f2;
-		border: 1px solid #dc2626;
-		color: #dc2626;
+		background: var(--chip-danger-bg);
+		border: 1px solid var(--chip-danger-fg);
+		color: var(--chip-danger-fg);
 		padding: 0.75rem;
-		border-radius: 4px;
+		border-radius: 8px;
 		font-weight: 600;
 		text-align: center;
 		display: flex;
@@ -285,48 +294,24 @@
 		gap: 0.25rem;
 
 		p {
-			color: #dc2626;
-		}
-
-		:global(svg) {
-			display: inline-block;
-			vertical-align: middle;
-			margin-right: 0.25rem;
+			margin: 0;
+			color: var(--chip-danger-fg);
 		}
 	}
 
 	.file-summary {
 		padding: 0.75rem;
-		background: #f5f5f5;
-		border-radius: 4px;
-	}
+		background: var(--chip-neutral-bg);
+		border-radius: 8px;
 
-	.file-summary p {
-		margin: 0;
-	}
-
-	.warning {
-		color: #b45309;
-		font-size: 12px;
-		margin-top: 0.5rem !important;
-		display: flex;
-		align-items: flex-start;
-		gap: 0.25rem;
-
-		:global(svg) {
-			flex-shrink: 0;
-			margin-top: 1px;
+		p {
+			margin: 0;
 		}
 	}
 
-	.upload-progress {
-		color: #4285f4;
-		font-weight: normal;
-	}
-
-	.upload-complete {
-		color: #16a34a;
-		font-weight: normal;
+	.warning {
+		color: var(--warn-700);
+		font-size: 12px;
 	}
 
 	.file-list {
@@ -352,7 +337,7 @@
 	}
 
 	.file-item.uploading {
-		background: #eff6ff;
+		background-color: var(--chip-primary-bg-light);
 	}
 
 	.file-icon {
@@ -367,43 +352,6 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-	}
-
-	.file-status {
-		flex-shrink: 0;
-	}
-
-	.badge {
-		padding: 0.125rem 0.5rem;
-		border-radius: 4px;
-		font-size: 11px;
-		text-transform: uppercase;
-		font-weight: 500;
-	}
-
-	.badge.ready {
-		background: #f0f0f0;
-		color: #666;
-	}
-
-	.badge.waiting {
-		background: #fef3c7;
-		color: #92400e;
-	}
-
-	.badge.uploading {
-		background: #dbeafe;
-		color: #1d4ed8;
-	}
-
-	.badge.success {
-		background: #dcfce7;
-		color: #16a34a;
-	}
-
-	.badge.error {
-		background: #fef2f2;
-		color: #dc2626;
 	}
 
 	.actions {

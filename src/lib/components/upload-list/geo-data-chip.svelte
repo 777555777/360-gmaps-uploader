@@ -38,19 +38,19 @@
 		font-size: 13px;
 		line-height: normal;
 
-		background-color: rgba(30, 225, 90, 0.1);
-		color: rgb(35, 190, 85);
+		background-color: var(--chip-success-bg);
+		color: var(--chip-success-fg);
 
 		&:hover {
-			background-color: rgba(30, 225, 90, 0.15);
+			background-color: var(--chip-success-hover-bg);
 		}
 
 		&:active {
-			background-color: rgba(30, 225, 90, 0.2);
+			background-color: var(--chip-success-active-bg);
 		}
 
 		&:focus-visible {
-			outline: 2px solid rgb(35, 190, 85);
+			outline: 2px solid var(--chip-success-fg);
 		}
 
 		.coordinates {
@@ -65,19 +65,19 @@
 	}
 
 	.geo-data:has(.no-data) {
-		background-color: rgba(223, 32, 32, 0.1);
-		color: rgb(223, 32, 32);
+		background-color: var(--chip-danger-bg);
+		color: var(--chip-danger-fg);
 
 		&:hover {
-			background-color: rgba(223, 32, 32, 0.15);
+			background-color: var(--chip-danger-hover-bg);
 		}
 
 		&:active {
-			background-color: rgba(223, 32, 32, 0.2);
+			background-color: var(--chip-danger-active-bg);
 		}
 
 		&:focus-visible {
-			outline: 2px solid rgb(223, 32, 32);
+			outline: 2px solid var(--chip-danger-fg);
 		}
 	}
 </style>

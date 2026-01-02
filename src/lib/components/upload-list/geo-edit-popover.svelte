@@ -174,19 +174,15 @@
 				0 6px 10px 4px rgba(60, 64, 67, 0.15);
 			transition: all 0.2s ease;
 
-			&:hover {
-				background-color: #3b82f633;
-				color: #3b82f6;
-			}
-
+			&:hover,
 			&:active {
-				background-color: #3b82f64d;
-				color: #1669bb;
+				background-color: var(--button-primary-bg);
+				color: var(--button-primary);
 			}
 
 			&:focus-visible {
 				outline: none;
-				border-color: #3b82f6;
+				border-color: var(--button-primary);
 			}
 		}
 
@@ -228,9 +224,7 @@
 				box-sizing: border-box;
 
 				&:focus {
-					border-color: #3b82f6;
-					box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
-					outline: none;
+					outline: 2px solid var(--button-primary);
 				}
 
 				&::placeholder {
