@@ -12,7 +12,7 @@ A deployed version can be found here: [https://pano-publisher.net](https://pano-
 - 📸 **Batch Upload** - queue and publish multiple 360° images
 - 🌐 **Built-in 360° Preview** - inspect your panoramas directly in the app before publishing
 - 🔐 **Privacy First** - all data processing happens locally in your browser until you publish to Google
-- ✏️ **Flexible Geo-Editing** - adjust coordinates manually via text input or by setting the markers position on the map
+- ✏️ **Geo-Data-Editing** - edit or add geo data via text input or by setting the marker's position on the map
 - 📱 **Responsive UI** - clean, user-friendly interface
 
 ## Prerequisites
