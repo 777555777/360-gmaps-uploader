@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { authState } from '$lib/auth-state.svelte';
 	import { consentState } from '$lib/consent-state.svelte';
 	import logo from '$lib/assets/icon-32x32.png';
 	import LoginBtn from './auth/login-btn.svelte';
 	import LogoutBtn from './auth/logout-btn.svelte';
 	import GithubLink from './header/github-link.svelte';
-	import InfoLink from './header/info-link.svelte';
+	import InfoMenu from './header/info-menu.svelte';
+	import { ArrowLeft } from '@lucide/svelte';
 
 	const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -20,6 +22,7 @@
 	let user = $derived(authState.user);
 	let isAuthenticated = $derived(authState.isAuthenticated);
 	let googleScriptLoaded = $derived(consentState.googleScriptLoaded);
+	let isHomePage = $derived(page.url.pathname === '/');
 
 	// Initialize GIS when script is loaded (reactive)
 	$effect(() => {
@@ -30,12 +33,24 @@
 </script>
 
 <header>
-	<div class="logo-container">
-		<img src={logo} alt="Logo" height="32" />
-		<span>Pano Publisher</span>
-	</div>
+	{#if isHomePage}
+		<div class="logo-container">
+			<img src={logo} alt="Logo" height="32" />
+			<span>Pano Publisher</span>
+		</div>
+	{:else}
+		<a href="/" class="back-link">
+			<div class="logo-container">
+				<div class="logo-placeholder">
+					<ArrowLeft size={20} />
+				</div>
+				<span>Back to App</span>
+			</div>
+		</a>
+	{/if}
+
 	<div class="g-container">
-		<InfoLink />
+		<InfoMenu />
 		<GithubLink />
 		<div class="g-profile">
 			{#if isAuthenticated && user}
@@ -75,6 +90,19 @@
 			}
 		}
 
+		a.back-link {
+			display: flex;
+			text-decoration: none;
+			color: var(--text-default);
+		}
+
+		.logo-placeholder {
+			padding-inline: 6px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
 		.g-container {
 			display: flex;
 			align-items: center;
@@ -104,7 +132,8 @@
 
 		@media (width < 400px) {
 			.logo-container {
-				img {
+				img,
+				.logo-placeholder {
 					display: none;
 				}
 			}
@@ -116,8 +145,9 @@
 					display: none;
 				}
 
-				img {
-					display: block;
+				img,
+				.logo-placeholder {
+					display: flex;
 				}
 			}
 		}

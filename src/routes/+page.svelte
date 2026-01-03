@@ -6,20 +6,15 @@
 	import Dialog from '$lib/components/util/dialog.svelte';
 	import PanoViewer from '$lib/components/pano-viewer.svelte';
 	import PublishDialog from '$lib/components/publish-dialog.svelte';
-	import ConsentDialog from '$lib/components/consent/consent-dialog.svelte';
-	import InfoDialog from '$lib/components/info-dialog.svelte';
 	import {
 		PUBLISH_DIALOG_ID,
 		UPLOAD_DIALOG_ID,
 		PANO_VIEWER_DIALOG_ID,
-		INFO_DIALOG_ID,
-		CONSENT_DIALOG_ID,
 		MAX_FILES_UPLOAD
 	} from '$lib/globals';
 	import UploadArea from '$lib/components/upload-list/upload-area.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
-	import { consentState } from '$lib/consent-state.svelte';
 	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
 
 	let currentPanoramaFile = $derived(fileState.currentPanoramaFile);
@@ -35,15 +30,6 @@
 			showDialogById(PANO_VIEWER_DIALOG_ID);
 		} else {
 			closeDialogById(PANO_VIEWER_DIALOG_ID);
-		}
-	});
-
-	// Consent-Dialog automatisch öffnen wenn Consent noch null ist
-	$effect(() => {
-		if (consentState.hasConsented() === null) {
-			showDialogById(CONSENT_DIALOG_ID);
-		} else {
-			closeDialogById(CONSENT_DIALOG_ID);
 		}
 	});
 
@@ -106,14 +92,6 @@
 	{/if}
 {/snippet}
 
-{#snippet consentDialogContent()}
-	<ConsentDialog />
-{/snippet}
-
-{#snippet infoDialogContent()}
-	<InfoDialog />
-{/snippet}
-
 <Header />
 
 <main>
@@ -131,8 +109,6 @@
 		title={currentPanoramaFile?.name || '360° Panorama'}
 		body={panoViewerDialogContent}
 	/>
-	<Dialog dialogId={INFO_DIALOG_ID} title="Information" body={infoDialogContent} />
-	<Dialog dialogId={CONSENT_DIALOG_ID} title="Cookie & Data Consent" body={consentDialogContent} />
 </main>
 
 <style>
