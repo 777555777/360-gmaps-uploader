@@ -2,9 +2,11 @@
 
 ![alt text](/docs/assets/dummy-ui-example.png)
 
+![](https://img.shields.io/badge/license-AGPL--3.0-blue)
+
 Pano Publisher is a simple webapp for uploading Equirectangular 360-Images to Google Maps via the Google Street View API. It is built with Svelte 5 and processes everything locally on the client up until publishing images to Google.
 
-A deployed version can be found here: [https://pano-publisher.net](https://pano-publisher.net)
+A deployed version can be found here: [https://panopublisher.net](https://panopublisher.net)
 
 ## Features
 
@@ -58,3 +60,38 @@ A deployed version can be found here: [https://pano-publisher.net](https://pano-
    ```
 
    The app will be running at `http://localhost:5173`
+
+## Deployment
+
+```bash
+npm run build
+npm run preview  # Test production build
+```
+
+## Legal & Disclaimer
+
+This project uses the **Google Street View Publish API**. By using this application, you agree to:
+
+- Google's [Terms of Service](https://developers.google.com/terms)
+- Google's [Street View Publish API Terms](https://developers.google.com/streetview/publish/terms)
+
+**Important:** You are responsible for:
+
+- Your own Google Cloud API usage and any associated costs
+- Compliance with Google's usage policies
+- The content you publish to Google Street View
+
+This software is provided "as-is" without warranty of any kind. The author assumes no liability for any damages or costs arising from the use of this software or the Google Street View API.
+
+## License
+
+This project is licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE).
+
+**Key points:**
+
+- Free to use, modify, and distribute
+- Source code must be made available when distributed
+- Network use is distribution - if you host a modified version publicly, you must provide the source code to users
+- Changes must be released under the same license
+
+Copyright (c) 2026 777555777
