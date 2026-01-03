@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Github } from '@lucide/svelte';
 
-	const GITHUB_URL = import.meta.env.VITE_GITHUB_URL;
+	const GITHUB_URL = 'https://github.com/777555777/360-gmaps-uploader';
 </script>
 
 <a

@@ -1,38 +1,60 @@
-# sv
+# Pano Publisher
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+![alt text](/docs/assets/dummy-ui-example.png)
 
-## Creating a project
+Pano Publisher is a simple webapp for uploading Equirectangular 360-Images to Google Maps via the Google Street View API. It is built with Svelte 5 and processes everything locally on the client up until publishing images to Google.
 
-If you're seeing this, you've probably already done this step. Congrats!
+A deployed version can be found here: [https://pano-publisher.net](https://pano-publisher.net)
 
-```sh
-# create a new project in the current directory
-npx sv create
+## Features
 
-# create a new project in my-app
-npx sv create my-app
-```
+- 🗺️ **Interactive Map** - visualize your panorama locations with OpenStreetMap integration
+- 📸 **Batch Upload** - queue and publish multiple 360° images
+- 🌐 **Built-in 360° Preview** - inspect your panoramas directly in the app before publishing
+- 🔐 **Privacy First** - all data processing happens locally in your browser until you publish to Google
+- ✏️ **Flexible Geo-Editing** - adjust coordinates manually via text input or by setting the markers position on the map
+- 📱 **Responsive UI** - clean, user-friendly interface
 
-## Developing
+## Prerequisites
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- Node.js 18+
+- Google Cloud Project with Street View Publish API enabled
+- OAuth 2.0 Client ID (see [Google Auth Setup](docs/GOOGLE_AUTH_SETUP.md))
 
-```sh
-npm run dev
+## Installation & Local Development
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+1. **Clone the repository**
 
-## Building
+   ```bash
+   git clone https://github.com/777555777/360-gmaps-uploader
+   cd 360-gmaps-uploader
+   ```
 
-To create a production version of your app:
+2. **Install dependencies**
 
-```sh
-npm run build
-```
+   ```bash
+   npm install
+   ```
 
-You can preview the production build with `npm run preview`.
+3. **Configure environment variables**
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+   Copy the template file `.env-template` and add your Google credentials:
+
+   ```bash
+   cp .env-template .env
+   ```
+
+   Edit `.env` and enter your values:
+
+   ```bash
+   VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+   VITE_DRY_RUN=true  # For local testing without actual upload
+   ```
+
+4. **Start development server**
+
+   ```bash
+   npm run dev
+   ```
+
+   The app will be running at `http://localhost:5173`
