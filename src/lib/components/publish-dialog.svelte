@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { fileState } from '$lib/file-state.svelte';
 	import { authState } from '$lib/auth-state.svelte';
-	import { PUBLISH_DIALOG_ID } from '$lib/globals';
-	import { closeDialogById } from '$lib/utils/dialog-helpers';
+	import { consentState } from '$lib/consent-state.svelte';
+	import { PUBLISH_DIALOG_ID, CONSENT_DIALOG_ID } from '$lib/globals';
+	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
 	import { uploadPhoto, type UploadProgress, type UploadResult } from '$lib/utils/streetview-api';
 	import { dateToUnixSeconds } from '$lib/utils/publish-helpers';
 	import LoginBtn from '$lib/components/auth/login-btn.svelte';
@@ -61,6 +62,13 @@
 	}
 
 	async function startUpload() {
+		// Check consent before upload
+		if (consentState.hasConsented() !== true) {
+			closeDialogById(PUBLISH_DIALOG_ID);
+			showDialogById(CONSENT_DIALOG_ID);
+			return;
+		}
+
 		if (!authState.accessToken || uploadableFiles.length === 0) return;
 
 		// Freeze the current file list so it stays stable during upload
