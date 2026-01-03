@@ -56,6 +56,7 @@
 		return () => {
 			if (mapState.map) {
 				mapState.map.remove();
+				mapState.setMap(null as any);
 			}
 		};
 	});
