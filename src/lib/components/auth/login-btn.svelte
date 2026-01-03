@@ -1,7 +1,15 @@
 <script lang="ts">
 	import { authState } from '$lib/auth-state.svelte';
+	import { consentState } from '$lib/consent-state.svelte';
+	import { showDialogById } from '$lib/utils/dialog-helpers';
+	import { CONSENT_DIALOG_ID } from '$lib/globals';
 
 	function handleSignIn() {
+		// Check consent before allowing sign-in
+		if (consentState.hasConsented() !== true) {
+			showDialogById(CONSENT_DIALOG_ID);
+			return;
+		}
 		authState.signIn();
 	}
 </script>

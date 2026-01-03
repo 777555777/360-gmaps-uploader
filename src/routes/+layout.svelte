@@ -12,6 +12,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>Pano Publisher</title>
 </svelte:head>
 
 {@render children()}

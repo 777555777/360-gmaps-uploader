@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { authState } from '$lib/auth-state.svelte';
+	import { consentState } from '$lib/consent-state.svelte';
 	import logo from '$lib/assets/icon-32x32.png';
 	import LoginBtn from './auth/login-btn.svelte';
 	import LogoutBtn from './auth/logout-btn.svelte';
@@ -19,19 +19,13 @@
 
 	let user = $derived(authState.user);
 	let isAuthenticated = $derived(authState.isAuthenticated);
+	let googleScriptLoaded = $derived(consentState.googleScriptLoaded);
 
-	onMount(() => {
-		// Initialize Google Identity Services Token Client (for API access)
-		const initializeAuth = () => {
-			if (typeof google !== 'undefined' && google.accounts) {
-				authState.initializeGIS(GOOGLE_CLIENT_ID, SCOPES);
-			} else {
-				// Retry if script not loaded yet
-				setTimeout(initializeAuth, 100);
-			}
-		};
-
-		initializeAuth();
+	// Initialize GIS when script is loaded (reactive)
+	$effect(() => {
+		if (googleScriptLoaded && typeof google !== 'undefined' && google.accounts) {
+			authState.initializeGIS(GOOGLE_CLIENT_ID, SCOPES);
+		}
 	});
 </script>
 
