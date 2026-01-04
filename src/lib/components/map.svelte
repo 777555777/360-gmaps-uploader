@@ -158,13 +158,16 @@
 
 		border: 1px solid var(--border-subtle);
 		background-color: var(--surface-base);
-		border-radius: 8px 8px 0 0;
+		border-radius: 8px 0 0 0;
 		overflow: hidden;
+
+		@media (width < 768px) {
+			border-radius: 0;
+		}
 	}
 
 	.map {
 		width: 100%;
-
 		height: 100%;
 		z-index: 0;
 	}

@@ -16,15 +16,24 @@
 
 <div class="consent-container">
 	<p>
-		This application uses Google services To publish panoramas to Google Street View, Google Login
-		and the Google Street View API are used. This involves the transfer of personal data (e.g., IP
-		address) to Google.
+		This application uses Google services To publish panoramas to Google Street View, <strong
+			>Google Login</strong
+		>
+		and the <strong>Google Street View API</strong> are used. This involves the transfer of personal data
+		(e.g., IP address) to Google.
 	</p>
 
 	<p>
-		Without this consent, logging in with your Google account and publishing panoramas to Google
-		Street View is not possible.
+		<strong>OpenStreetMap</strong> is used to display and edit photo locations on an interactive map.
+		This involves loading map tiles and related data from OpenStreetMap servers.
 	</p>
+
+	<p>
+		Without your consent, logging in with your Google account and publishing panoramas to Google
+		Street View as well as loading the interactive map is not possible.
+	</p>
+
+	<p>You may withdraw your consent at any time via the consent management.</p>
 
 	<div class="actions">
 		<button class="primary-btn" onclick={acceptCookies}>Accept</button>

@@ -35,6 +35,19 @@
 			trademarks of Google.
 		</p>
 	</section>
+	<section>
+		<h3>Image Credits</h3>
+		<ul>
+			<li>
+				<span>Map Placeholder Image: </span>
+				<a
+					href="https://www.freepik.com/free-vector/damask-seamless-pattern_6541371.htm#fromView=search&page=2&position=2&uuid=1ad6ecdf-1808-4ae4-8017-90719b5050c4&query=topography"
+					target="_blank"
+					rel="noopener noreferrer">by GarryKillian on Freepik</a
+				>
+			</li>
+		</ul>
+	</section>
 </div>
 
 <style>

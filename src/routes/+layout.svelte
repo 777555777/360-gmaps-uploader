@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../colors.css';
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/logo.svg';
 	import { useWorkerPoolCleanup } from '$lib/actions/worker-lifecycle';
 	import Dialog from '$lib/components/util/dialog.svelte';
 	import ConsentDialog from '$lib/components/consent/consent-dialog.svelte';

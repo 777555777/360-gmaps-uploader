@@ -10,12 +10,16 @@
 		PUBLISH_DIALOG_ID,
 		UPLOAD_DIALOG_ID,
 		PANO_VIEWER_DIALOG_ID,
+		CONSENT_DIALOG_ID,
 		MAX_FILES_UPLOAD
 	} from '$lib/globals';
 	import UploadArea from '$lib/components/upload-list/upload-area.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
 	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
+	import { consentState } from '$lib/consent-state.svelte';
+	import { Cookie, MapPin } from '@lucide/svelte';
+	import placeholderMapPng from '$lib/assets/map-placeholder.webp';
 
 	let currentPanoramaFile = $derived(fileState.currentPanoramaFile);
 	let publishDialogRef: PublishDialog | undefined = $state();
@@ -96,7 +100,26 @@
 
 <main>
 	<Sidebar />
-	<Map />
+	{#if consentState.hasConsented()}
+		<Map />
+	{:else}
+		<div class="map-placeholder">
+			<div class="map-placeholder-overlay" style="--bg-image: url({placeholderMapPng})"></div>
+			<div class="placeholder-content">
+				<MapPin size={48} strokeWidth={1.5} color="var(--text-subtle)" />
+				<h2>Map Unavailable</h2>
+				<p>
+					The interactive map requires your consent to load OpenStreetMap tiles and display your
+					photo locations.
+				</p>
+				<button class="primary-btn" onclick={() => showDialogById(CONSENT_DIALOG_ID)}>
+					<Cookie size={16} color="var(--text-white)" />
+					Consent Management
+				</button>
+			</div>
+		</div>
+	{/if}
+
 	<Dialog dialogId={UPLOAD_DIALOG_ID} title="Add 360 Photos" body={uploadDialogContent} />
 	<Dialog
 		dialogId={PUBLISH_DIALOG_ID}
@@ -124,6 +147,76 @@
 		margin-bottom: 24px;
 		font-size: 14px;
 		text-align: center;
+	}
+
+	.map-placeholder {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--surface-base);
+		border-radius: 8px 0 0 0;
+		border: 1px solid var(--border-subtle);
+		position: relative;
+
+		.map-placeholder-overlay {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			border-radius: 8px 0 0 0;
+			background-image: var(--bg-image);
+			background-size: 50%;
+			background-repeat: repeat;
+			filter: opacity(0.175);
+		}
+
+		.placeholder-content {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 1.5rem;
+			max-width: 100%;
+			padding: 400px 300px;
+			padding: 35% 25%;
+
+			text-align: center;
+			background: radial-gradient(ellipse, var(--surface-base) 30%, transparent 60%);
+			z-index: 1;
+
+			h2 {
+				font-size: 1.5rem;
+				font-weight: 600;
+				color: var(--text-default);
+				margin: 0;
+			}
+
+			p {
+				color: var(--text-muted);
+				line-height: 1.6;
+				margin: 0;
+				max-width: 400px;
+				box-sizing: content-box;
+			}
+		}
+
+		@media (width < 768px) {
+			border-radius: 0;
+
+			.placeholder-content {
+				padding: 35px;
+				background: radial-gradient(ellipse, var(--surface-base) 40%, transparent 70%);
+			}
+			.map-placeholder-overlay {
+				border-radius: 0;
+			}
+		}
+
+		@media (width < 380px) {
+			.placeholder-content {
+				padding: 20px;
+			}
+		}
 	}
 
 	/* Spezielle Styles für den Panorama Viewer Dialog */
