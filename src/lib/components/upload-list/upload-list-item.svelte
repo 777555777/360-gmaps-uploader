@@ -100,7 +100,7 @@
 						<span>Loading Metadata...</span>
 					</div>
 				{:else}
-					<GeoDataChip {index} {hasGeoData} {metadata} />
+					<GeoDataChip {index} {hasGeoData} {metadata} {isPublished} />
 					{#if isPublished}
 						<PublishedChip />
 					{/if}

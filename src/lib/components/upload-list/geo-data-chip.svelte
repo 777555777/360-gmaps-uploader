@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { MapPin } from '@lucide/svelte';
 
-	let { index, hasGeoData, metadata } = $props();
+	let { index, hasGeoData, metadata, isPublished = false } = $props();
 </script>
 
 <button
 	class="geo-data"
 	style="anchor-name: --geo-data-anchor-{index};"
 	popovertarget="geo-popover-{index}"
-	title="Edit GPS Data"
+	title={isPublished ? 'Already Published - GPS Data Locked' : 'Edit GPS Data'}
+	disabled={isPublished}
 >
 	<MapPin size={18} />
 	{#if hasGeoData && metadata?.geoLocation}
@@ -51,6 +52,11 @@
 
 		&:focus-visible {
 			outline: 2px solid var(--chip-success-fg);
+		}
+
+		&:disabled {
+			background-color: var(--chip-neutral-bg);
+			color: var(--chip-neutral-fg);
 		}
 
 		.coordinates {
