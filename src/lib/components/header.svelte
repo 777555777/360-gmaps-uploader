@@ -69,6 +69,8 @@
 		display: flex;
 		justify-content: space-between;
 		background-color: var(--surface-base);
+		position: sticky;
+		top: 0;
 
 		.logo-container {
 			padding-left: 12px;
