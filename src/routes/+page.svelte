@@ -76,10 +76,14 @@
 	<div class="upload-area-container">
 		<div class="upload-instructions">
 			<p>
-				Add between 1 and {MAX_FILES_UPLOAD} 360° panorama images.<br /> The Image format must be equirectangular
-				with a 2:1 aspect ratio.
+				Add <strong>between 1 and {MAX_FILES_UPLOAD}</strong> panorama images.<br /> The Image
+				format must be equirectangular with a <strong>2:1 aspect ratio</strong>.
 			</p>
-			<p>If an image has no GPS metadata, you can add it manually later.</p>
+			<p>
+				Your images are processed locally until you publish them to Google
+				<br />
+				If an image has no GPS metadata, you can add it manually later.
+			</p>
 		</div>
 
 		<UploadArea />
@@ -206,6 +210,14 @@
 			.placeholder-content {
 				padding: 35px;
 				background: radial-gradient(ellipse, var(--surface-base) 40%, transparent 70%);
+				gap: 0.75rem;
+
+				h2 {
+					font-size: 1.25rem;
+				}
+				p {
+					font-size: 0.85rem;
+				}
 			}
 			.map-placeholder-overlay {
 				border-radius: 0;
@@ -214,7 +226,7 @@
 
 		@media (width < 380px) {
 			.placeholder-content {
-				padding: 20px;
+				padding: 16px;
 			}
 		}
 	}

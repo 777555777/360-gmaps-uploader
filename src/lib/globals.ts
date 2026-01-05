@@ -8,3 +8,5 @@ export const streetViewBaseURL = 'https://streetviewpublish.googleapis.com';
 
 export const MAX_FILES_UPLOAD = 16;
 export const MAX_CONCURRENT_UPLOADS = 4;
+export const MAX_FILE_SIZE_BYTES = 75 * 1024 * 1024; // 75 MB
+export const SUPPORTED_IMAGE_FORMATS = ['image/jpeg', 'image/jpg']; // Upload supports JPG, JPEG, jpg, jpeg

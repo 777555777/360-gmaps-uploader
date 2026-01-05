@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { fileState } from '$lib/file-state.svelte';
-	import { MAX_FILES_UPLOAD, UPLOAD_DIALOG_ID } from '$lib/globals';
+	import {
+		MAX_FILES_UPLOAD,
+		UPLOAD_DIALOG_ID,
+		MAX_FILE_SIZE_BYTES,
+		SUPPORTED_IMAGE_FORMATS
+	} from '$lib/globals';
 	import { closeDialogById } from '$lib/utils/dialog-helpers';
 	import { validateStreetViewImage } from '$lib/utils/image-helpers';
 	import { Upload } from '@lucide/svelte';
@@ -81,6 +86,11 @@
 	function handleClick(): void {
 		fileInput?.click();
 	}
+
+	function mimeToReadableFormat(mimeType: string): string {
+		const format = mimeType.split('/')[1];
+		return format.toUpperCase();
+	}
 </script>
 
 <div
@@ -99,9 +109,13 @@
 
 	<p class="upload-title">Add images by clicking or dragging them here</p>
 	<p class="upload-hint">
-		Your images are processed locally until you publish them to Google
+		Supported formats:
+		<strong>
+			{SUPPORTED_IMAGE_FORMATS.map(mimeToReadableFormat).join(', ')}
+		</strong>
 		<br />
-		Supported formats: JPG
+		Maximum file size per image:
+		<strong>{(MAX_FILE_SIZE_BYTES / (1024 * 1024)).toFixed(0)} MB</strong>
 	</p>
 
 	<input
@@ -148,6 +162,7 @@
 		font-size: 16px;
 		font-weight: 500;
 		color: var(--text-default);
+		text-align: center;
 	}
 
 	.upload-hint {
