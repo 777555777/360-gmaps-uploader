@@ -33,7 +33,7 @@
 			<li>
 				<a href="/privacy" onclick={() => closeDropdown()}>
 					<ShieldCheck size={16} />
-					<span>Privacy Policy</span>
+					<span>Privacy Policy (DE)</span>
 				</a>
 			</li>
 			<li>
