@@ -196,6 +196,12 @@
 			</div>
 		{/if}
 
+		<p>
+			After your photos have been successfully published, they will be visible to the public on
+			Google Maps as blue circles. Please note that it may take a few hours or days for them to
+			appear.
+		</p>
+
 		<!-- File Summary -->
 		<div class="file-summary">
 			<p>
