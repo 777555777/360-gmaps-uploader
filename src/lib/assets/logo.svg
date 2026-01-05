@@ -2,14 +2,43 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-  width="164.55862mm"
-  height="162.47932mm"
-  viewBox="0 0 164.55862 162.47932"
-  version="1.1"
-  id="svg1"
-  xml:space="preserve"
-  xmlns="http://www.w3.org/2000/svg"
-  xmlns:svg="http://www.w3.org/2000/svg"><title>Pano Publisher logo</title><defs
+   width="164mm"
+   height="164mm"
+   viewBox="0 0 164 164"
+   version="1.1"
+   id="svg1"
+   xml:space="preserve"
+   sodipodi:docname="logo.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.95506383"
+     inkscape:cx="340.81492"
+     inkscape:cy="330.34441"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="2552"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g2"><inkscape:page
+       x="0"
+       y="0"
+       width="164"
+       height="164"
+       id="page1"
+       margin="0 0 0"
+       bleed="0" /></sodipodi:namedview><defs
      id="defs1" /><style
      type="text/css"
      id="style1">
@@ -18,7 +47,7 @@
 ]]>
 </style><g
      id="g15"
-     transform="translate(-794.47151,673.3768)"><path
+     transform="translate(-794.4715,673.37683)"><path
        id="path1-7-6-6-9-8-6-2"
        style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.985011;paint-order:stroke fill markers"
        d="m 511.13748,-657.45212 c -25.0082,-8e-5 -45.28147,17.52172 -45.28147,45.28148 0,27.75975 40.89305,87.91401 45.28147,87.91401 4.38842,0 45.28147,-60.15426 45.28147,-87.91401 0,-27.75976 -20.27326,-45.28156 -45.28147,-45.28148 z" /><circle
@@ -34,13 +63,16 @@
        id="g2"><rect
          style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:35;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:50;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
          id="rect2"
-         width="164.55864"
-         height="162.47935"
+         width="164"
+         height="164"
          x="794.4715"
          y="-673.37683"
-         ry="22.81922" /><g
+         ry="23.032785"
+         inkscape:export-filename="logo64x64.png"
+         inkscape:export-xdpi="9.9121952"
+         inkscape:export-ydpi="9.9121952" /><g
          id="g3"
-         transform="translate(-1.0269772,1.1374649e-5)"><circle
+         transform="translate(-1.3062969,0.76033395)"><circle
            style="fill:#0083ff;fill-opacity:1;stroke:none;stroke-width:5.82084;stroke-linecap:round;stroke-opacity:0;paint-order:stroke fill markers"
            id="path5-0-09-0-5"
            cx="876.75085"
