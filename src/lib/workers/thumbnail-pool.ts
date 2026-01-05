@@ -11,6 +11,12 @@
  */
 
 import type { ThumbnailRequest, ThumbnailResponse } from './thumbnail.worker';
+import ThumbnailWorker from './thumbnail.worker?worker';
+
+// ?worker is a Vite-specific way to handle Web Workers in a build-tool-friendly manner.
+// It ensures that the worker is bundled correctly into its own bundle file and
+// can be loaded with the correct path at runtime.
+// See: https://vitejs.dev/guide/features.html#web-workers
 
 interface ThumbnailJob {
 	id: string;
@@ -28,14 +34,12 @@ export class ThumbnailWorkerPool {
 	private jobIdCounter = 0;
 
 	private readonly poolSize: number;
-	private readonly workerPath: string;
 	private isInitialized = false;
 
 	constructor(poolSize: number = Math.min(navigator.hardwareConcurrency || 2, 4)) {
 		// Limit pool size (min 2, max 4 for stability)
 		// More workers = more overhead from context switching
 		this.poolSize = Math.min(Math.max(poolSize, 2), 4);
-		this.workerPath = new URL('./thumbnail.worker.ts', import.meta.url).href;
 	}
 
 	/**
@@ -46,10 +50,10 @@ export class ThumbnailWorkerPool {
 
 		console.log(`🔧 Initializing Thumbnail Worker Pool (${this.poolSize} workers)...`);
 
-		// Create workers
+		// Create workers using Vite's worker import
 		for (let i = 0; i < this.poolSize; i++) {
 			try {
-				const worker = new Worker(this.workerPath, { type: 'module' });
+				const worker = new ThumbnailWorker();
 
 				// Setup message handler
 				worker.onmessage = (event: MessageEvent<ThumbnailResponse>) => {
