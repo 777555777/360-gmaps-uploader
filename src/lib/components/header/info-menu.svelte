@@ -92,4 +92,15 @@
 			}
 		}
 	}
+
+	@media (width <= 768px) {
+		.menu-list {
+			li {
+				button,
+				a {
+					padding: 0.75rem;
+				}
+			}
+		}
+	}
 </style>

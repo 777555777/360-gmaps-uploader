@@ -77,4 +77,47 @@
 			0 10px 15px -3px var(--shadow-inner),
 			0 4px 6px -2px var(--shadow-outer);
 	}
+
+	@media (width <= 768px) {
+		.dropdown-menu {
+			position: fixed;
+			bottom: 0;
+			top: auto;
+			right: 0;
+			left: 0;
+			margin-inline: 0.5rem;
+			width: auto;
+			padding: 1rem;
+			border-radius: 8px 8px 0 0;
+			transition:
+				translate 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+				opacity 0.3s ease;
+			translate: 0 0;
+		}
+
+		.dropdown-menu:popover-open {
+			translate: 0 0;
+		}
+
+		@starting-style {
+			.dropdown-menu:popover-open {
+				translate: 0 100%;
+			}
+		}
+
+		.dropdown-menu::backdrop {
+			background-color: var(--backdrop-color);
+			backdrop-filter: blur(2px);
+			transition:
+				background-color 0.3s ease,
+				backdrop-filter 0.3s ease;
+		}
+
+		@starting-style {
+			.dropdown-menu::backdrop {
+				background-color: transparent;
+				backdrop-filter: blur(0);
+			}
+		}
+	}
 </style>
