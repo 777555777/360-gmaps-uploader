@@ -6,16 +6,19 @@
 	import Dialog from '$lib/components/util/dialog.svelte';
 	import PanoViewer from '$lib/components/pano-viewer.svelte';
 	import PublishDialog from '$lib/components/publish-dialog.svelte';
+	import GPanoFixDialog from '$lib/components/upload-list/gpano-fix-dialog.svelte';
 	import {
 		PUBLISH_DIALOG_ID,
 		UPLOAD_DIALOG_ID,
 		PANO_VIEWER_DIALOG_ID,
 		CONSENT_DIALOG_ID,
+		GPANO_FIX_DIALOG_ID,
 		MAX_FILES_UPLOAD
 	} from '$lib/globals';
 	import UploadArea from '$lib/components/upload-list/upload-area.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
+	import { gpanoFixState } from '$lib/gpano-fix-state.svelte';
 	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
 	import { consentState } from '$lib/consent-state.svelte';
 	import { Cookie, MapPin } from '@lucide/svelte';
@@ -26,6 +29,10 @@
 
 	function handlePublishDialogClose() {
 		publishDialogRef?.onDialogClose();
+	}
+
+	function handleGPanoFixDialogClose() {
+		gpanoFixState.cancel();
 	}
 
 	// Reaktiv den Dialog öffnen/schließen wenn sich currentPanoramaFile ändert
@@ -100,6 +107,10 @@
 	{/if}
 {/snippet}
 
+{#snippet gpanoFixDialogContent()}
+	<GPanoFixDialog />
+{/snippet}
+
 <Header />
 
 <main>
@@ -135,6 +146,12 @@
 		dialogId={PANO_VIEWER_DIALOG_ID}
 		title={currentPanoramaFile?.name || '360° Panorama'}
 		body={panoViewerDialogContent}
+	/>
+	<Dialog
+		dialogId={GPANO_FIX_DIALOG_ID}
+		title="Panorama Metadata"
+		body={gpanoFixDialogContent}
+		onClose={handleGPanoFixDialogClose}
 	/>
 </main>
 
@@ -235,7 +252,7 @@
 	:global(#pano-viewer-dialog) {
 		max-width: 95vw;
 		width: 1200px;
-		max-height: 90vh;
+		max-height: 95dvh;
 	}
 
 	:global(#pano-viewer-dialog .dialog-body) {

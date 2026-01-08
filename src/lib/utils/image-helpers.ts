@@ -1,4 +1,11 @@
 import exifr from 'exifr';
+import {
+	extractGPanoMetadata,
+	generateDefaultGPanoMetadata,
+	getJpegSize,
+	validateGPanoMetadata,
+	type GPanoMetadata
+} from './gpano-helpers';
 
 export interface GeoCoordinates {
 	latitude: number;
@@ -18,7 +25,17 @@ export interface ImageMetadata {
 export interface ValidationResult {
 	isValid: boolean;
 	errors: string[];
+	warnings?: string[];
+	// GPano Auto-Fix support
+	canAutoFix?: boolean;
+	missingGPanoFields?: string[];
+	suggestedGPano?: GPanoMetadata;
+	imageWidth?: number;
+	imageHeight?: number;
 }
+
+// Re-export GPanoMetadata for convenience
+export type { GPanoMetadata };
 
 /**
  * Formats a file size in bytes to a human-readable string
@@ -181,19 +198,30 @@ async function createThumbnailMainThread(file: File, maxSize = 512): Promise<str
 /**
  * Validates a 360° image for the Street View API.
  * Requirements:
- * JPEG
- * max. 75 MB
- * Minimum resolution (3840x1920)
- * Aspect ratio 2:1
+ * - JPEG format
+ * - Max 75 MB file size
+ * - Minimum resolution (3840x1920)
+ * - Aspect ratio 2:1
+ * - Google Photo Sphere XMP metadata (GPano namespace)
  *
  * Uses fast JPEG header parser (no decode!).
  */
 export async function validateStreetViewImage(file: File): Promise<ValidationResult> {
 	const errors: string[] = [];
+	const warnings: string[] = [];
 
 	const MAX_FILE_SIZE = 75 * 1024 * 1024; // 75 MB
 	const MIN_WIDTH = 3840;
 	const MIN_HEIGHT = 1920;
+
+	// Image dimensions - needed for both dimension validation and GPano validation
+	let imageWidth = 0;
+	let imageHeight = 0;
+
+	// GPano Auto-Fix support
+	let canAutoFix = false;
+	let missingGPanoFields: string[] = [];
+	let suggestedGPano: GPanoMetadata | undefined;
 
 	// --- 1. Check MIME type ---
 	if (file.type !== 'image/jpeg' && file.type !== 'image/jpg') {
@@ -207,17 +235,19 @@ export async function validateStreetViewImage(file: File): Promise<ValidationRes
 
 	// --- 3. Read JPEG dimensions quickly from header ---
 	try {
-		const { width, height } = await getJpegSize(file);
+		const dimensions = await getJpegSize(file);
+		imageWidth = dimensions.width;
+		imageHeight = dimensions.height;
 
 		// Minimum resolution
-		if (width < MIN_WIDTH || height < MIN_HEIGHT) {
+		if (imageWidth < MIN_WIDTH || imageHeight < MIN_HEIGHT) {
 			errors.push(
-				`Resolution too low. At least ${MIN_WIDTH}×${MIN_HEIGHT} required (Current: ${width}×${height}).`
+				`Resolution too low. At least ${MIN_WIDTH}×${MIN_HEIGHT} required (Current: ${imageWidth}×${imageHeight}).`
 			);
 		}
 
 		// Aspect ratio 2:1
-		const ratio = width / height;
+		const ratio = imageWidth / imageHeight;
 		if (Math.abs(ratio - 2) > 0.01) {
 			errors.push(`Aspect ratio must be 2:1 (Current: ${ratio.toFixed(2)}:1).`);
 		}
@@ -226,44 +256,52 @@ export async function validateStreetViewImage(file: File): Promise<ValidationRes
 		errors.push('Could not read JPEG dimensions. Is the file corrupted?');
 	}
 
+	// --- 4. Validate Google Photo Sphere XMP metadata ---
+	// Only validate if we successfully read the dimensions and basic checks passed
+	const hasBasicErrors = errors.length > 0;
+
+	if (imageWidth > 0 && imageHeight > 0) {
+		try {
+			const gpano = await extractGPanoMetadata(file);
+			const metadataValidation = validateGPanoMetadata(gpano, imageWidth, imageHeight);
+
+			errors.push(...metadataValidation.errors);
+			warnings.push(...metadataValidation.warnings);
+
+			// Check if we can auto-fix (only if no other critical errors)
+			if (
+				!hasBasicErrors &&
+				metadataValidation.canAutoFix &&
+				metadataValidation.missingFields.length > 0
+			) {
+				canAutoFix = true;
+				missingGPanoFields = metadataValidation.missingFields;
+				suggestedGPano = generateDefaultGPanoMetadata(imageWidth, imageHeight);
+			}
+
+			// Add helpful hint if metadata is missing
+			if (!metadataValidation.valid && gpano === null) {
+				warnings.push(
+					'Tip: Images edited in Photoshop or other software often lose these metadata fields.'
+				);
+			}
+		} catch (err) {
+			console.error('Error checking GPano metadata:', err);
+			warnings.push('Could not validate Photo Sphere metadata.');
+		}
+	}
+
 	return {
 		isValid: errors.length === 0,
-		errors
+		errors,
+		warnings,
+		canAutoFix,
+		missingGPanoFields: missingGPanoFields.length > 0 ? missingGPanoFields : undefined,
+		suggestedGPano,
+		imageWidth: imageWidth > 0 ? imageWidth : undefined,
+		imageHeight: imageHeight > 0 ? imageHeight : undefined
 	};
 }
 
-/**
- * Reads JPEG width and height very quickly from the SOF segment.
- * Only uses the first 1 MB of the file.
- */
-async function getJpegSize(file: File): Promise<{ width: number; height: number }> {
-	const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB reichen locker
-	const buffer = await file.slice(0, CHUNK_SIZE).arrayBuffer();
-	const view = new DataView(buffer);
-
-	let offset = 2; // JPEG starts with 0xFFD8
-
-	while (offset < view.byteLength) {
-		if (view.getUint8(offset) !== 0xff) {
-			throw new Error('Invalid JPEG (missing marker).');
-		}
-
-		const marker = view.getUint8(offset + 1);
-		offset += 2;
-
-		// SOF0, SOF2 contain width/height
-		if (marker >= 0xc0 && marker <= 0xc3) {
-			offset += 3; // Skip segment length + precision
-			const height = view.getUint16(offset);
-			offset += 2;
-			const width = view.getUint16(offset);
-			return { width, height };
-		}
-
-		// Skip other segments
-		const length = view.getUint16(offset);
-		offset += length;
-	}
-
-	throw new Error('SOF marker not found (not a valid JPEG?).');
-}
+// Re-export GPano functions for convenience
+export { injectGPanoMetadata } from './gpano-helpers';

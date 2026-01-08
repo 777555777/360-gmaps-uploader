@@ -261,7 +261,7 @@
 		</ul>
 
 		<!-- Actions -->
-		<div class="actions">
+		<div class="dialog-actions">
 			{#if !isUploading && results.length === 0}
 				<button class="primary-btn" onclick={startUpload} disabled={displayFiles.length === 0}>
 					{#if dryRunMode}
@@ -366,13 +366,5 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-	}
-
-	.actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: 0.5rem;
-		padding-top: 1rem;
-		border-top: 1px solid var(--border-subtle);
 	}
 </style>

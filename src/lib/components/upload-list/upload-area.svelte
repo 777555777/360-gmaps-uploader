@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { fileState } from '$lib/file-state.svelte';
+	import { gpanoFixState } from '$lib/gpano-fix-state.svelte';
 	import {
 		MAX_FILES_UPLOAD,
 		UPLOAD_DIALOG_ID,
+		GPANO_FIX_DIALOG_ID,
 		MAX_FILE_SIZE_BYTES,
 		SUPPORTED_IMAGE_FORMATS
 	} from '$lib/globals';
-	import { closeDialogById } from '$lib/utils/dialog-helpers';
-	import { validateStreetViewImage } from '$lib/utils/image-helpers';
+	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
+	import { validateStreetViewImage, type ValidationResult } from '$lib/utils/image-helpers';
 	import { Upload } from '@lucide/svelte';
 
 	let isDragging = $state(false);
@@ -56,26 +58,35 @@
 			return;
 		}
 
-		const validFiles: File[] = [];
-		const errors: string[] = [];
+		// Validate all files and collect results
+		const validationResults: { file: File; validation: ValidationResult }[] = [];
 
 		for (const file of files) {
-			const result = await validateStreetViewImage(file);
-
-			if (result.isValid) {
-				validFiles.push(file);
-			} else {
-				errors.push(`• ${file.name}:\n  ${result.errors.join('\n  ')}`);
-			}
+			const validation = await validateStreetViewImage(file);
+			validationResults.push({ file, validation });
 		}
 
-		if (validFiles.length > 0) {
-			fileState.addFiles(validFiles);
-			closeDialogById(UPLOAD_DIALOG_ID);
-		}
+		// Process results through the GPano fix state
+		gpanoFixState.processValidationResults(validationResults);
 
-		if (errors.length > 0) {
-			alert(`Some files could not be added:\n\n${errors.join('\n\n')}`);
+		// Close upload dialog first
+		closeDialogById(UPLOAD_DIALOG_ID);
+
+		// Determine what to do based on validation results
+		const hasFixable = gpanoFixState.hasFixableFiles;
+		const hasRejected = gpanoFixState.hasRejectedFiles;
+		const hasValid = gpanoFixState.validFiles.length > 0;
+
+		if (hasFixable || hasRejected) {
+			// Show the dialog for any combination that needs user attention:
+			// - Files that need metadata fixing
+			// - Files that were rejected (even with valid files)
+			// - Only rejected files
+			showDialogById(GPANO_FIX_DIALOG_ID);
+		} else if (hasValid) {
+			// All files are valid, add them directly (no dialog needed)
+			fileState.addFiles(gpanoFixState.validFiles);
+			gpanoFixState.clear();
 		}
 
 		if (fileInput) {
