@@ -230,21 +230,68 @@ export async function getJpegSize(file: File): Promise<{ width: number; height: 
 }
 
 /**
+ * Finds the XMP APP1 segment in a JPEG buffer.
+ * Returns the start offset and length if found.
+ */
+function findXmpSegment(view: Uint8Array): { offset: number; length: number } | null {
+	const XMP_NAMESPACE = 'http://ns.adobe.com/xap/1.0/';
+	let offset = 2; // Skip SOI marker
+
+	while (offset < view.length - 4) {
+		if (view[offset] !== 0xff) {
+			offset++;
+			continue;
+		}
+
+		const marker = view[offset + 1];
+
+		// Stop at SOS (Start of Scan) or EOI (End of Image)
+		if (marker === 0xda || marker === 0xd9) break;
+
+		// APP1 marker (0xE1)
+		if (marker === 0xe1) {
+			const segmentLength = (view[offset + 2] << 8) | view[offset + 3];
+			const segmentData = view.slice(offset + 4, offset + 4 + Math.min(50, segmentLength));
+			const decoder = new TextDecoder('utf-8', { fatal: false });
+			const segmentStr = decoder.decode(segmentData);
+
+			// Check if this APP1 contains XMP (starts with XMP namespace)
+			if (segmentStr.startsWith(XMP_NAMESPACE)) {
+				return {
+					offset: offset,
+					length: 2 + segmentLength // marker (2) + length (2) + data
+				};
+			}
+		}
+
+		// Skip to next segment
+		if (marker >= 0xe0 && marker <= 0xef) {
+			const segmentLength = (view[offset + 2] << 8) | view[offset + 3];
+			offset += 2 + segmentLength;
+		} else {
+			offset++;
+		}
+	}
+
+	return null;
+}
+
+/**
  * Injects GPano XMP metadata into a JPEG file.
  * Creates a new File object with the metadata embedded.
  *
- * JPEG Structure Primer:
- * - JPEGs are composed of "markers" (2-byte codes starting with 0xFF)
- * - 0xFFD8 = SOI (Start of Image) - first 2 bytes of every JPEG
- * - 0xFFE1 = APP1 marker - used for EXIF and XMP metadata
- * - Each segment has: [marker] [length 2 bytes] [data]
+ * IMPORTANT: Google Street View API requires CLEAN XMP with ONLY GPano namespace.
+ * Mixed namespaces (dc, photoshop, xmpMM, etc.) cause "not a 360 photo" errors.
+ * This function REPLACES any existing XMP with a clean GPano-only XMP.
  *
- * This function inserts a new APP1 segment right after the SOI marker.
- * This is the standard way to add XMP metadata and preserves existing EXIF data.
+ * JPEG Structure:
+ * - 0xFFD8 = SOI (Start of Image)
+ * - 0xFFE1 = APP1 marker (EXIF/XMP metadata)
+ * - Each segment: [marker 2 bytes] [length 2 bytes] [data]
  *
  * @param file - The original JPEG file
  * @param gpano - The GPano metadata to inject
- * @returns A new File object with the metadata embedded
+ * @returns A new File object with clean GPano-only XMP
  */
 export async function injectGPanoMetadata(file: File, gpano: GPanoMetadata): Promise<File> {
 	const buffer = await file.arrayBuffer();
@@ -255,55 +302,67 @@ export async function injectGPanoMetadata(file: File, gpano: GPanoMetadata): Pro
 		throw new Error('Not a valid JPEG file');
 	}
 
-	// Generate XMP packet
+	const XMP_NAMESPACE = 'http://ns.adobe.com/xap/1.0/\0';
+	const namespaceBytes = new TextEncoder().encode(XMP_NAMESPACE);
+
+	// Generate clean GPano-only XMP
 	const xmpPacket = generateXMPPacket(gpano);
 	const xmpBytes = new TextEncoder().encode(xmpPacket);
 
-	// Create APP1 segment for XMP metadata
-	// Standard structure: 0xFFE1 [length] [namespace] [XMP data]
-	const xmpNamespace = 'http://ns.adobe.com/xap/1.0/\0';
-	const namespaceBytes = new TextEncoder().encode(xmpNamespace);
-
-	// Calculate segment length (includes length field itself, but not the marker)
+	// Build new APP1 segment
 	const segmentLength = 2 + namespaceBytes.length + xmpBytes.length;
+	const newApp1 = new Uint8Array(2 + segmentLength);
+	newApp1[0] = 0xff;
+	newApp1[1] = 0xe1;
+	newApp1[2] = (segmentLength >> 8) & 0xff;
+	newApp1[3] = segmentLength & 0xff;
+	newApp1.set(namespaceBytes, 4);
+	newApp1.set(xmpBytes, 4 + namespaceBytes.length);
 
-	// Build the complete APP1 segment
-	const app1Segment = new Uint8Array(2 + segmentLength);
-	app1Segment[0] = 0xff; // Marker byte 1
-	app1Segment[1] = 0xe1; // Marker byte 2: APP1 (used for XMP/EXIF)
-	app1Segment[2] = (segmentLength >> 8) & 0xff; // Length high byte
-	app1Segment[3] = segmentLength & 0xff; // Length low byte
-	app1Segment.set(namespaceBytes, 4);
-	app1Segment.set(xmpBytes, 4 + namespaceBytes.length);
+	// Check for existing XMP segment
+	const existingXmp = findXmpSegment(view);
+	let newBuffer: Uint8Array;
 
-	// Construct new JPEG: [SOI] [new APP1 with XMP] [rest of original file]
-	const newBuffer = new Uint8Array(2 + app1Segment.length + (view.length - 2));
-	newBuffer[0] = 0xff; // SOI marker byte 1
-	newBuffer[1] = 0xd8; // SOI marker byte 2
-	newBuffer.set(app1Segment, 2); // Insert our new APP1 segment
-	newBuffer.set(view.subarray(2), 2 + app1Segment.length); // Copy rest of original
+	if (existingXmp) {
+		// REPLACE existing XMP with clean GPano-only XMP
+		const beforeXmp = view.slice(0, existingXmp.offset);
+		const afterXmp = view.slice(existingXmp.offset + existingXmp.length);
 
-	// Create new File with same name and type
-	return new File([newBuffer], file.name, { type: file.type, lastModified: Date.now() });
+		newBuffer = new Uint8Array(beforeXmp.length + newApp1.length + afterXmp.length);
+		newBuffer.set(beforeXmp, 0);
+		newBuffer.set(newApp1, beforeXmp.length);
+		newBuffer.set(afterXmp, beforeXmp.length + newApp1.length);
+	} else {
+		// No existing XMP - insert after SOI
+		newBuffer = new Uint8Array(2 + newApp1.length + (view.length - 2));
+		newBuffer[0] = 0xff;
+		newBuffer[1] = 0xd8;
+		newBuffer.set(newApp1, 2);
+		newBuffer.set(view.subarray(2), 2 + newApp1.length);
+	}
+
+	return new File([newBuffer.buffer as ArrayBuffer], file.name, {
+		type: file.type,
+		lastModified: Date.now()
+	});
 }
 
 /**
- * Generates an XMP packet containing GPano metadata.
- * Follows the Adobe XMP specification and Google Photo Sphere format.
+ * Generates a CLEAN XMP packet containing ONLY GPano metadata.
+ * Google Street View API requires XMP without other namespaces.
  */
 function generateXMPPacket(gpano: GPanoMetadata): string {
-	const gpanoFields = Object.entries(gpano)
+	const gpanoAttrs = Object.entries(gpano)
 		.filter(([, value]) => value !== undefined)
 		.map(([key, value]) => `      GPano:${key}="${value}"`)
 		.join('\n');
 
 	return `<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>
-<x:xmpmeta xmlns:x="adobe:ns:meta/">
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <rdf:Description rdf:about=""
       xmlns:GPano="http://ns.google.com/photos/1.0/panorama/"
-${gpanoFields}>
-    </rdf:Description>
+${gpanoAttrs}/>
   </rdf:RDF>
 </x:xmpmeta>
 <?xpacket end="w"?>`;

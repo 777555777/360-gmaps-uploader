@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { gpanoFixState } from '$lib/gpano-fix-state.svelte';
 	import { fileState } from '$lib/file-state.svelte';
-	import { injectGPanoMetadata } from '$lib/utils/image-helpers';
+	import { injectGPanoMetadata, type GPanoMetadata } from '$lib/utils/image-helpers';
 	import { closeDialogById } from '$lib/utils/dialog-helpers';
 	import { GPANO_FIX_DIALOG_ID } from '$lib/globals';
 	import { Check, Wrench, FileX } from '@lucide/svelte';
@@ -89,41 +89,15 @@
 		closeDialogById(GPANO_FIX_DIALOG_ID);
 	}
 
-	// Helper function to get only the MISSING metadata fields that will be added
-	// Returns only fields that are actually missing in the original image
-	function getMissingMetadata(
-		missingFields: string[],
-		suggestedGPano: any
-	): Array<{ field: string; value: any }> {
-		const result: Array<{ field: string; value: any }> = [];
-
-		// Map from field names (as stored in missingFields) to GPano keys
-		const fieldToKeyMap: Record<string, keyof typeof suggestedGPano> = {
-			'GPano:ProjectionType': 'ProjectionType',
-			'GPano:UsePanoramaViewer': 'UsePanoramaViewer',
-			'GPano:FullPanoWidthPixels': 'FullPanoWidthPixels',
-			'GPano:FullPanoHeightPixels': 'FullPanoHeightPixels',
-			'GPano:CroppedAreaImageWidthPixels': 'CroppedAreaImageWidthPixels',
-			'GPano:CroppedAreaImageHeightPixels': 'CroppedAreaImageHeightPixels',
-			'GPano:CroppedAreaLeftPixels': 'CroppedAreaLeftPixels',
-			'GPano:CroppedAreaTopPixels': 'CroppedAreaTopPixels',
-			'GPano:InitialViewHeadingDegrees': 'InitialViewHeadingDegrees',
-			'GPano:InitialViewPitchDegrees': 'InitialViewPitchDegrees',
-			'GPano:InitialViewRollDegrees': 'InitialViewRollDegrees'
-		};
-
-		// Only include fields that are actually missing
-		for (const missingField of missingFields) {
-			const key = fieldToKeyMap[missingField];
-			if (key && suggestedGPano[key] !== undefined) {
-				result.push({
-					field: missingField,
-					value: suggestedGPano[key]
-				});
-			}
-		}
-
-		return result;
+	// Helper function to get ALL metadata fields that will be written
+	// Since we completely replace XMP with clean GPano-only data, show all fields
+	function getNewMetadata(suggestedGPano: GPanoMetadata): Array<{ field: string; value: string }> {
+		return (Object.entries(suggestedGPano) as [string, string | undefined][])
+			.filter(([, value]) => value !== undefined)
+			.map(([key, value]) => ({
+				field: `GPano:${key}`,
+				value: value!
+			}));
 	}
 
 	/**
@@ -196,6 +170,7 @@
 		{#if hasFixable}
 			<div class="section info">
 				<h3>Images that will be prepared automatically</h3>
+				<p class="metadata-info">Required GPano metadata will be added before publishing.</p>
 				{#each gpanoFixState.fixableFiles as item (item.file.name)}
 					<AccordionItem name="file-details" summaryTitle={item.file.name}>
 						{#snippet icon()}
@@ -203,7 +178,7 @@
 						{/snippet}
 						{#snippet content()}
 							<ul class="metadata-list">
-								{#each getMissingMetadata(item.missingFields, item.suggestedGPano) as { field, value }}
+								{#each getNewMetadata(item.suggestedGPano) as { field, value }}
 									<li>
 										<code>{field}</code> = <code>{value}</code>
 									</li>
@@ -384,6 +359,12 @@
 	}
 
 	/* Metadata details */
+	.metadata-info {
+		font-size: 12px;
+		color: var(--text-subtle);
+		margin: 0;
+	}
+
 	.metadata-list {
 		list-style: none;
 		padding-inline: 0.5rem;

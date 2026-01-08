@@ -51,6 +51,58 @@ GPano:CroppedAreaLeftPixels       = "0"
 GPano:CroppedAreaTopPixels        = "0"
 ```
 
+## ⚠️ Critical: Clean XMP Requirement
+
+**Google Street View API rejects images with mixed XMP namespaces!**
+
+This was discovered through extensive testing (Jan 2026). The API returns "The image is not a 360 photo" error even when all GPano fields are present, if the XMP contains other namespaces.
+
+### What Works ✅
+
+```xml
+<rdf:Description rdf:about=""
+  xmlns:GPano="http://ns.google.com/photos/1.0/panorama/"
+  GPano:UsePanoramaViewer="True"
+  GPano:ProjectionType="equirectangular"
+  GPano:FullPanoWidthPixels="11904"
+  .../>
+```
+
+### What Fails ❌
+
+```xml
+<rdf:Description rdf:about=""
+  xmlns:GPano="http://ns.google.com/photos/1.0/panorama/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:photoshop="http://ns.adobe.com/photoshop/1.0/"
+  xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"
+  GPano:ProjectionType="equirectangular"
+  dc:format="image/tiff"
+  photoshop:DateCreated="2026-01-06"
+  ...>
+  <xmpMM:History>...</xmpMM:History>
+</rdf:Description>
+```
+
+### Key Findings
+
+| Image Source                 | XMP Content                    | Result   |
+| ---------------------------- | ------------------------------ | -------- |
+| Insta360 Studio              | GPano only                     | ✅ Works |
+| Lightroom/Photoshop export   | GPano + dc + photoshop + xmpMM | ❌ Fails |
+| Our auto-fix (merged)        | GPano merged into existing     | ❌ Fails |
+| Our auto-fix (clean replace) | GPano only, replaces existing  | ✅ Works |
+
+### Implementation
+
+The `injectGPanoMetadata()` function now:
+
+1. **Finds** existing XMP APP1 segment (if any)
+2. **Replaces** it entirely with clean GPano-only XMP
+3. Does NOT merge into existing metadata
+
+This means some original metadata (dc:creator, photoshop:DateCreated, etc.) is lost, but this is necessary for Street View compatibility.
+
 ## Auto-Fix Logic
 
 **Can auto-fix when:**
@@ -68,16 +120,16 @@ GPano:CroppedAreaTopPixels        = "0"
 
 - Only reads first **2 MB** for XMP extraction (metadata is always at JPEG start)
 - Only reads first **1 MB** for JPEG dimension parsing (SOF marker)
-- Injection prepends new APP1 segment, preserves existing EXIF
+- XMP segment is found and replaced in-place (not prepended)
 
 ## XMP Injection
 
 The `injectGPanoMetadata()` function:
 
 1. Reads full file into `ArrayBuffer`
-2. Builds XMP packet with GPano namespace
-3. Creates APP1 segment: `0xFFE1 [length] [namespace] [XMP]`
-4. Inserts after SOI marker (byte 2), before rest of file
+2. Finds existing XMP APP1 segment (starts with `http://ns.adobe.com/xap/1.0/`)
+3. Builds **clean** XMP packet with **only** GPano namespace
+4. **Replaces** existing XMP segment (or inserts after SOI if none exists)
 5. Returns new `File` object
 
 ## References
