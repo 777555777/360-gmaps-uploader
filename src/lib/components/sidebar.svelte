@@ -144,7 +144,7 @@
 		aside {
 			width: unset;
 			min-height: 50%;
-			max-height: 65%;
+			max-height: 60%;
 			margin-bottom: 1rem;
 		}
 	}

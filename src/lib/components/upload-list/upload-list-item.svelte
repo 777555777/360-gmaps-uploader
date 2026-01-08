@@ -150,13 +150,25 @@
 		margin-bottom: 3px;
 
 		h3 {
-			max-width: 300px;
+			max-width: 280px;
 			font-size: 14px;
 			font-weight: 500;
 			margin: 0;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
+		}
+	}
+
+	@media (max-width: 476px) {
+		.card-header h3 {
+			max-width: 240px;
+		}
+	}
+
+	@media (max-width: 396px) {
+		.card-header h3 {
+			max-width: 200px;
 		}
 	}
 

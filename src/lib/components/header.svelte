@@ -132,7 +132,7 @@
 			}
 		}
 
-		@media (width < 400px) {
+		@media (width < 405px) {
 			.logo-container {
 				img,
 				.logo-placeholder {
@@ -141,7 +141,7 @@
 			}
 		}
 
-		@media (width < 365px) {
+		@media (width < 370px) {
 			.logo-container {
 				span {
 					display: none;

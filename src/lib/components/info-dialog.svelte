@@ -1,4 +1,11 @@
-<script lang="ts"></script>
+<script lang="ts">
+	import { closeDialogById } from '$lib/utils/dialog-helpers';
+	import { INFO_DIALOG_ID } from '$lib/globals';
+
+	function closeInfoDialog() {
+		closeDialogById(INFO_DIALOG_ID);
+	}
+</script>
 
 <div class="info-content">
 	<section>
@@ -8,9 +15,10 @@
 			Street View. These images appear as the blue circles on Google Maps.
 		</p>
 		<p>
-			It was created to fill a gap in Google's official tools: Google Street View Studio does not
-			support uploading single images, and Google has discontinued the Street View mobile app, which
-			was previously the only alternative for publishing standalone photo spheres.
+			It was created to fill a gap in Google's official tools: <span class="no-wrap"
+				>Google Street View Studio</span
+			> does not support uploading single images, and Google has discontinued the Street View mobile app,
+			which was previously the only alternative for publishing standalone photo spheres.
 		</p>
 		<p>
 			<strong>Important:</strong> This project is intentionally focused on uploading individual photo
@@ -24,7 +32,7 @@
 		<p>
 			If you want to upload videos or create connected street-level imagery, please use
 			<a href="https://streetviewstudio.maps.google.com" target="_blank" rel="noopener noreferrer">
-				Google Street View Studio
+				<span class="no-wrap">Street View Studio</span>
 			</a>.
 		</p>
 	</section>
@@ -48,6 +56,13 @@
 			</li>
 		</ul>
 	</section>
+
+	<!-- Actions -->
+	<div class="dialog-actions">
+		<button class="primary-btn" onclick={closeInfoDialog} aria-label="Close Info Dialog">
+			Close
+		</button>
+	</div>
 </div>
 
 <style>
@@ -55,6 +70,10 @@
 		font-size: 14px;
 		line-height: 1.6;
 		text-align: justify;
+	}
+
+	.no-wrap {
+		white-space: nowrap;
 	}
 
 	section {

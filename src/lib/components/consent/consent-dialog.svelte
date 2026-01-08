@@ -35,21 +35,13 @@
 
 	<p>You may withdraw your consent at any time via the consent management.</p>
 
-	<div class="actions">
+	<div class="dialog-actions">
 		<button class="primary-btn" onclick={acceptCookies}>Accept</button>
 		<button class="secondary-btn" onclick={declineCookies}>Decline</button>
 	</div>
 </div>
 
 <style>
-	.actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: 0.5rem;
-		padding-top: 1rem;
-		border-top: 1px solid var(--border-subtle);
-	}
-
 	p {
 		color: var(--text-muted);
 	}

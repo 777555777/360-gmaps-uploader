@@ -188,3 +188,18 @@ h6 {
 		cursor: not-allowed;
 	}
 }
+
+.dialog-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--border-subtle);
+}
+
+hr.separator {
+	border: none;
+	border-top: 1px solid var(--border-subtle);
+	margin-block: 0.5rem;
+	margin-inline: 0.25rem;
+}

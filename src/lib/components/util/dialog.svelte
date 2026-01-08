@@ -35,8 +35,8 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 		max-width: 90vw;
-		max-height: 90vh;
-		width: 600px;
+		max-height: 90dvh;
+		width: 720px;
 		padding: 0;
 		border-radius: 8px;
 		border: none;
@@ -65,10 +65,21 @@
 		font-weight: 500;
 		color: var(--text-default);
 		line-height: 1.5;
+		/* min-width: 260px; */
+		white-space: normal;
+		word-break: break-word;
+
+		@media (max-width: 576px) {
+			font-size: 16px;
+			min-width: 0;
+			max-width: calc(100vw - 100px);
+		}
 	}
 
 	.dialog-body {
 		padding: 24px;
+		overflow: auto;
+		max-height: 80dvh;
 	}
 
 	dialog :global(p) {
@@ -79,5 +90,12 @@
 
 	dialog :global(p:last-child) {
 		margin-bottom: 0;
+	}
+
+	@media (width < 380px) {
+		dialog {
+			max-width: 95vw;
+			max-height: 95dvh;
+		}
 	}
 </style>

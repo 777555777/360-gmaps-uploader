@@ -117,4 +117,9 @@
 	--dropdown-bg: var(--surface-base);
 	--dropdown-bg-hover: var(--surface-subtle);
 	--dropdown-bg-active: var(--surface-strong);
+
+	/* Accordion colors */
+	--accordion-bg: var(--neutral-50);
+	--accordion-bg-hover: var(--neutral-100);
+	--accordion-bg-active: var(--neutral-200);
 }
