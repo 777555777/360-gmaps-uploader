@@ -4,8 +4,8 @@
 	import favicon from '$lib/assets/logo.svg';
 	import { useWorkerPoolCleanup } from '$lib/actions/worker-lifecycle';
 	import Dialog from '$lib/components/util/dialog.svelte';
-	import ConsentDialog from '$lib/components/consent/consent-dialog.svelte';
-	import InfoDialog from '$lib/components/info-dialog.svelte';
+	import ConsentDialog from '$lib/components/dialogs/consent-dialog.svelte';
+	import InfoDialog from '$lib/components/dialogs/info-dialog.svelte';
 	import { INFO_DIALOG_ID, CONSENT_DIALOG_ID } from '$lib/globals';
 	import { consentState } from '$lib/consent-state.svelte';
 	import { showDialogById, closeDialogById } from '$lib/utils/dialog-helpers';

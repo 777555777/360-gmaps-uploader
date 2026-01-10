@@ -4,9 +4,9 @@
 	import Header from '$lib/components/header.svelte';
 	import Sidebar from '$lib/components/sidebar.svelte';
 	import Dialog from '$lib/components/util/dialog.svelte';
-	import PanoViewer from '$lib/components/pano-viewer.svelte';
-	import PublishDialog from '$lib/components/publish-dialog.svelte';
-	import GPanoFixDialog from '$lib/components/upload-list/gpano-fix-dialog.svelte';
+	import PanoViewer from '$lib/components/dialogs/pano-viewer-dialog.svelte';
+	import PublishDialog from '$lib/components/dialogs/publish-dialog.svelte';
+	import GPanoFixDialog from '$lib/components/dialogs/gpano-fix-dialog.svelte';
 	import {
 		PUBLISH_DIALOG_ID,
 		UPLOAD_DIALOG_ID,
