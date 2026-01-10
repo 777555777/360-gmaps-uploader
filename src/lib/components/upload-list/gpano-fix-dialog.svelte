@@ -173,7 +173,7 @@
 				<p class="metadata-info">Required GPano metadata will be added before publishing.</p>
 				{#each gpanoFixState.fixableFiles as item (item.file.name)}
 					<AccordionItem name="file-details" summaryTitle={item.file.name}>
-						{#snippet icon()}
+						{#snippet header()}
 							<Wrench size={16} />
 						{/snippet}
 						{#snippet content()}
@@ -196,7 +196,7 @@
 				<h3>Images that cannot be added</h3>
 				{#each gpanoFixState.rejectedFiles as { file, errors }, index (file.name)}
 					<AccordionItem name="rejected-files" summaryTitle={file.name} open={index === 0}>
-						{#snippet icon()}
+						{#snippet header()}
 							<FileX size={16} />
 						{/snippet}
 						{#snippet content()}

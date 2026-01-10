@@ -5,24 +5,26 @@
 		/** The name attribute for grouping accordions (allows only one open at a time) */
 		name?: string;
 		/** The title shown in the summary header */
-		summaryTitle: string;
-		/** Icon snippet to display before the title */
-		icon?: Snippet;
+		summaryTitle?: string;
+		/** Header snippet to display before the title */
+		header?: Snippet;
 		/** Content snippet displayed after the separator line */
 		content: Snippet;
 		/** Whether the accordion should be open by default */
 		open?: boolean;
 	}
 
-	let { name, summaryTitle, icon, content, open = false }: Props = $props();
+	let { name, summaryTitle, header, content, open = false }: Props = $props();
 </script>
 
 <details {name} {open}>
 	<summary>
-		{#if icon}
-			{@render icon()}
+		{#if header}
+			{@render header()}
 		{/if}
-		<span class="summary-title">{summaryTitle}</span>
+		{#if summaryTitle}
+			<span class="summary-title">{summaryTitle}</span>
+		{/if}
 	</summary>
 	<div class="accordion-content">
 		<hr class="separator" />

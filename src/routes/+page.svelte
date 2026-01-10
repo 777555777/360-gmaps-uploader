@@ -79,6 +79,24 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Pano Publisher - Upload 360° Photos to Google Street View</title>
+
+	<meta
+		name="description"
+		content="Pano Publisher is a local-first web application for uploading individual 360° photos (Photo Spheres) to Google Maps and Google Street View. No proprietary user accounts or data collection - publishing via your Google account using the Google API."
+	/>
+
+	<link rel="canonical" href="https://panopublisher.net" />
+
+	<meta property="og:title" content="Pano Publisher - Upload 360° Photos to Google Street View" />
+	<meta
+		property="og:description"
+		content="Free, open-source web app for uploading individual 360° photo spheres to Google Maps. Local processing, no data collection."
+	/>
+	<meta property="og:url" content="https://panopublisher.net" />
+</svelte:head>
+
 {#snippet uploadDialogContent()}
 	<div class="upload-area-container">
 		<div class="upload-instructions">

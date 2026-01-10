@@ -36,14 +36,15 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 
-	<title>Pano Publisher - Upload 360° Photos to Google Street View</title>
-
-	<meta
-		name="description"
-		content="Pano Publisher is a local-first web application for uploading individual 360° photos (Photo Spheres) to Google Maps and Google Street View. No proprietary user accounts or data collection - publishing via your Google account using the Google API."
-	/>
-
 	<meta name="robots" content="index, follow" />
+
+	<!-- Global Open Graph tags (inherited by all pages) -->
+	<meta property="og:site_name" content="Pano Publisher" />
+	<meta property="og:image" content="https://panopublisher.net/og-image.jpg" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:type" content="website" />
 
 	<script type="application/ld+json">
 		{

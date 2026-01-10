@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Info, ShieldCheck, Cookie } from '@lucide/svelte';
+	import { Info, ShieldCheck, Cookie, MessageCircleQuestionMark } from '@lucide/svelte';
 	import { INFO_DIALOG_ID, CONSENT_DIALOG_ID } from '$lib/globals';
 	import { showDialogById } from '$lib/utils/dialog-helpers';
 	import Dropdown from '$lib/components/util/dropdown.svelte';
@@ -29,6 +29,12 @@
 					<Info size={16} />
 					<span>About this Application</span>
 				</button>
+			</li>
+			<li>
+				<a href="/faq" onclick={() => closeDropdown()}>
+					<MessageCircleQuestionMark size={16} />
+					<span>FAQ</span>
+				</a>
 			</li>
 			<li>
 				<a href="/privacy" onclick={() => closeDropdown()}>

@@ -1,9 +1,29 @@
 <script lang="ts">
 	import Header from '$lib/components/header.svelte';
+	import { page } from '$app/state';
+
+	// Get full canonical URL
+	const canonicalUrl = `https://panopublisher.net${page.url.pathname}`;
 </script>
 
 <svelte:head>
 	<title>Privacy Policy - Pano Publisher</title>
+	<meta
+		name="description"
+		content="Privacy policy and data protection information for Pano Publisher. Learn how we handle your data when uploading 360° photos to Google Street View."
+	/>
+
+	<!-- Canonical URL -->
+	<link rel="canonical" href={canonicalUrl} />
+
+	<!-- Open Graph / Social Media -->
+	<meta property="og:title" content="Privacy Policy - Pano Publisher" />
+	<meta
+		property="og:description"
+		content="Privacy policy and data protection information for Pano Publisher."
+	/>
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:type" content="website" />
 </svelte:head>
 
 <div class="privacy-page">

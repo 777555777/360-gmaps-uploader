@@ -7,7 +7,7 @@
 </script>
 
 <AccordionItem name="group-1" summaryTitle="File Details">
-	{#snippet icon()}
+	{#snippet header()}
 		<FileImage size={16} />
 	{/snippet}
 	{#snippet content()}
@@ -26,5 +26,6 @@
 | -------------- | --------- | -------- | ----------------------------------------------------------- |
 | `summaryTitle` | `string`  | Yes      | The title displayed in the accordion header                 |
 | `name`         | `string`  | No       | Groups accordions together (only one can be open at a time) |
-| `icon`         | `Snippet` | No       | Icon displayed before the title                             |
+| `header`       | `Snippet` | No       | Header snippet displayed before the title                   |
 | `content`      | `Snippet` | Yes      | The main content shown when accordion is expanded           |
+| `open`         | `boolean` | No       | Whether the accordion is open by default                    |
