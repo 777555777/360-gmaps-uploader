@@ -5,11 +5,11 @@
 		dialogId = 'dialog',
 		title,
 		body,
-		onClose
-	}: { dialogId?: string; title?: string; body: () => any; onClose?: () => void } = $props();
+		onDismiss
+	}: { dialogId?: string; title?: string; body: () => any; onDismiss?: () => void } = $props();
 
 	function handleClose() {
-		onClose?.();
+		onDismiss?.();
 	}
 </script>
 

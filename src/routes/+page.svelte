@@ -158,7 +158,7 @@
 		dialogId={PUBLISH_DIALOG_ID}
 		title="Publish Photos"
 		body={publishDialogContent}
-		onClose={handlePublishDialogClose}
+		onDismiss={handlePublishDialogClose}
 	/>
 	<Dialog
 		dialogId={PANO_VIEWER_DIALOG_ID}
@@ -169,7 +169,7 @@
 		dialogId={GPANO_FIX_DIALOG_ID}
 		title="Panorama Metadata"
 		body={gpanoFixDialogContent}
-		onClose={handleGPanoFixDialogClose}
+		onDismiss={handleGPanoFixDialogClose}
 	/>
 </main>
 
