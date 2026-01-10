@@ -45,6 +45,7 @@
 	--surface-subtle: var(--neutral-50);
 	--surface-strong: var(--neutral-100);
 	--surface-dark: var(--neutral-800);
+	--surface-dark-overlay: oklch(from var(--neutral-900) l c h / 0.9);
 
 	/* Text Colors */
 	--link-color: var(--primary-500);

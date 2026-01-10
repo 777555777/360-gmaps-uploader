@@ -141,9 +141,9 @@
 	.geo-popover {
 		align-items: center;
 		gap: 1rem;
-		padding: 0.75rem 1rem;
+		padding: 0.75rem;
 		background: var(--surface-base);
-		border-radius: 12px;
+		border-radius: 100vmax;
 		box-shadow: 0 4px 16px var(--shadow-outer);
 		border: 1px solid var(--border-subtle);
 		position: fixed;
@@ -205,7 +205,7 @@
 				display: flex;
 				align-items: center;
 				flex: 1;
-				gap: 8px;
+				gap: 0.5rem;
 			}
 
 			input {
@@ -230,6 +230,24 @@
 				&::placeholder {
 					color: var(--text-subtle);
 					font-style: italic;
+				}
+			}
+		}
+	}
+
+	@media (max-width: 576px) {
+		.geo-popover {
+			min-width: unset;
+			padding: 0.5rem;
+			.geo-inputs {
+				flex: unset;
+
+				.top-row {
+					gap: 0.5rem;
+				}
+
+				input {
+					max-width: 8rem;
 				}
 			}
 		}

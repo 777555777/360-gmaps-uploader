@@ -130,4 +130,13 @@
 			transform: rotate(360deg);
 		}
 	}
+
+	@media (max-width: 576px) {
+		img {
+			height: 120px;
+		}
+		.loading-indicator {
+			height: 120px;
+		}
+	}
 </style>

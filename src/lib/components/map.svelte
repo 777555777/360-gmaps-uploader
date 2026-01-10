@@ -148,7 +148,8 @@
 
 	{#if mapState.isPickingLocation}
 		<div id="picker-popover" class="show" style="position-anchor: --map-anchor;">
-			<span>Click on the map to set location</span>
+			<span class="desktop">Click on the map to set location</span>
+			<span class="touch">Tap to select location</span>
 			<button
 				class="secondary-btn"
 				onclick={() => mapState.stopPickingLocation()}
@@ -254,6 +255,16 @@
 		transform: scale(1.1);
 	}
 
+	@media (max-width: 576px) {
+		:global(.leaflet-popup-content) {
+			margin: 0.375rem !important;
+		}
+
+		:global(.popup-header h4) {
+			max-width: 200px !important;
+		}
+	}
+
 	/* Picker Mode Popover */
 	#picker-popover {
 		--popover-width: 340px;
@@ -266,11 +277,12 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 8px;
-		padding: 14px 20px;
+		padding: 14px;
+		padding-left: 24px;
 
-		background-color: var(--surface-dark);
+		background-color: var(--surface-dark-overlay);
 		color: var(--text-white);
-		border-radius: 8px;
+		border-radius: 100vmax;
 		box-shadow:
 			0 2px 4px var(--shadow-inner),
 			0 4px 8px var(--shadow-outer);
@@ -286,5 +298,32 @@
 
 	#picker-popover.show {
 		opacity: 1;
+	}
+
+	/* Default: Desktop */
+	.touch {
+		display: none;
+	}
+
+	/* Touch devices (tablets, phones) */
+	@media (hover: none) and (pointer: coarse) {
+		.desktop {
+			display: none;
+		}
+		.touch {
+			display: inline;
+		}
+	}
+
+	/* Mobile layout */
+	@media (max-width: 576px) {
+		#picker-popover {
+			padding: 0.5rem;
+			padding-left: 1.5rem;
+			width: calc(100% - 2rem);
+			max-width: 18rem;
+			right: 50%;
+			transform: translateX(50%);
+		}
 	}
 </style>
