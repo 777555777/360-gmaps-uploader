@@ -271,6 +271,15 @@
 		-moz-osx-font-smoothing: grayscale;
 	}
 
+	@media (max-width: 576px) {
+		:global(.faq svg) {
+			display: none;
+		}
+		:global(.faq .accordion-content p) {
+			padding-inline: 0.75rem;
+		}
+	}
+
 	.others {
 		margin-top: 3rem;
 		border-top: 2px solid var(--border-subtle);
