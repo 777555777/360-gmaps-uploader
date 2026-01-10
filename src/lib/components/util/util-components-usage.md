@@ -2,11 +2,11 @@
 
 ```svelte
 <script>
-	import AccordionItem from '$lib/components/util/accordion-item.svelte';
+	import Accordion from '$lib/components/util/accordion.svelte';
 	import { FileImage } from '@lucide/svelte';
 </script>
 
-<AccordionItem name="group-1" summaryTitle="File Details">
+<Accordion name="group-1" summaryTitle="File Details">
 	{#snippet header()}
 		<FileImage size={16} />
 	{/snippet}
@@ -17,7 +17,7 @@
 			<li>Item 2</li>
 		</ul>
 	{/snippet}
-</AccordionItem>
+</Accordion>
 ```
 
 ### Props

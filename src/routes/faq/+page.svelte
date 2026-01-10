@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Header from '$lib/components/header.svelte';
-	import AccordionItem from '$lib/components/util/accordion-item.svelte';
+	import Accordion from '$lib/components/util/accordion.svelte';
 	import { MessageCircleQuestionMark } from '@lucide/svelte';
 	import { page } from '$app/state';
 
@@ -36,7 +36,7 @@
 
 		<h2>General</h2>
 		<section class="faq general">
-			<AccordionItem open={true}>
+			<Accordion open={true}>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>Is Pano Publisher free to use?</h3>
@@ -44,9 +44,9 @@
 				{#snippet content()}
 					<p>Yes. Pano Publisher is completely free to use and does not charge any fees.</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 
-			<AccordionItem open={true}>
+			<Accordion open={true}>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>Is Pano Publisher an official Google product?</h3>
@@ -57,9 +57,9 @@
 						affiliated with or endorsed by Google.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 
-			<AccordionItem open={true}>
+			<Accordion open={true}>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>Does Pano Publisher store my images or personal data?</h3>
@@ -71,9 +71,9 @@
 						not retain copies of your images or collect personal information.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 
-			<AccordionItem>
+			<Accordion>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>Why does Pano Publisher only support uploading individual photo spheres?</h3>
@@ -87,12 +87,12 @@
 						free and easy to use.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 		</section>
 
 		<h2>Technical</h2>
 		<section class="faq technical">
-			<AccordionItem>
+			<Accordion>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>Which image formats are supported?</h3>
@@ -103,9 +103,9 @@
 						maximum upload size per image is 75 MB, with a maximum resolution of 100 megapixels.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 
-			<AccordionItem>
+			<Accordion>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>Do I need special metadata in my images?</h3>
@@ -128,9 +128,9 @@
 						>.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 
-			<AccordionItem>
+			<Accordion>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>How many images can I upload at once?</h3>
@@ -141,12 +141,12 @@
 						Street View API allows up to 2,000 uploads per Google account per day.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 		</section>
 
 		<h2>Features</h2>
 		<section class="faq general">
-			<AccordionItem>
+			<Accordion>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>Can I upload videos or connected panoramas (blue lines)?</h3>
@@ -158,9 +158,9 @@
 						View Studio.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 
-			<AccordionItem>
+			<Accordion>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>How can I delete an uploaded panorama?</h3>
@@ -172,9 +172,9 @@
 						delete uploaded panoramas.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 
-			<AccordionItem>
+			<Accordion>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>My images don’t have GPS coordinates - can I still upload them?</h3>
@@ -186,9 +186,9 @@
 						important to you, we recommend copying and pasting exact coordinates from Google Maps.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 
-			<AccordionItem>
+			<Accordion>
 				{#snippet header()}
 					<MessageCircleQuestionMark size={16} />
 					<h3>How long does it take until my panorama is visible on Google Maps?</h3>
@@ -201,7 +201,7 @@
 						may take several hours or even days.
 					</p>
 				{/snippet}
-			</AccordionItem>
+			</Accordion>
 		</section>
 
 		<section class="others">

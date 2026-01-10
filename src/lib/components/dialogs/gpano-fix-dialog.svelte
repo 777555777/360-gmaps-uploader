@@ -5,7 +5,7 @@
 	import { closeDialogById } from '$lib/utils/dialog-helpers';
 	import { GPANO_FIX_DIALOG_ID } from '$lib/globals';
 	import { Check, Wrench, FileX } from '@lucide/svelte';
-	import AccordionItem from '$lib/components/util/accordion-item.svelte';
+	import Accordion from '$lib/components/util/accordion.svelte';
 
 	let isProcessing = $state(false);
 	let processedCount = $state(0);
@@ -172,7 +172,7 @@
 				<h3>Images that will be prepared automatically</h3>
 				<p class="metadata-info">Required GPano metadata will be added before publishing.</p>
 				{#each gpanoFixState.fixableFiles as item (item.file.name)}
-					<AccordionItem name="file-details" summaryTitle={item.file.name}>
+					<Accordion name="file-details" summaryTitle={item.file.name}>
 						{#snippet header()}
 							<Wrench size={16} />
 						{/snippet}
@@ -185,7 +185,7 @@
 								{/each}
 							</ul>
 						{/snippet}
-					</AccordionItem>
+					</Accordion>
 				{/each}
 			</div>
 		{/if}
@@ -195,7 +195,7 @@
 			<div class="section rejection {hasOnlyRejected ? 'rejected-only' : ''}">
 				<h3>Images that cannot be added</h3>
 				{#each gpanoFixState.rejectedFiles as { file, errors }, index (file.name)}
-					<AccordionItem name="rejected-files" summaryTitle={file.name} open={index === 0}>
+					<Accordion name="rejected-files" summaryTitle={file.name} open={index === 0}>
 						{#snippet header()}
 							<FileX size={16} />
 						{/snippet}
@@ -206,7 +206,7 @@
 								{/each}
 							</ul>
 						{/snippet}
-					</AccordionItem>
+					</Accordion>
 				{/each}
 			</div>
 		{/if}
