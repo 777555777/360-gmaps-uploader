@@ -9,12 +9,16 @@ Pano Publisher is a local-first web application for uploading individual 360° p
 
 ## Key Characteristics
 - Local-first processing in the browser
-- No cloud storage of images between the user and Google
 - No proprietary user accounts
 - Uses Google account only for publishing via Google APIs
 - Free to use
 - Open source
 - Modern, clean and fast user interface
+
+## Data Handling
+- No server-side storage of images
+- All processing happens locally in the browser
+- Images are sent only to Google APIs for publishing
 
 ## Limitations
 - No video uploads
@@ -24,3 +28,4 @@ Pano Publisher is a local-first web application for uploading individual 360° p
 ## Important Pages
 - /        Main application
 - /privacy Privacy policy
+- /faq     Frequently asked questions
