@@ -36,8 +36,8 @@
 	<p>You may withdraw your consent at any time via the consent management.</p>
 
 	<div class="dialog-actions">
-		<button class="primary-btn" onclick={acceptCookies}>Accept</button>
 		<button class="secondary-btn" onclick={declineCookies}>Decline</button>
+		<button class="primary-btn" onclick={acceptCookies}>Accept</button>
 	</div>
 </div>
 

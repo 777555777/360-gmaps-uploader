@@ -263,6 +263,7 @@
 		<!-- Actions -->
 		<div class="dialog-actions">
 			{#if !isUploading && results.length === 0}
+				<button class="secondary-btn" onclick={resetAndClose}> Cancel </button>
 				<button class="primary-btn" onclick={startUpload} disabled={displayFiles.length === 0}>
 					{#if dryRunMode}
 						<FlaskConical size={16} /> Start Dry-Run

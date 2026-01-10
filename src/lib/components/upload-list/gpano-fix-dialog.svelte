@@ -216,7 +216,7 @@
 	<div class="dialog-actions">
 		{#if hasOnlyRejected}
 			<!-- Only rejected: just close -->
-			<button class="primary-btn" onclick={handleClose}>Close</button>
+			<button class="secondary-btn" onclick={handleClose}>Close</button>
 		{:else if hasValidAndRejected}
 			<!-- Valid + rejected: add valid ones -->
 			<button class="secondary-btn" onclick={handleClose}>Cancel</button>
