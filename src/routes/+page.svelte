@@ -232,7 +232,6 @@
 
 			p {
 				color: var(--text-muted);
-				line-height: 1.6;
 				margin: 0;
 				max-width: 400px;
 				box-sizing: content-box;

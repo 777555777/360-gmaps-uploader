@@ -63,6 +63,14 @@ h6 {
 	color: var(--text-default);
 }
 
+p {
+	line-height: 1.6;
+	letter-spacing: 0.015em;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
 /*  =========================================  */
 
 .loading-indicator {

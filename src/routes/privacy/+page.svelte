@@ -445,7 +445,6 @@
 
 	p {
 		margin: 0 0 1rem 0;
-		line-height: 1.7;
 		color: var(--text-muted);
 	}
 

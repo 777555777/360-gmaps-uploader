@@ -263,12 +263,6 @@
 		padding-inline: 2.5rem;
 		margin-bottom: 0rem !important;
 		color: var(--text-subtle);
-		/* Improve Text readability */
-		line-height: 1.6;
-		letter-spacing: 0.015em;
-		text-rendering: optimizeLegibility;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
 	}
 
 	@media (max-width: 576px) {
@@ -296,7 +290,6 @@
 				margin: 0.5rem 0 0 0;
 				color: var(--text-muted);
 				font-size: 14px;
-				line-height: 1.6;
 			}
 		}
 	}
