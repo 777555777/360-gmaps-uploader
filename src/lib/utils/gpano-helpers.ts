@@ -53,18 +53,36 @@ export async function extractGPanoMetadata(file: File): Promise<GPanoMetadata | 
 
 		const xmpData = content.substring(xmpStart, xmpEnd + 50);
 
-		// Extract GPano attributes using regex
-		const gpanoRegex = /GPano:(\w+)="([^"]*)"/g;
-		const matches = [...xmpData.matchAll(gpanoRegex)];
-
-		if (matches.length === 0) {
-			return null;
-		}
-
+		// Extract GPano metadata
+		// Support both formats:
+		// 1. Attribute format: GPano:FieldName="value"
+		// 2. XML element format: <GPano:FieldName>value</GPano:FieldName>
 		const gpano: GPanoMetadata = {};
-		for (const match of matches) {
+
+		// Try attribute format first (used by some tools like Insta360 Studio)
+		const attrRegex = /GPano:(\w+)="([^"]*)"/g;
+		const attrMatches = [...xmpData.matchAll(attrRegex)];
+
+		for (const match of attrMatches) {
 			const key = match[1] as keyof GPanoMetadata;
 			gpano[key] = match[2];
+		}
+
+		// Also parse XML element format (used by PTGui and other stitching software)
+		const elemRegex = /<GPano:(\w+)>([^<]+)<\/GPano:\1>/g;
+		const elemMatches = [...xmpData.matchAll(elemRegex)];
+
+		for (const match of elemMatches) {
+			const key = match[1] as keyof GPanoMetadata;
+			// Only set if not already set by attribute format
+			if (!gpano[key]) {
+				gpano[key] = match[2];
+			}
+		}
+
+		// Return null if no GPano data was found
+		if (Object.keys(gpano).length === 0) {
+			return null;
 		}
 
 		return gpano;
