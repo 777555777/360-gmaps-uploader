@@ -84,6 +84,7 @@ export async function extractGPanoMetadata(file: File): Promise<GPanoMetadata | 
 		if (Object.keys(gpano).length === 0) {
 			return null;
 		}
+		console.info('found the following gpano metadata for file', file.name, gpano);
 
 		return gpano;
 	} catch (error) {

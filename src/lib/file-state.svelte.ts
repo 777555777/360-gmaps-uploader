@@ -26,6 +26,10 @@ class FileState {
 	// Reactive Map for metadata errors
 	metadataErrors = new SvelteMap<File, string>();
 
+	// Thumbnail cache - persists across navigation
+	// Stores blob URLs for generated thumbnails
+	thumbnailCache = new SvelteMap<File, string>();
+
 	// Panorama Viewer State
 	currentPanoramaFile = $state<File | null>(null);
 
@@ -85,6 +89,12 @@ class FileState {
 		this.loadingFiles.delete(file);
 		this.selectedFiles.delete(file);
 		this.publishedFiles.delete(file);
+		// Revoke blob URL and remove from cache
+		const thumbUrl = this.thumbnailCache.get(file);
+		if (thumbUrl?.startsWith('blob:')) {
+			URL.revokeObjectURL(thumbUrl);
+		}
+		this.thumbnailCache.delete(file);
 	}
 
 	clearFiles(): void {
@@ -94,6 +104,13 @@ class FileState {
 		this.loadingFiles.clear();
 		this.selectedFiles.clear();
 		this.publishedFiles.clear();
+		// Revoke all blob URLs before clearing cache
+		for (const url of this.thumbnailCache.values()) {
+			if (url.startsWith('blob:')) {
+				URL.revokeObjectURL(url);
+			}
+		}
+		this.thumbnailCache.clear();
 	}
 
 	hasFile(file: File): boolean {

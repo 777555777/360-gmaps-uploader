@@ -9,32 +9,44 @@
 		onRemove: () => void;
 	}>();
 
+	// Check cache first for instant display after navigation
+	let cachedUrl = $derived(fileState.thumbnailCache.get(file));
 	let thumbUrl = $state<string>('');
 	let isLoading = $state(true);
 	let hasError = $state(false);
 
-	// Create object URL for the image and clean up
+	// Use cached thumbnail or generate new one
 	$effect(() => {
+		// If already cached, use immediately
+		if (cachedUrl) {
+			thumbUrl = cachedUrl;
+			isLoading = false;
+			hasError = false;
+			return;
+		}
+
+		// Generate new thumbnail
+		isLoading = true;
 		getThumbnail(file)
 			.then((url) => {
 				thumbUrl = url;
+				// Store in persistent cache
+				fileState.thumbnailCache.set(file, url);
 				isLoading = false;
 				hasError = false;
 			})
 			.catch((err) => {
 				console.error(`Thumbnail generation failed for ${file.name}:`, err);
-				// Fallback zu data URL placeholder
-				thumbUrl =
+				// Fallback placeholder
+				const placeholder =
 					'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="14"%3ENo Preview%3C/text%3E%3C/svg%3E';
+				thumbUrl = placeholder;
+				fileState.thumbnailCache.set(file, placeholder);
 				isLoading = false;
 				hasError = true;
 			});
 
-		return () => {
-			if (thumbUrl && thumbUrl.startsWith('blob:')) {
-				URL.revokeObjectURL(thumbUrl);
-			}
-		};
+		// No cleanup here - cache handles blob URL lifecycle
 	});
 </script>
 

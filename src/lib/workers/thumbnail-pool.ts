@@ -36,10 +36,18 @@ export class ThumbnailWorkerPool {
 	private readonly poolSize: number;
 	private isInitialized = false;
 
-	constructor(poolSize: number = Math.min(navigator.hardwareConcurrency || 2, 4)) {
-		// Limit pool size (min 2, max 4 for stability)
-		// More workers = more overhead from context switching
-		this.poolSize = Math.min(Math.max(poolSize, 2), 4);
+	constructor(poolSize?: number) {
+		// Detect Firefox - it handles workers differently and benefits from fewer parallel workers
+		const isFirefox =
+			typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes('firefox');
+
+		// Default pool size based on browser
+		// Firefox: max 2 workers (slower File handling in workers)
+		// Chrome/others: max 4 workers
+		const maxWorkers = isFirefox ? 2 : 4;
+		const defaultSize = Math.min(navigator.hardwareConcurrency || 2, maxWorkers);
+
+		this.poolSize = poolSize ?? defaultSize;
 	}
 
 	/**
@@ -100,44 +108,43 @@ export class ThumbnailWorkerPool {
 	}
 
 	/**
-	 * Processes the job queue
+	 * Processes the job queue with staggered starts to prevent memory spikes
 	 */
 	private processQueue(): void {
-		while (this.availableWorkers.length > 0 && this.jobQueue.length > 0) {
+		// Process one job at a time, with delay between starts
+		// This prevents all workers from reading large files simultaneously
+		// Longer delay (150ms) helps Firefox which has slower File handling in workers
+		if (this.availableWorkers.length > 0 && this.jobQueue.length > 0) {
 			const worker = this.availableWorkers.shift()!;
 			const job = this.jobQueue.shift()!;
 
 			this.executeJob(worker, job);
+
+			// If more jobs waiting, schedule next with delay
+			// 150ms gives browser time for GC and keeps UI responsive
+			if (this.jobQueue.length > 0 && this.availableWorkers.length > 0) {
+				setTimeout(() => this.processQueue(), 150);
+			}
 		}
 	}
 
 	/**
 	 * Executes a job in a worker
 	 */
-	private async executeJob(worker: Worker, job: ThumbnailJob): Promise<void> {
-		try {
-			// Read file as ArrayBuffer
-			const arrayBuffer = await job.file.arrayBuffer();
+	private executeJob(worker: Worker, job: ThumbnailJob): void {
+		// Create request with File object directly
+		// File objects are structured-cloneable and can be passed to workers
+		// The actual file.arrayBuffer() call now happens IN the worker thread,
+		// which prevents blocking the main thread for large 60MB+ files
+		const request: ThumbnailRequest = {
+			id: job.id,
+			file: job.file,
+			maxSize: job.maxSize
+		};
 
-			// Create request
-			const request: ThumbnailRequest = {
-				id: job.id,
-				fileData: arrayBuffer,
-				fileName: job.file.name,
-				maxSize: job.maxSize
-			};
-
-			// Send to worker (WITHOUT transfer, copies instead)
-			// Prevents "object no longer usable" error in Firefox
-			worker.postMessage(request);
-		} catch (error) {
-			// Error reading file
-			this.handleJobError(
-				worker,
-				job.id,
-				error instanceof Error ? error : new Error('File read failed')
-			);
-		}
+		// Send File object to worker (structured clone, not transfer)
+		// This is fast because File is just a reference/handle
+		worker.postMessage(request);
 	}
 
 	/**

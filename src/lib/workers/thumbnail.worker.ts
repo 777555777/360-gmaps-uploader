@@ -2,12 +2,15 @@
  * Thumbnail Worker
  * Generates thumbnails in a separate thread
  * to avoid blocking the main thread.
+ *
+ * IMPORTANT: File reading now happens IN the worker thread,
+ * not in the main thread. This prevents UI blocking when
+ * reading large 60MB+ panorama images.
  */
 
 export interface ThumbnailRequest {
 	id: string;
-	fileData: ArrayBuffer;
-	fileName: string;
+	file: File; // File object is structured-cloneable and passed to worker
 	maxSize: number;
 }
 
@@ -19,11 +22,12 @@ export interface ThumbnailResponse {
 }
 
 self.onmessage = async (event: MessageEvent<ThumbnailRequest>) => {
-	const { id, fileData, maxSize } = event.data;
+	const { id, file, maxSize } = event.data;
 
 	try {
-		// 1. Create blob from ArrayBuffer
-		const blob = new Blob([fileData], { type: 'image/jpeg' });
+		// 1. Create ImageBitmap directly from File (most efficient)
+		//    The browser handles reading the file in this worker thread
+		const blob = file;
 
 		// 2. Create ImageBitmap (efficient, no DOM)
 		const bitmap = await createImageBitmap(blob);
