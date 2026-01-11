@@ -143,8 +143,7 @@
 	@media (width < 768px) {
 		aside {
 			width: unset;
-			min-height: 45%;
-			max-height: 50%;
+			height: 50%;
 			border-bottom: none;
 		}
 	}
