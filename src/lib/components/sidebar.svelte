@@ -143,9 +143,9 @@
 	@media (width < 768px) {
 		aside {
 			width: unset;
-			min-height: 40%;
-			max-height: 45%;
-			margin-bottom: 1rem;
+			min-height: 45%;
+			max-height: 50%;
+			border-bottom: none;
 		}
 	}
 </style>

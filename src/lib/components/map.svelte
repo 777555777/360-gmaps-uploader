@@ -163,17 +163,8 @@
 	.map-container {
 		display: flex;
 		flex-direction: column;
-
-		flex: 1;
-
-		border: 1px solid var(--border-subtle);
-		background-color: var(--surface-base);
-		border-radius: 8px 0 0 0;
-		overflow: hidden;
-
-		@media (width < 768px) {
-			border-radius: 0;
-		}
+		width: 100%;
+		height: 100%;
 	}
 
 	.map {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import Map from '$lib/components/map.svelte';
 	import Header from '$lib/components/header.svelte';
 	import Sidebar from '$lib/components/sidebar.svelte';
@@ -133,25 +134,29 @@
 
 <main>
 	<Sidebar />
-	{#if consentState.hasConsented()}
-		<Map />
-	{:else}
-		<div class="map-placeholder">
-			<div class="map-placeholder-overlay" style="--bg-image: url({placeholderMapPng})"></div>
-			<div class="placeholder-content">
-				<MapPin size={48} strokeWidth={1.5} color="var(--text-subtle)" />
-				<h2>Map Unavailable</h2>
-				<p>
-					The interactive map requires your consent to load OpenStreetMap tiles and display your
-					photo locations.
-				</p>
-				<button class="primary-btn" onclick={() => showDialogById(CONSENT_DIALOG_ID)}>
-					<Cookie size={16} color="var(--text-white)" />
-					Consent Management
-				</button>
-			</div>
-		</div>
-	{/if}
+	<div class="map-wrapper">
+		{#if browser}
+			{#if consentState.hasConsented()}
+				<Map />
+			{:else}
+				<div class="map-placeholder">
+					<div class="map-placeholder-overlay" style="--bg-image: url({placeholderMapPng})"></div>
+					<div class="placeholder-content">
+						<MapPin size={48} strokeWidth={1.5} color="var(--text-subtle)" />
+						<h2>Map Unavailable</h2>
+						<p>
+							The interactive map requires your consent to load OpenStreetMap tiles and display your
+							photo locations.
+						</p>
+						<button class="primary-btn" onclick={() => showDialogById(CONSENT_DIALOG_ID)}>
+							<Cookie size={16} color="var(--text-white)" />
+							Consent Management
+						</button>
+					</div>
+				</div>
+			{/if}
+		{/if}
+	</div>
 
 	<Dialog dialogId={UPLOAD_DIALOG_ID} title="Add 360 Photos" body={uploadDialogContent} />
 	<Dialog
@@ -188,14 +193,20 @@
 		text-align: center;
 	}
 
-	.map-placeholder {
+	.map-wrapper {
 		flex: 1;
+		border-radius: 8px 0 0 0;
+		border: 1px solid var(--border-subtle);
+		background-color: var(--surface-base);
+		overflow: hidden;
+	}
+
+	.map-placeholder {
+		width: 100%;
+		height: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: var(--surface-base);
-		border-radius: 8px 0 0 0;
-		border: 1px solid var(--border-subtle);
 		position: relative;
 
 		.map-placeholder-overlay {
@@ -203,7 +214,6 @@
 			inset: 0;
 			width: 100%;
 			height: 100%;
-			border-radius: 8px 0 0 0;
 			background-image: var(--bg-image);
 			background-size: 50%;
 			background-repeat: repeat;
@@ -239,8 +249,6 @@
 		}
 
 		@media (width < 768px) {
-			border-radius: 0;
-
 			.placeholder-content {
 				padding: 35px;
 				background: radial-gradient(ellipse, var(--surface-base) 40%, transparent 70%);
@@ -252,9 +260,6 @@
 				p {
 					font-size: 0.85rem;
 				}
-			}
-			.map-placeholder-overlay {
-				border-radius: 0;
 			}
 		}
 
@@ -277,6 +282,10 @@
 	}
 
 	@media (width < 768px) {
+		.map-wrapper {
+			border-radius: 0;
+		}
+
 		main {
 			display: flex;
 			flex-direction: column-reverse;
