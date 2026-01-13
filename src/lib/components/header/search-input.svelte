@@ -21,17 +21,16 @@
 	let requestTimestamps: number[] = [];
 
 	// Element references
-	let inputElement: HTMLInputElement;
-	let popoverElement: HTMLElement;
+	let inputElement = $state<HTMLInputElement | null>(null);
+	let popoverElement = $state<HTMLElement | null>(null);
 
 	// Popover ID for anchor positioning
 	const popoverId = 'search-suggestions-popover';
 	const anchorName = '--search-input-anchor';
 
 	// Check if search is enabled (requires consent) and route is "/"
-	const isSearchEnabled = $derived(
-		consentState.hasConsented() === true && page.url.pathname === '/'
-	);
+	const isSearchEnabled = $derived(consentState.hasConsented() === true);
+	const isHomePage = $derived(browser && page.url.pathname === '/');
 
 	// Derived: should show dropdown content
 	const showDropdown = $derived(suggestions.length > 0 || isLoading);
@@ -86,7 +85,7 @@
 			return;
 		}
 
-		// Debounce for 500ms (conservative to avoid too many requests)
+		// Debounce for 400ms (conservative to avoid too many requests)
 		debounceTimeout = setTimeout(async () => {
 			if (!isWithinRateLimit()) return;
 
@@ -200,51 +199,53 @@
 	}
 </script>
 
-<div class="search-container" style="anchor-name: {anchorName};">
-	<button
-		class="clickable-icon"
-		title={isSearchEnabled ? 'Search' : 'Accept cookies to enable search'}
-		disabled={!isSearchEnabled}
-		onclick={handleSearchClick}
-	>
-		<Search />
-	</button>
-	<input
-		bind:this={inputElement}
-		type="text"
-		placeholder={isSearchEnabled ? 'Search location...' : 'Accept cookies to search'}
-		class="search-input"
-		value={searchQuery}
-		oninput={handleInput}
-		onkeydown={handleKeydown}
-		disabled={!isSearchEnabled}
-	/>
-	{#if searchQuery && isSearchEnabled}
-		<button class="clickable-icon clear-btn" onclick={clearSearch} title="Clear search">
-			<Eraser size={18} />
+{#if isHomePage}
+	<div class="search-container" style="anchor-name: {anchorName};">
+		<button
+			class="clickable-icon"
+			title={isSearchEnabled ? 'Search' : 'Accept cookies to enable search'}
+			disabled={!isSearchEnabled}
+			onclick={handleSearchClick}
+		>
+			<Search />
 		</button>
-	{/if}
-	<button
-		class="clickable-icon"
-		onclick={focusUserLocation}
-		title={isSearchEnabled ? 'Focus your location' : 'Accept cookies to enable location'}
-		disabled={!isSearchEnabled}
-	>
-		<MapPinHouse />
-	</button>
-</div>
+		<input
+			bind:this={inputElement}
+			type="text"
+			placeholder={isSearchEnabled ? 'Search location...' : 'Accept cookies to search'}
+			class="search-input"
+			value={searchQuery}
+			oninput={handleInput}
+			onkeydown={handleKeydown}
+			disabled={!isSearchEnabled}
+		/>
+		{#if searchQuery && isSearchEnabled}
+			<button class="clickable-icon clear-btn" onclick={clearSearch} title="Clear search">
+				<Eraser size={18} />
+			</button>
+		{/if}
+		<button
+			class="clickable-icon"
+			onclick={focusUserLocation}
+			title={isSearchEnabled ? 'Focus your location' : 'Accept cookies to enable location'}
+			disabled={!isSearchEnabled}
+		>
+			<MapPinHouse />
+		</button>
+	</div>
 
-<div
-	bind:this={popoverElement}
-	popover="manual"
-	id={popoverId}
-	class="autocomplete-dropdown"
-	style="position-anchor: {anchorName};"
->
-	{#if showDropdown}
-		<SearchSuggestions {suggestions} {isLoading} {selectedIndex} onSelect={selectSuggestion} />
-	{/if}
-</div>
+	<div
+		bind:this={popoverElement}
+		popover="manual"
+		id={popoverId}
+		class="autocomplete-dropdown"
+		style="position-anchor: {anchorName};"
+	>
+		{#if showDropdown}
+			<SearchSuggestions {suggestions} {isLoading} {selectedIndex} onSelect={selectSuggestion} />
+		{/if}
+	</div>
+{/if}
 
 <style>
 	.search-container {
