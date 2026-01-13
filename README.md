@@ -88,7 +88,7 @@ This project uses the **Google Street View Publish API**. By using this applicat
 
 ### Optional External Services
 
-When enabled, the location search feature uses the **MapTiler API** for geocoding. By enabling this feature, you agree to:
+When enabled, the search feature uses the **MapTiler API** for geocoding. By enabling this feature, you agree to:
 
 - [Terms of Service](https://www.maptiler.com/terms/)
 - [Privacy Policy](https://www.maptiler.com/privacy-policy/).
