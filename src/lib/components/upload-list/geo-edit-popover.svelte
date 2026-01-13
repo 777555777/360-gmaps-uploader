@@ -213,7 +213,7 @@
 				line-height: 30px;
 				padding-inline: 12px;
 				border: 1px solid var(--border-default);
-				border-radius: 999px;
+				border-radius: 100vmax;
 				width: 100%;
 				max-width: 10rem;
 				font-size: 13px;

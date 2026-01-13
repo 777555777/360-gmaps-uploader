@@ -66,6 +66,65 @@ class MapState {
 		});
 	}
 
+	// Focus on a bounding box (used for search results)
+	focusBounds(south: number, west: number, north: number, east: number): void {
+		if (!this.map) return;
+
+		this.map.flyToBounds(
+			[
+				[south, west],
+				[north, east]
+			],
+			{
+				duration: 0.8,
+				padding: [50, 50]
+			}
+		);
+	}
+
+	// Focus on user's current location (requests geolocation permission)
+	async focusUserLocation(): Promise<void> {
+		if (!this.map) {
+			console.warn('Map not initialized');
+			return;
+		}
+
+		if (!navigator.geolocation) {
+			alert('Geolocation is not supported by your browser');
+			return;
+		}
+
+		try {
+			const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+				navigator.geolocation.getCurrentPosition(resolve, reject, {
+					enableHighAccuracy: true,
+					timeout: 10000,
+					maximumAge: 0
+				});
+			});
+
+			const { latitude, longitude } = position.coords;
+			this.focusLocation(latitude, longitude, 15);
+		} catch (error) {
+			if (error instanceof GeolocationPositionError) {
+				switch (error.code) {
+					case error.PERMISSION_DENIED:
+						alert('Location permission denied. Please enable location access in your browser.');
+						break;
+					case error.POSITION_UNAVAILABLE:
+						alert('Location information is unavailable.');
+						break;
+					case error.TIMEOUT:
+						alert('The request to get your location timed out.');
+						break;
+				}
+			} else {
+				console.error('Error getting user location:', error);
+				alert('Failed to get your location. Please try again.');
+			}
+		}
+	}
+
 	// Add a marker for a file
 	addMarker(
 		file: File,

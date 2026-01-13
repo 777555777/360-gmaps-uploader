@@ -262,7 +262,7 @@
 	:global(.accordion-content p) {
 		padding-inline: 2.5rem;
 		margin-bottom: 0rem !important;
-		color: var(--text-subtle);
+		color: var(--text-medium);
 	}
 
 	@media (max-width: 576px) {

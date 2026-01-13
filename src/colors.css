@@ -51,6 +51,7 @@
 	--link-color: var(--primary-500);
 	--text-default: var(--neutral-800);
 	--text-muted: var(--neutral-600);
+	--text-medium: var(--neutral-400);
 	--text-subtle: var(--neutral-350);
 	--text-light: var(--neutral-100);
 	--text-white: var(--neutral-0);

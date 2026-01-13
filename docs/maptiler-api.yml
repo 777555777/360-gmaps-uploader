@@ -1,0 +1,2330 @@
+openapi: 3.1.0
+info:
+  title: MapTiler API
+  version: '1.0'
+  description: |
+    MapTiler API allows you to programmatically access all the data, maps, services, and resources available in your MapTiler account.
+
+    Access to your resources via MapTiler API is read-only, and therefore safe and well suited for public end-user applications. You can use it to add a map directly to your website, request map tiles, create an image with a location map for your business, search for addresses, and more.
+
+    The universal public API request format is:
+
+    ```
+    https://api.maptiler.com/{METHOD}/{QUERY}.json?{PARAMS}&key=YOUR_MAPTILER_API_KEY_HERE
+    ```
+
+    <div class="message mb-3" markdown="1">
+    You need a **MapTiler API key** to use any of our services. [Get your key here](https://cloud.maptiler.com/account/keys/){:target="_blank" rel="noopener"} and [learn how to protect it](/guides/maps-apis/maps-platform/how-to-protect-your-map-key/).
+    </div>
+  termsOfService: https://www.maptiler.com/terms/
+  contact:
+    name: Support
+    email: support@maptiler.com
+    url: https://docs.maptiler.com/support/requests/
+    premium: https://www.maptiler.com/support/
+servers:
+  - description: MapTiler API
+    url: https://api.maptiler.com/
+security:
+  - key: []
+tags:
+  - name: Maps
+  - name: Static maps
+  - name: Tiles
+  - name: Data
+  - name: Images
+  - name: Geocoding
+  - name: Geolocation
+  - name: Coordinates
+  - name: Elevation
+  - name: Weather
+  - name: Other
+paths:
+  /maps/{mapId}/:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+    get:
+      summary: Embeddable HTML viewer
+      tags:
+        - Maps
+      responses:
+        '200':
+          description: ''
+          content:
+            text/html: {}
+  /maps/{mapId}/style.json:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+    get:
+      summary: Style JSON of the map
+      description: Style JSON describing the map cartography. Can be used with various libraries to display a vector map (e.g. Mapbox GL JS, OpenLayers, ...).
+      tags:
+        - Maps
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StyleJSON'
+  /maps/{mapId}/sprite{scale}.{format}:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+      - name: scale
+        in: path
+        required: false
+        schema:
+          type: string
+          enum:
+            - '@2x'
+      - name: format
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+            - png
+            - json
+    get:
+      summary: Map symbols (sprites)
+      description: Map symbols (sprites) required to display the vector map.
+      tags:
+        - Maps
+      security: []
+      responses:
+        '200':
+          content:
+            application/json: {}
+            image/png: {}
+  /maps/{mapId}/{tileSize/}/{z}/{x}/{y}{scale}.{format}:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+      - name: tileSize/
+        in: path
+        required: false
+        schema:
+          type: integer
+          enum:
+            - '256'
+      - $ref: '#/components/parameters/z'
+      - $ref: '#/components/parameters/x'
+      - $ref: '#/components/parameters/y'
+      - $ref: '#/components/parameters/rasterizationScale'
+      - $ref: '#/components/parameters/rasterizationFormat'
+    get:
+      summary: Raster XYZ tiles
+      description: Rasterized tiles (XYZ) of the map. Can be used with various libraries to display a raster map (e.g. Leaflet, OpenLayers, ...). It's usually better (if possible) to use the TileJSON rather than using the tile URL directly.
+      tags:
+        - Maps
+      responses:
+        '200':
+          $ref: '#/components/responses/RasterizedImage'
+        '400':
+          description: Out of bounds / Invalid format
+  /maps/{mapId}/{tileSize/}/tiles.json:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+      - name: tileSize/
+        in: path
+        required: false
+        schema:
+          type: integer
+          enum:
+            - '256'
+    get:
+      summary: TileJSON
+      description: TileJSON describing the metadata of the map as well as link to the XYZ tiles. Can be used with various libraries to display a raster map (e.g. Leaflet, OpenLayers, ...).
+      tags:
+        - Maps
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TileJSON'
+  /maps/{mapId}/tiles:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+    get:
+      summary: OGC API - Tiles
+      description: Tileset landing page of the rasterized tiles. Can be used in software supporting the OGC API - Tiles v1.0 specification.
+      tags:
+        - Maps
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+  /maps/{mapId}/tileMatrixSet:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+    get:
+      summary: OGC API TileMatrixSets
+      description: Description of the tileset tile matrix sets according to the OGC Web API. This resource is linked from the OGC API - Tiles endpoint.
+      tags:
+        - Maps
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+  /maps/{mapId}/WMTSCapabilities.xml:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+    get:
+      summary: WMTS Capabilities
+      description: WMTS Capabilities XML document describing the metadata of the map as well as link to the XYZ tiles. Can be used with various GIS software (e.g. QGIS) to display the map.
+      tags:
+        - Maps
+      responses:
+        '200':
+          content:
+            text/xml:
+              schema:
+                type: string
+  /maps/{mapId}/static/{lon},{lat},{zoom}/{width}x{height}{scale}.{format}:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+      - name: lon
+        in: path
+        description: Longitude of the center of the image.
+        required: true
+        schema:
+          type: number
+      - name: lat
+        in: path
+        description: Latitude of the center of the image.
+        required: true
+        schema:
+          type: number
+      - name: zoom
+        in: path
+        description: Zoom level of the resulting image (can be fractional). (In the tile pyramid based on 512x512 tiles.)
+        required: true
+        schema:
+          type: number
+      - $ref: '#/components/parameters/imageWidth'
+      - $ref: '#/components/parameters/imageHeight'
+      - $ref: '#/components/parameters/rasterizationScale'
+      - $ref: '#/components/parameters/rasterizationFormat'
+      - $ref: '#/components/parameters/path'
+      - $ref: '#/components/parameters/markers'
+      - $ref: '#/components/parameters/latlng'
+      - $ref: '#/components/parameters/attribution'
+      - $ref: '#/components/parameters/fill'
+      - $ref: '#/components/parameters/stroke'
+      - $ref: '#/components/parameters/width'
+      - $ref: '#/components/parameters/encodedpath'
+      - $ref: '#/components/parameters/shortest'
+    get:
+      summary: Center-based image
+      description: Generates a raster image based on the specified center and zoom level.
+      tags:
+        - Static maps
+      responses:
+        '200':
+          $ref: '#/components/responses/RasterizedImage'
+        '400':
+          description: Out of bounds / Invalid format / Invalid image size
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '414':
+          $ref: '#/components/responses/414'
+  /maps/{mapId}/static/{minx},{miny},{maxx},{maxy}/{width}x{height}{scale}.{format}:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+      - name: minx
+        in: path
+        description: Longitude of the left (west) edge.
+        required: true
+        schema:
+          type: number
+      - name: miny
+        in: path
+        description: Latitude of the bottom (south) edge.
+        required: true
+        schema:
+          type: number
+      - name: maxx
+        in: path
+        description: Longitude of the right (east) edge.
+        required: true
+        schema:
+          type: number
+      - name: maxy
+        in: path
+        description: Latitude of the top (north) edge.
+        required: true
+        schema:
+          type: number
+      - $ref: '#/components/parameters/imageWidth'
+      - $ref: '#/components/parameters/imageHeight'
+      - $ref: '#/components/parameters/rasterizationScale'
+      - $ref: '#/components/parameters/rasterizationFormat'
+      - $ref: '#/components/parameters/padding'
+      - $ref: '#/components/parameters/path'
+      - $ref: '#/components/parameters/markers'
+      - $ref: '#/components/parameters/latlng'
+      - $ref: '#/components/parameters/attribution'
+      - $ref: '#/components/parameters/fill'
+      - $ref: '#/components/parameters/stroke'
+      - $ref: '#/components/parameters/width'
+      - $ref: '#/components/parameters/encodedpath'
+      - $ref: '#/components/parameters/shortest'
+    get:
+      summary: Bounds-based image
+      description: Generates a raster image based on the given bounds.
+      tags:
+        - Static maps
+      responses:
+        '200':
+          $ref: '#/components/responses/RasterizedImage'
+        '400':
+          description: Out of bounds / Invalid format / Invalid image size
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '414':
+          $ref: '#/components/responses/414'
+  /maps/{mapId}/static/auto/{width}x{height}{scale}.{format}:
+    parameters:
+      - $ref: '#/components/parameters/mapId'
+      - $ref: '#/components/parameters/imageWidth'
+      - $ref: '#/components/parameters/imageHeight'
+      - $ref: '#/components/parameters/rasterizationScale'
+      - $ref: '#/components/parameters/rasterizationFormat'
+      - $ref: '#/components/parameters/padding'
+      - $ref: '#/components/parameters/path'
+      - $ref: '#/components/parameters/markers'
+      - $ref: '#/components/parameters/latlng'
+      - $ref: '#/components/parameters/attribution'
+      - $ref: '#/components/parameters/fill'
+      - $ref: '#/components/parameters/stroke'
+      - $ref: '#/components/parameters/width'
+      - $ref: '#/components/parameters/encodedpath'
+      - $ref: '#/components/parameters/shortest'
+    get:
+      summary: Auto-fitted image
+      description: Generates a raster image based on the given features. The area is calculated so that all the paths and markers given in query are visible.
+      tags:
+        - Static maps
+      responses:
+        '200':
+          $ref: '#/components/responses/RasterizedImage'
+        '400':
+          description: Out of bounds / Invalid format / Invalid image size
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '414':
+          $ref: '#/components/responses/414'
+  /tiles/{tilesId}/:
+    parameters:
+      - $ref: '#/components/parameters/tilesId'
+    get:
+      summary: Embeddable HTML viewer
+      tags:
+        - Tiles
+      responses:
+        '200':
+          description: ''
+          content:
+            text/html: {}
+  /tiles/{tilesId}/{z}/{x}/{y}:
+    parameters:
+      - $ref: '#/components/parameters/tilesId'
+      - $ref: '#/components/parameters/z'
+      - $ref: '#/components/parameters/x'
+      - $ref: '#/components/parameters/y'
+    get:
+      summary: XYZ tiles
+      description: The individual tiles. Can be used with various libraries to display the tiles (e.g. Leaflet, OpenLayers, ...). It's usually better (if possible) to use the TileJSON rather than using the tile URL directly.
+      tags:
+        - Tiles
+      responses:
+        '200':
+          content:
+            '*': {}
+        '204':
+          description: Tile not present -- presumed empty (empty response)
+        '400':
+          description: Out of bounds
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+  /tiles/{tilesId}/tiles.json:
+    parameters:
+      - $ref: '#/components/parameters/tilesId'
+    get:
+      summary: TileJSON
+      description: TileJSON describing the metadata of the tiles as well as link to the XYZ tiles. Can be used with various libraries to display the tiles (e.g. Leaflet, OpenLayers, ...).
+      tags:
+        - Tiles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TileJSON'
+  /tiles/{tilesId}/tiles:
+    parameters:
+      - $ref: '#/components/parameters/tilesId'
+    get:
+      summary: OGC API - Tiles
+      description: Tileset landing page of the tiles. Can be used in software supporting the OGC API - Tiles v1.0 specification.
+      tags:
+        - Tiles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+  /tiles/{tilesId}/tileMatrixSet:
+    parameters:
+      - $ref: '#/components/parameters/tilesId'
+    get:
+      summary: OGC API TileMatrixSets
+      description: Description of the tileset tile matrix sets according to the OGC Web API. This resource is linked from the OGC API - Tiles endpoint.
+      tags:
+        - Tiles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+  /tiles/{tilesId}/WMTSCapabilities.xml:
+    parameters:
+      - $ref: '#/components/parameters/tilesId'
+    get:
+      summary: WMTS Capabilities
+      description: WMTS Capabilities XML document describing the metadata of the tiles as well as link to the XYZ tiles. Can be used with various GIS software (e.g. QGIS) to display the tiles.
+      tags:
+        - Tiles
+      responses:
+        '200':
+          content:
+            text/xml:
+              schema:
+                type: string
+  /data/{dataId}/features.json:
+    parameters:
+      - $ref: '#/components/parameters/dataId'
+    get:
+      summary: GeoJSON
+      description: GeoJSON containing the vector features.
+      tags:
+        - Data
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJSON'
+  /images/{imageId}/image.json:
+    parameters:
+      - $ref: '#/components/parameters/imageId'
+    get:
+      summary: ImageJSON
+      description: JSON describing the metadata of the image. Can be used with MapTiler SDK to display the image.
+      tags:
+        - Images
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageJSON'
+  /images/{imageId}/{z}/{x}/{y}:
+    parameters:
+      - $ref: '#/components/parameters/imageId'
+      - $ref: '#/components/parameters/z'
+      - $ref: '#/components/parameters/x'
+      - $ref: '#/components/parameters/y'
+    get:
+      summary: XYZ tiles
+      description: The individual tiles. Can be used with various libraries to display the image. It's better to use the ImageJSON with MapTiler SDK rather than using the tile URL directly.
+      tags:
+        - Images
+      responses:
+        '200':
+          content:
+            '*': {}
+        '204':
+          description: Tile not present -- presumed empty (empty response)
+        '400':
+          description: Out of bounds
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+  /geocoding/{query}.json:
+    parameters:
+      - name: query
+        in: path
+        description: Place name to search. You can also use bare [POI category](/cloud/api/geocoding/#PoiCategory) or mix it with a name to search for POIs of desired category, unless `poi` index is excluded.
+        examples:
+          place:
+            value: Zurich
+            summary: Search place name
+          poi:
+            value: restaurant mediterranean
+            summary: Search POI category
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/bbox'
+      - $ref: '#/components/parameters/proximity'
+      - $ref: '#/components/parameters/language'
+      - $ref: '#/components/parameters/country'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/types'
+      - $ref: '#/components/parameters/excludeTypes'
+      - $ref: '#/components/parameters/fuzzyMatch'
+      - $ref: '#/components/parameters/autocomplete'
+      - $ref: '#/components/parameters/worldview'
+    get:
+      summary: Search by name (forward)
+      description: Forward <a href="https://www.maptiler.com/cloud/geocoding/">geocoding (search by place name)</a>.
+      tags:
+        - Geocoding
+      responses:
+        '200':
+          $ref: '#/components/responses/ok'
+        '400':
+          description: Query too long / Invalid parameters
+        '403':
+          $ref: '#/components/responses/403'
+  /geocoding/{longitude},{latitude}.json:
+    parameters:
+      - name: longitude
+        in: path
+        example: 8.528509
+        required: true
+        schema:
+          type: number
+          minimum: -180
+          maximum: 180
+      - name: latitude
+        in: path
+        example: 47.3774434
+        required: true
+        schema:
+          type: number
+          minimum: -90
+          maximum: 90
+      - $ref: '#/components/parameters/language'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/types'
+      - $ref: '#/components/parameters/excludeTypes'
+      - $ref: '#/components/parameters/worldview'
+    get:
+      summary: Search by coordinates (reverse)
+      description: Reverse geocoding (search by coordinates).
+      tags:
+        - Geocoding
+      responses:
+        '200':
+          $ref: '#/components/responses/ok'
+        '400':
+          description: Query too long / Invalid parameters
+        '403':
+          $ref: '#/components/responses/403'
+  /geocoding/{id}.json:
+    parameters:
+      - name: id
+        in: path
+        example: country.26561650
+        required: true
+        schema:
+          type: string
+          pattern: ^(\S+)\.([0-9]+)$
+        description: Feature ID (found in response of forward or reverse geocoding)
+      - $ref: '#/components/parameters/language'
+      - $ref: '#/components/parameters/worldview'
+    get:
+      summary: Search by feature ID
+      description: Search feature by its ID (`id`) as returned in forward or reverse geocoding response and return its full geometry. Note that the feature ID is not stable and it changes when the database is re-indexed.
+      tags:
+        - Geocoding
+      responses:
+        '200':
+          $ref: '#/components/responses/ok'
+        '400':
+          description: Query too long / Invalid parameters
+        '403':
+          $ref: '#/components/responses/403'
+  /geocoding/{queries}.json:
+    parameters:
+      - in: path
+        name: queries
+        description: Semicolon-separated list of queries. Semicolon `;` must be provided verbatim and not be URL-encoded. Each query may be forward, reverse or by feature ID. Maximum of 50 queries are supported.
+        example: Paris;Berlin
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/bbox'
+      - $ref: '#/components/parameters/proximity'
+      - $ref: '#/components/parameters/language'
+      - $ref: '#/components/parameters/country'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/types'
+      - $ref: '#/components/parameters/excludeTypes'
+      - $ref: '#/components/parameters/fuzzyMatch'
+      - $ref: '#/components/parameters/autocomplete'
+      - $ref: '#/components/parameters/worldview'
+    get:
+      summary: Batch geocoding API
+      description: Perform geocoding of more than one request in a single API call. Check out the <a href="/guides/geocoding/batch-geocoding-api/">Batch Geocoding guide</a> for an example.
+      tags:
+        - Geocoding
+      responses:
+        '200':
+          description: Array of geocoding results where items are matching order of queries in the request. Every result is represented as FeatureCollection where every item is represented as a GeoJSON Feature
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/result'
+        '400':
+          description: Query too long / Invalid parameters
+        '403':
+          $ref: '#/components/responses/403'
+  /geolocation/ip.json:
+    get:
+      summary: IP Geolocation
+      description: Obtain information about visitor's location based on IP address of the incoming request.
+      tags:
+        - Geolocation
+      parameters:
+        - name: elevation
+          in: query
+          description: Include elevation (in meters) in the results.
+          default: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeolocationResult'
+        '403':
+          $ref: '#/components/responses/403'
+  /coordinates/search/{query}.json:
+    get:
+      summary: Search coordinate systems
+      tags:
+        - Coordinates
+      parameters:
+        - name: query
+          in: path
+          description: |-
+            Query string used to search the catalog. It accepts plain terms such as names of locations and key:value pairs for filtering.
+
+            Following parameter values can be used:
+            - kind
+                - \* (All kinds)
+                - CRS (All coordinate reference systems - default)
+                    - CRS-PROJCRS (Projected coordinate systems)
+                    - CRS-GEOGCRS (Geodetic coordinate systems)
+                    - CRS-GEOG3DCRS (Geodetic 3D coordinate systems)
+                    - CRS-GCENCRS (Geocentric coordinate systems)
+                    - CRS-VERTCRS (Vertical coordinate systems)
+                    - CRS-ENGCRS (Engineering coordinate systems)
+                    - CRS-COMPOUNDCRS (Compound coordinate systems)
+                    - CRS-DRVDCRS (Derived coordinate systems)
+                - COORDOP (All operations)
+                    - COORDOP-COPTRAN (Transformations)
+                    - COORDOP-COPCONO (Compound operations)
+                    - COORDOP-POIMOTO (Point motion operations)
+                    - COORDOP-COPCON (Conversions)
+                - DATUM (All datums)
+                    - DATUM-VERTDAT (Vertical datums)
+                    - DATUM-ENGDAT (Engineering datums)
+                    - DATUM-GEODDAT (Geodetic datums)
+                    - DATUM-DYNGEODDA (Dynamic geodetic datums)
+                    - DATUM-ENSEMDAT (Ensemble datum)
+                - ELLIPSOID (Ellipsoid)
+                - PRIMEM (Prime meridian)
+                - METHOD (Method / Projection)
+                - CS (Coordinate systems)
+                    - CS-VERTCS (Vertical coordinate system)
+                    - CS-SPHERCS (Spherical coordinate system)
+                    - CS-CARTESCS (Cartesian coordinate system)
+                    - CS-ELLIPCS (Ellipsoidal coordinate system)
+                    - CS-AFFINE (Affine coordinate system)
+                    - CS-ORDINAL (Ordinal coordinate system)
+                - AXIS (Axis)
+                - AREA (Area)
+                - UNIT (Unit)
+                    - UNIT-ANGUNIT (Angle unit)
+                    - UNIT-SCALEUNIT (Scale unit)
+                    - UNIT-LENUNIT (Length unit)
+                    - UNIT-TIMEUNIT (Time unit)
+            - code
+                - Full code of the resource
+            - trans
+                - Code of the transformation
+            - deprecated
+                - \* (Both active and deprecated)
+                - 0 (active only - default)
+                - 1 (deprecated only)
+          examples:
+            all:
+              summary: Finding all resources of Finland
+              value: finland deprecated:* kind:*
+            basic:
+              summary: Basic example
+              value: United Kingdom
+            deprecated:
+              summary: Finding deprecated mercator CRS
+              value: mercator deprecated:1
+            parameterized:
+              summary: Filtering resources using parameter(s)
+              value: Finland kind:DATUM
+            specific:
+              summary: Finding specific resource (WGS84) by code
+              value: code:4326
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of results returned
+          required: false
+          schema:
+            default: 10
+            maximum: 50
+            minimum: 1
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          description: The starting position of returned list of results
+          schema:
+            default: 0
+            minimum: 0
+            type: integer
+        - name: transformations
+          in: query
+          required: false
+          description: Show detailed transformations for each CRS
+          schema:
+            default: false
+            type: boolean
+        - name: exports
+          in: query
+          required: false
+          description: Show exports in WKT and Proj4 notations
+          schema:
+            default: false
+            type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  results:
+                    items:
+                      properties:
+                        accuracy:
+                          title: Accuracy
+                          type: number
+                        area:
+                          title: Area
+                          type: string
+                        bbox:
+                          description: Bounding box of the resource in [min_lon, min_lat, max_lon, max_lat] order.
+                          items:
+                            type: number
+                          title: Bbox
+                          type: array
+                        default_transformation:
+                          allOf:
+                            - $ref: '#/components/schemas/Id'
+                          description: Most suitable transformation for this CRS.
+                          title: Default Transformation
+                        deprecated:
+                          title: Deprecated
+                          type: boolean
+                        exports:
+                          $ref: '#/components/schemas/ExportItem'
+                        id:
+                          $ref: '#/components/schemas/Id'
+                        kind:
+                          title: Kind
+                          type: string
+                        name:
+                          title: Name
+                          type: string
+                        transformations:
+                          items:
+                            anyOf:
+                              - type: object
+                                properties:
+                                  accuracy:
+                                    title: Accuracy
+                                    type: number
+                                  area:
+                                    title: Area
+                                    type: string
+                                  bbox:
+                                    description: Bounding box of the resource in [min_lon, min_lat, max_lon, max_lat] order.
+                                    items:
+                                      type: number
+                                    title: Bbox
+                                    type: array
+                                  deprecated:
+                                    title: Deprecated
+                                    type: boolean
+                                  exports:
+                                    $ref: '#/components/schemas/ExportItem'
+                                  grids:
+                                    description: List of grids used in this operation.
+                                    items:
+                                      properties:
+                                        path:
+                                          title: Path
+                                          type: string
+                                      required:
+                                        - path
+                                      title: GridFile
+                                      type: object
+                                    title: Grids
+                                    type: array
+                                  id:
+                                    $ref: '#/components/schemas/Id'
+                                  name:
+                                    title: Name
+                                    type: string
+                                  reversible:
+                                    description: Whether this operation can be used in reverse or not.
+                                    title: Reversible
+                                    type: boolean
+                                  target_crs:
+                                    $ref: '#/components/schemas/Id'
+                                  unit:
+                                    title: Unit
+                                    type: string
+                                  usable:
+                                    description: Whether this operation can be used in online API or not.
+                                    title: Usable
+                                    type: boolean
+                                required:
+                                  - id
+                                  - name
+                                  - reversible
+                                  - grids
+                                  - usable
+                                  - deprecated
+                                title: TransformationItem
+                              - type: integer
+                          title: Transformations
+                          type: array
+                        unit:
+                          title: Unit
+                          type: string
+                      required:
+                        - id
+                        - kind
+                        - name
+                        - deprecated
+                      title: SearchItem
+                      type: object
+                    title: Results
+                    type: array
+                  total:
+                    title: Total
+                    type: integer
+                required:
+                  - results
+                  - total
+                title: SearchResult
+                type: object
+  /coordinates/transform/{coordinates}.json:
+    get:
+      summary: Transform coordinates
+      tags:
+        - Coordinates
+      parameters:
+        - name: coordinates
+          in: path
+          required: true
+          description: List of coordinate pairs seperated by `;` delimeter (Max 50 pairs).
+          example: 17,50;17,50,300
+          schema:
+            type: string
+        - name: s_srs
+          description: Source CRS
+          in: query
+          required: false
+          schema:
+            default: 4326
+            type: integer
+        - name: t_srs
+          description: Target CRS
+          in: query
+          required: false
+          schema:
+            default: 4326
+            type: integer
+        - name: ops
+          description: List of codes of operations seperated by a | (pipe) operator
+          example: '1623'
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  results:
+                    items:
+                      properties:
+                        x:
+                          type: number
+                        'y':
+                          type: number
+                        z:
+                          type: number
+                      type: object
+                      title: XYZ
+                    type: array
+                  transformer_selection_strategy:
+                    description: Transformations are selected using given `ops` parameter. If no parameter is given, `auto` strategy is used. If given, it may try to use a `listed` transformation, then fallback to `towgs84` patching, and finally `boundcrs`.
+                    type: string
+                required:
+                  - transformer_selection_strategy
+                  - results
+                title: TransformResult
+                type: object
+  /elevation/{locations}.json:
+    get:
+      summary: Get elevation
+      description: Get the elevation at given locations. If <i>unit</i> is omitted, elevation values are in meters.
+      tags:
+        - Elevation
+      parameters:
+        - name: locations
+          in: path
+          required: true
+          description: List of `lng,lat` WGS 84 positions seperated by `;` delimeter (Max 50 positions). Longitude values must be `> -180 < 180`. Latitudes must be `>= -85 <= 85`.
+          example: 17,50;-133.5,58.39
+          schema:
+            type: string
+        - name: unit
+          in: query
+          description: Unit of the elevation.
+          schema:
+            type: string
+            default: meters
+            enum:
+              - meters
+              - feet
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: ElevationResults
+                description: Array of locations with elevation `[lng, lat, ele]`
+                type: array
+                example:
+                  - - 17
+                    - 50
+                    - 364.20001220703125
+                  - - -133.5
+                    - 58.39
+                    - 1323.800048828125
+                items:
+                  type: array
+                  minItems: 3
+                  maxItems: 3
+                  items:
+                    type: number
+        '400':
+          description: Out of bounds
+  /weather/latest.json:
+    get:
+      summary: Weather catalog
+      description: List current weather-related variables, their metadata and individual keyframes
+      tags:
+        - Weather
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherCatalogResult'
+        '403':
+          $ref: '#/components/responses/403'
+  /fonts/{fontstack}/{start}-{end}.pbf:
+    parameters:
+      - name: fontstack
+        in: path
+        required: true
+        description: Font name, or more comma-separated names.
+        schema:
+          type: string
+      - name: start
+        in: path
+        required: true
+        description: Start of the glyph range.
+        schema:
+          type: integer
+          multipleOf: 256
+      - name: end
+        in: path
+        required: true
+        description: End of the glyph range (last glyph index).
+        schema:
+          type: integer
+    get:
+      summary: Font glyphs
+      description: Generates the glyphs for the requested fonts. Used when displaying vector maps.
+      tags:
+        - Other
+      responses:
+        '200':
+          content:
+            application/x-protobuf: {}
+        '400':
+          description: Invalid glyph range
+  /ogc/conformance:
+    get:
+      summary: OGC API conformance classes
+      description: Declaration of the implemented conformance classes.
+      tags:
+        - Other
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  securitySchemes:
+    key:
+      description: Your own API key from https://cloud.maptiler.com/
+      type: apiKey
+      name: key
+      in: query
+  parameters:
+    mapId:
+      name: mapId
+      in: path
+      description: Identifier of the map. See [MapTiler Maps](https://cloud.maptiler.com/maps/).
+      example: streets-v2
+      required: true
+      schema:
+        type: string
+    z:
+      name: z
+      description: Zoom level. Specifies the tile's zoom level. See [Tiles à la Google Maps](https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection/)
+      in: path
+      required: true
+      schema:
+        type: integer
+    x:
+      name: x
+      description: Column. Specifies the tile's column. See [Tiles à la Google Maps](https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection/)
+      in: path
+      required: true
+      schema:
+        type: integer
+    'y':
+      name: 'y'
+      description: Row. Specifies the tile's row. See [Tiles à la Google Maps](https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection/)
+      in: path
+      required: true
+      schema:
+        type: integer
+    rasterizationScale:
+      name: scale
+      in: path
+      description: Use "@2x" to get "retina"/HiDPI image.
+      required: false
+      schema:
+        type: string
+        enum:
+          - '@2x'
+    rasterizationFormat:
+      name: format
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - png
+          - jpg
+          - webp
+    imageWidth:
+      name: width
+      in: path
+      description: Width of the image in pixels.
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 2048
+    imageHeight:
+      name: height
+      in: path
+      description: Height of the image in pixels.
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 2048
+    path:
+      name: path
+      in: query
+      description: Define path(s) to be drawn on top of the map. Can be used multiple times. See [https://support.maptiler.com/i26-static-maps-for-your-web](https://support.maptiler.com/i26-static-maps-for-your-web).
+      schema:
+        type: string
+        pattern: ((fill|stroke|width|shortest)\:[^\|]+\|)*((enc:.+)|((-?\d+\.?\d*,-?\d+\.?\d*\|)+(-?\d+\.?\d*,-?\d+\.?\d*)))
+    markers:
+      name: markers
+      in: query
+      description: Define marker(s) to be drawn on top of the map. Can be used multiple times. See [https://support.maptiler.com/i26-static-maps-for-your-web](https://support.maptiler.com/i26-static-maps-for-your-web).
+      schema:
+        type: string
+        pattern: ((icon|anchor|scale)\:[^\|]+\|)*((-?\d+\.?\d*,-?\d+\.?\d*(,[^\|]+)?\|)*(-?\d+\.?\d*,-?\d+\.?\d*(,[^\|]+)?))
+    latlng:
+      name: latlng
+      in: query
+      description: Use [latitude, longitude] order for coordinates instead of [longitude, latitude].
+      default: false
+      schema:
+        type: boolean
+    attribution:
+      name: attribution
+      in: query
+      description: Changes the position of map attribution. If you disable the attribution make sure to display it in your application yourself (visibly).
+      default: bottomright
+      schema:
+        type: string
+        enum:
+          - bottomright
+          - bottomleft
+          - topleft
+          - topright
+          - 'false'
+    fill:
+      name: fill
+      in: query
+      description: Color to use as a fill when drawing polygons. Deprecated, use "path" instead.
+      deprecated: true
+      default: rgba(255,255,255,0.4)
+      schema:
+        type: string
+    stroke:
+      name: stroke
+      in: query
+      description: Color to use as a stroke when drawing polygons. Deprecated, use "path" instead.
+      deprecated: true
+      default: rgba(0,64,255,0.7)
+      schema:
+        type: string
+    width:
+      name: width
+      in: query
+      description: Width of the stroke line when drawing polygons (in pixels). Deprecated, use "path" instead.
+      deprecated: true
+      default: 1
+      schema:
+        type: number
+    encodedpath:
+      name: encodedpath
+      in: query
+      description: Path in [Google Encoded Polyline Format](https://developers.google.com/maps/documentation/utilities/polylinealgorithm). Deprecated, use "path" instead.
+      deprecated: true
+      schema:
+        type: string
+    shortest:
+      name: shortest
+      in: query
+      description: Draw the shortest paths, allow to cross the dateline.
+      default: false
+      schema:
+        type: boolean
+    padding:
+      name: padding
+      in: query
+      description: Ensures the autofitted bounds or features are comfortably visible in the resulting area. E.g. use 0.1 to add 10% margin (at least) of the size to each side.
+      default: 0.1
+      schema:
+        type: number
+    tilesId:
+      name: tilesId
+      in: path
+      description: Identifier of the tiles. See [MapTiler Tiles](https://cloud.maptiler.com/tiles/).
+      example: satellite-v2
+      required: true
+      schema:
+        type: string
+    dataId:
+      name: dataId
+      in: path
+      description: Identifier of the data. See [MapTiler Datasets](https://cloud.maptiler.com/data/).
+      required: true
+      schema:
+        type: string
+    imageId:
+      name: imageId
+      in: path
+      description: Identifier of the image.
+      required: true
+      schema:
+        type: string
+    bbox:
+      schema:
+        $ref: '#/components/schemas/bbox'
+      example: 5.9559,45.818,10.4921,47.8084
+      in: query
+      name: bbox
+      required: false
+      description: A `[w, s, e, n]` bounding box array to use for limiting search results. Only features inside the provided bounding box will be included.
+      explode: false
+    proximity:
+      schema:
+        anyOf:
+          - $ref: '#/components/schemas/coordinates'
+          - $ref: '#/components/schemas/ip'
+      example: 8.528509,47.3774434
+      in: query
+      name: proximity
+      required: false
+      description: A `[lon, lat]` array to use for biasing search results or the string `ip` to do server-side IP based geolocation. Specify to prefer results close to a specific location - features closer to the proximity value will be given priority over those further from the proximity value.
+      explode: false
+    language:
+      schema:
+        type: array
+        maxItems: 20
+        uniqueItems: true
+        items:
+          type: string
+          example: en
+          enum:
+            - aa
+            - ab
+            - ae
+            - af
+            - ak
+            - am
+            - an
+            - ar
+            - as
+            - av
+            - ay
+            - az
+            - ba
+            - be
+            - bg
+            - bh
+            - bi
+            - bm
+            - bn
+            - bo
+            - br
+            - bs
+            - ca
+            - ce
+            - ch
+            - co
+            - cr
+            - cs
+            - cu
+            - cv
+            - cy
+            - da
+            - de
+            - dv
+            - dz
+            - ee
+            - el
+            - en
+            - eo
+            - es
+            - et
+            - eu
+            - fa
+            - ff
+            - fi
+            - fj
+            - fo
+            - fr
+            - fy
+            - ga
+            - gd
+            - gl
+            - gn
+            - gu
+            - gv
+            - ha
+            - he
+            - hi
+            - ho
+            - hr
+            - ht
+            - hu
+            - hy
+            - hz
+            - ia
+            - id
+            - ie
+            - ig
+            - ii
+            - ik
+            - io
+            - is
+            - it
+            - iu
+            - ja
+            - jv
+            - ka
+            - kg
+            - ki
+            - kj
+            - kk
+            - kl
+            - km
+            - kn
+            - ko
+            - kr
+            - ks
+            - ku
+            - kv
+            - kw
+            - ky
+            - la
+            - lb
+            - lg
+            - li
+            - ln
+            - lo
+            - lt
+            - lu
+            - lv
+            - mg
+            - mh
+            - mi
+            - mk
+            - ml
+            - mn
+            - mr
+            - ms
+            - mt
+            - my
+            - na
+            - nb
+            - nd
+            - ne
+            - ng
+            - nl
+            - nn
+            - 'no'
+            - nr
+            - nv
+            - ny
+            - oc
+            - oj
+            - om
+            - or
+            - os
+            - pa
+            - pi
+            - pl
+            - ps
+            - pt
+            - qu
+            - rm
+            - rn
+            - ro
+            - ru
+            - rw
+            - sa
+            - sc
+            - sd
+            - se
+            - sg
+            - si
+            - sk
+            - sl
+            - sm
+            - sn
+            - so
+            - sq
+            - sr
+            - ss
+            - st
+            - su
+            - sv
+            - sw
+            - ta
+            - te
+            - tg
+            - th
+            - ti
+            - tk
+            - tl
+            - tn
+            - to
+            - tr
+            - ts
+            - tt
+            - tw
+            - ty
+            - ug
+            - uk
+            - ur
+            - uz
+            - ve
+            - vi
+            - vo
+            - wa
+            - wo
+            - xh
+            - yi
+            - yo
+            - za
+            - zh
+            - zu
+        example: de,en
+      example: de,en
+      in: query
+      name: language
+      required: false
+      description: Prefer results in specific language specified as ISO 639-1 code. Only the first language code is used when prioritizing forward geocode results to be matched. If this query parameter is omited then Accept-Language HTTP header will be analyzed. If the parameter is provided but is empty then no language preference is made.
+      explode: false
+    country:
+      schema:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+        example: sk,cz
+      example: sk,cz
+      in: query
+      name: country
+      required: false
+      description: Limit search to specific country/countries.
+      explode: false
+    limit:
+      schema:
+        type: integer
+        default: 5
+        minimum: 1
+        maximum: 10
+      in: query
+      name: limit
+      required: false
+      description: Maximum number of results to return. For reverse geocoding with multiple types this must not be set or must be set to 1.
+    types:
+      schema:
+        type: array
+        uniqueItems: true
+        items:
+          $ref: '#/components/schemas/placeType'
+      in: query
+      name: types
+      required: false
+      description: Filter types of which features to return. If not specified, features of all types except `poi` and `major_landform` are returned (`types = ["poi", "major_landform"]`, `excludeTypes = true`). In case of reverse geocoding if just a single type is specified, then multiple nearby features of the single type can be returned, otherwise single feature for every specified type (or default types) can be returned.
+    excludeTypes:
+      schema:
+        type: boolean
+        default: false
+      in: query
+      name: excludeTypes
+      required: false
+      description: Set to `true` to use all available feature types except those specified in `types`.
+    fuzzyMatch:
+      schema:
+        type: boolean
+        default: true
+      in: query
+      name: fuzzyMatch
+      required: false
+      description: Set to `false` to disable fuzzy search.
+    autocomplete:
+      schema:
+        type: boolean
+      in: query
+      name: autocomplete
+      required: false
+      description: Set to `true` to use autocomplete, `false` to disable autocomplete.
+      default: true
+    worldview:
+      schema:
+        type: string
+        example: ch
+        enum:
+          - default
+          - auto
+          - ch
+          - us
+      name: worldview
+      required: false
+      in: query
+      description: >
+        Some of the geographical boundaries and names are disputed. When `worldview` option is selected, the Geocoding API
+        responses will be aligned with the borders and names recognized by the selected country (US or Switzerland). This
+        affects filtering by country, the context returned with the given feature and also some of the labels (e.g.,
+        Gulf of Mexico vs. Gulf of America).
+        Special values include: `auto` - the worldview is determined by the location of the client, `default` - disputed
+        areas are returned without country information, countries with disputed borders are returned without full geometry.
+      example: ch
+      default: default
+    keyId:
+      in: path
+      description: Identifier of API Key.
+      name: keyId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    cursor:
+      name: cursor
+      in: query
+      description: Page cursor
+      required: false
+      schema:
+        type: string
+        format: byte
+  responses:
+    '403':
+      description: Key is missing, invalid or restricted
+    '404':
+      description: The item does not exist
+    '414':
+      description: URI Too Long. Maximum allowed length is 8192 bytes.
+    RasterizedImage:
+      content:
+        image/*:
+          schema:
+            type: string
+            format: binary
+    ok:
+      description: Search result represented as FeatureCollection where every item is represented as a GeoJSON Feature
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/result'
+  schemas:
+    StyleJSON:
+      type: object
+      description: Style JSON object
+      externalDocs:
+        url: https://docs.mapbox.com/mapbox-gl-js/style-spec/
+    TileJSON:
+      type: object
+      externalDocs:
+        url: https://raw.githubusercontent.com/mapbox/tilejson-spec/master/2.2.0/schema.json
+    GeoJSON:
+      type: object
+      externalDocs:
+        url: https://tools.ietf.org/html/rfc7946
+    ImageJSON:
+      title: ImageJSON Schema
+      type: object
+      properties:
+        id:
+          description: Optional identifier of the image.
+          type: string
+        description:
+          description: Optional description of the image.
+          type: string
+        attribution:
+          description: Optional attribution for the image.
+          type: string
+        width:
+          description: Image width in pixels.
+          type: integer
+          required: true
+        height:
+          description: Image height in pixels.
+          type: integer
+          required: true
+        minzoom:
+          description: Minimum available zoom level.
+          type: integer
+          required: true
+        maxzoom:
+          description: Maximum available zoom level.
+          type: integer
+          required: true
+        tileSize:
+          description: Tile size in pixels.
+          type: integer
+          required: true
+    bbox:
+      example:
+        - 5.9559
+        - 45.818
+        - 10.4921
+        - 47.8084
+      type: array
+      title: BoundingBox
+      prefixItems:
+        - type: number
+          minimum: -180
+          maximum: 180
+          description: minimal longitude
+        - type: number
+          minimum: -90
+          maximum: 90
+          description: minimal latitude
+        - type: number
+          minimum: -180
+          maximum: 180
+          description: maximal longitude
+        - type: number
+          minimum: -90
+          maximum: 90
+          description: maximal latitude
+    coordinates:
+      example:
+        - 8.528509
+        - 47.3774434
+      type: array
+      title: Coordinates
+      prefixItems:
+        - type: number
+          minimum: -180
+          maximum: 180
+          description: longitude
+        - type: number
+          minimum: -90
+          maximum: 90
+          description: latitude
+    ip:
+      type: string
+      title: IP
+      description: Server-side IP based geolocation
+      const: ip
+    placeType:
+      type: string
+      title: PlaceType
+      description: Check out the [descriptions and default values](/cloud/api/geocoding/#PlaceTypeValues) of each of the PlaceType values
+      enum:
+        - continental_marine
+        - country
+        - major_landform
+        - region
+        - subregion
+        - county
+        - joint_municipality
+        - joint_submunicipality
+        - municipality
+        - municipal_district
+        - locality
+        - neighbourhood
+        - place
+        - postal_code
+        - address
+        - road
+        - poi
+    commonProperties:
+      title: CommonProperties
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          description: Unique feature ID
+          type: string
+          example: municipality.46425
+        text:
+          description: Localized feature name
+          type: string
+          example: Paris
+        language:
+          description: Query's primary ISO 639-1 language code
+          type: string
+          example: en
+      patternProperties:
+        ^text_(\w\w):
+          type: string
+          description: A string analogous to the `text` field that matches the query in the requested language. This field is only returned when multiple languages are requested using the `language` parameter, and will be present for each requested language.
+        ^language_(\w\w):
+          type: string
+          description: A ISO 639-1 query's fallback language code. This field is only returned when multiple languages are requested using the `language` parameter, and will be present for each requested language.
+      required:
+        - id
+        - text
+    featureProperties:
+      title: FeatureProperties
+      type: object
+      additionalProperties: true
+      properties:
+        ref:
+          description: (experimental) External reference of the feature used for debugging purposes.
+            The exact format of this field may change without notice, and should not be relied on at the moment.
+          type: string
+          example: osm:r71525
+        country_code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code of the feature
+          example: fr
+        kind:
+          type: string
+          description: (experimental) Kind of the feature
+          enum:
+            - road
+            - road_relation
+            - admin_area
+            - place
+            - street
+            - virtual_street
+        categories:
+          type: array
+          description: Array of [POI category](/cloud/api/geocoding/#PoiCategory). Only available for `poi` type. Category values may change in the near future.
+          minItems: 1
+          items:
+            type: string
+            example: restaurant
+        feature_tags:
+          type: object
+          title: Feature tags
+          description: (experimental) Feature tags, only available for `poi` type. They can include e.g. working hours, type of amenity or wheelchair access.
+          additionalProperties:
+            type: string
+        place_designation:
+          type: string
+          title: Place designation
+          description:
+            (experimental) Additional information about the place. The main use case is to determine if the administrative area represents a town, a city or a village.
+            This field is especially useful in cases, where a large city is a region, land or prefecture from administrative point of view (typical examples are Berlin and Tokyo).
+          example: city
+      required:
+        - ref
+        - country_code
+    result:
+      description: Search result represented by FeatureCollection where every item is represented as a GeoJSON Feature
+      type: object
+      title: SearchResults
+      properties:
+        type:
+          type: string
+          const: FeatureCollection
+        features:
+          description: Array of features found
+          type: array
+          title: Feature
+          items:
+            allOf:
+              - $ref: '#/components/schemas/commonProperties'
+              - type: object
+                patternProperties:
+                  ^place_name_(\w\w):
+                    type: string
+                    description: A string analogous to the `place_name` field that matches the query in the requested language. This field is only returned when multiple languages are requested using the `language` parameter, and will be present for each requested language.
+                properties:
+                  type:
+                    type: string
+                    const: Feature
+                  properties:
+                    description: Feature properties
+                    $ref: '#/components/schemas/featureProperties'
+                  geometry:
+                    anyOf:
+                      - type: object
+                        title: Point
+                        properties:
+                          type:
+                            type: string
+                            const: Point
+                          coordinates:
+                            $ref: '#/components/schemas/coordinates'
+                        required:
+                          - type
+                          - coordinates
+                      - type: object
+                        title: LineString
+                        properties:
+                          type:
+                            type: string
+                            const: LineString
+                          coordinates:
+                            minItems: 2
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/coordinates'
+                        required:
+                          - type
+                          - coordinates
+                      - type: object
+                        title: Polygon
+                        properties:
+                          type:
+                            type: string
+                            const: Polygon
+                          coordinates:
+                            type: array
+                            items:
+                              minItems: 4
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/coordinates'
+                        required:
+                          - type
+                          - coordinates
+                      - type: object
+                        title: MultiPoint
+                        properties:
+                          type:
+                            type: string
+                            const: MultiPoint
+                          coordinates:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/coordinates'
+                        required:
+                          - type
+                          - coordinates
+                      - type: object
+                        title: MultiLineString
+                        properties:
+                          type:
+                            type: string
+                            const: MultiLineString
+                          coordinates:
+                            type: array
+                            items:
+                              minItems: 2
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/coordinates'
+                        required:
+                          - type
+                          - coordinates
+                      - type: object
+                        title: MultiPolygon
+                        properties:
+                          type:
+                            type: string
+                            const: MultiPolygon
+                          coordinates:
+                            type: array
+                            items:
+                              type: array
+                              items:
+                                minItems: 4
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/coordinates'
+                        required:
+                          - type
+                          - coordinates
+                      - type: object
+                        title: GeometryCollection
+                        properties:
+                          type:
+                            type: string
+                            const: GeometryCollection
+                          geometries:
+                            type: array
+                            items:
+                              anyOf:
+                                - type: object
+                                  title: Point
+                                  properties:
+                                    type:
+                                      type: string
+                                      const: Point
+                                    coordinates:
+                                      $ref: '#/components/schemas/coordinates'
+                                  required:
+                                    - type
+                                    - coordinates
+                                - type: object
+                                  title: LineString
+                                  properties:
+                                    type:
+                                      type: string
+                                      const: LineString
+                                    coordinates:
+                                      minItems: 2
+                                      type: array
+                                      items:
+                                        $ref: '#/components/schemas/coordinates'
+                                  required:
+                                    - type
+                                    - coordinates
+                                - type: object
+                                  title: Polygon
+                                  properties:
+                                    type:
+                                      type: string
+                                      const: Polygon
+                                    coordinates:
+                                      type: array
+                                      items:
+                                        minItems: 4
+                                        type: array
+                                        items:
+                                          $ref: '#/components/schemas/coordinates'
+                                  required:
+                                    - type
+                                    - coordinates
+                                - type: object
+                                  title: MultiPoint
+                                  properties:
+                                    type:
+                                      type: string
+                                      const: MultiPoint
+                                    coordinates:
+                                      type: array
+                                      items:
+                                        $ref: '#/components/schemas/coordinates'
+                                  required:
+                                    - type
+                                    - coordinates
+                                - type: object
+                                  title: MultiLineString
+                                  properties:
+                                    type:
+                                      type: string
+                                      const: MultiLineString
+                                    coordinates:
+                                      type: array
+                                      items:
+                                        minItems: 2
+                                        type: array
+                                        items:
+                                          $ref: '#/components/schemas/coordinates'
+                                  required:
+                                    - type
+                                    - coordinates
+                                - type: object
+                                  title: MultiPolygon
+                                  properties:
+                                    type:
+                                      type: string
+                                      const: MultiPolygon
+                                    coordinates:
+                                      type: array
+                                      items:
+                                        type: array
+                                        items:
+                                          minItems: 4
+                                          type: array
+                                          items:
+                                            $ref: '#/components/schemas/coordinates'
+                                  required:
+                                    - type
+                                    - coordinates
+                        required:
+                          - type
+                          - geometries
+                  bbox:
+                    description: Bounding box of the original feature as `[w, s, e, n]` array
+                    $ref: '#/components/schemas/bbox'
+                  center:
+                    description: A `[lon, lat]` array of the original feature centeroid
+                    $ref: '#/components/schemas/coordinates'
+                  place_name:
+                    description: Formatted (including the hierarchy) and localized feature full name
+                    type: string
+                  matching_place_name:
+                    description: A string analogous to the `place_name` field that matches the query. This field is only returned to help you understand how the response aligns with the submitted query.
+                    type: string
+                  matching_text:
+                    description: A string analogous to the `text` field that matches the query. This field is only returned to help you understand how the response aligns with the submitted query.
+                    type: string
+                  place_type:
+                    description: An array of feature types describing the feature. Currently each feature has only single type but this may change in the future.
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/placeType'
+                  place_type_name:
+                    type: array
+                    description: Localized type of the place name, matches `place_type` property.
+                    items:
+                      type: string
+                  relevance:
+                    description: Indicates how well the returned feature matches the user's query on a scale from 0 to 1. 0 means the result does not match the query text at all, while 1 means the result fully matches the query text. You can use the relevance property to remove results that don't fully match the query.
+                    type: number
+                  context:
+                    description: Feature hierarchy
+                    type: array
+                    title: Context
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/featureProperties'
+                        - $ref: '#/components/schemas/commonProperties'
+                  address:
+                    description: Address number, if applicable
+                    type: string
+                required:
+                  - type
+                  - properties
+                  - geometry
+                  - bbox
+                  - center
+                  - place_name
+                  - place_type
+                  - place_type_name
+                  - relevance
+        query:
+          description: Tokenized search query
+          type: array
+          items:
+            type: string
+        attribution:
+          description: Attribution of the result
+          type: string
+          example: <a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>
+      required:
+        - type
+        - features
+        - query
+        - attribution
+    GeolocationResult:
+      type: object
+      title: GeolocationResult
+      properties:
+        country:
+          type: string
+          description: Name of the country
+          example: Switzerland
+        country_code:
+          type: string
+          description: Two-letter code of the country
+          example: CH
+          externalDocs:
+            description: ISO 3166-1 alpha-2 codes
+            url: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+        country_bounds:
+          type: array
+          items:
+            type: number
+          minItems: 4
+          maxItems: 4
+          description: Bounds of the country in WGS84 degrees `[west, south, east, north]`.
+          example:
+            - 5.95538
+            - 45.818852
+            - 10.490936
+            - 47.809357
+        country_languages:
+          type: array
+          items:
+            type: string
+          description: Official country languages in ISO 639-1 format.
+          example:
+            - de
+            - fr
+            - it
+          externalDocs:
+            description: ISO 639-1 codes
+            url: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+        continent:
+          type: string
+          description: Name of the continent
+          example: Europe
+        continent_code:
+          type: string
+          description: Two-letter code of the continent
+          example: EU
+        eu:
+          type: boolean
+          description: Indicated whether the country is part of the European Union.
+          example: false
+        city:
+          type: string
+          description: Name of the city
+          example: Zurich
+        latitude:
+          type: number
+          description: Latitude of the location
+          example: 47.36667
+        longitude:
+          type: number
+          description: Longitude of the location
+          example: 8.55
+        postal:
+          type: string
+          description: Postal code
+          example: '8000'
+        region:
+          type: string
+          description: If known, the ISO 3166-2 name for the first level region.
+          example: Zurich
+          externalDocs:
+            description: ISO 3166-2 codes
+            url: https://en.wikipedia.org/wiki/ISO_3166-2
+        region_code:
+          type: string
+          description: If known, the ISO 3166-2 code for the first level region.
+          example: ZH
+          externalDocs:
+            description: ISO 3166-2 codes
+            url: https://en.wikipedia.org/wiki/ISO_3166-2
+        timezone:
+          type: string
+          description: Name of the timezone
+          example: Europe/Zurich
+        elevation:
+          type: number
+          description: Elevation of the location in meters
+          example: 433
+    Id:
+      properties:
+        authority:
+          title: Authority
+          type: string
+        code:
+          title: Code
+          type: integer
+      required:
+        - authority
+        - code
+      title: Id
+      type: object
+    ExportItem:
+      properties:
+        proj4:
+          title: Proj4
+          type: string
+        wkt:
+          title: Wkt
+          type: string
+      title: ExportItem
+      type: object
+    TilesetDefinition:
+      type: object
+      title: TilesetDefinition
+      properties:
+        spatial_ref_sys:
+          type: object
+          title: Spatial reference system
+          description: Projection
+          properties:
+            auth_name:
+              type: string
+              description: Name of the defining authority
+              example: EPSG
+            auth_srid:
+              type: string
+              description: ID given by the defining authority
+              example: '3857'
+            wkt:
+              type: string
+              description: Well known text of the definition
+              example: PROJCRS["WGS 84 / Pseudo-Mercator",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Popular Visualisation Pseudo-Mercator",METHOD["Popular Visualisation Pseudo Mercator",ID["EPSG",1024]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",0,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Web mapping and visualisation."],AREA["World between 85.06°S and 85.06°N."],BBOX[-85.06,-180,85.06,180]],ID["EPSG",3857]]
+          required:
+            - auth_name
+            - auth_srid
+        bounds:
+          title: Bounds
+          type: array
+          item: number
+          description: Bounds of the area represented by the tileset. Coordinates are in the given projection.
+          minItems: 4
+          maxItems: 4
+          example:
+            - -20037481.18083349
+            - -20037508.342789244
+            - 20008180.55502281
+            - 20037508.342789244
+        tile_format:
+          type: string
+          description: Format of individual tiles
+          example: png
+        tile_matrix_set:
+          type: object
+          title: Tile matrix set
+          properties:
+            bounds:
+              type: array
+              title: Bounds
+              item: number
+              minItems: 4
+              maxItems: 4
+              example:
+                - -20037481.18083349
+                - -20037508.342789244
+                - 20008180.55502281
+                - 20037508.342789244
+            items:
+              type: array
+              items:
+                type: object
+                title: Tile matrix
+                properties:
+                  zoom_level:
+                    type: integer
+                  matrix_width:
+                    type: integer
+                  matrix_height:
+                    type: integer
+                  tile_width:
+                    type: integer
+                  tile_height:
+                    type: integer
+                  pixel_x_size:
+                    type: number
+                  pixel_y_size:
+                    type: number
+        metadata:
+          type: object
+          title: Metadata
+          properties:
+            weather_variable:
+              type: object
+              title: Weather variable
+              properties:
+                name:
+                  type: string
+                  description: Human-friendly name of the variable
+                  example: Wind
+                description:
+                  type: string
+                  description: Human-friendly description of the variable
+                  example: Wind at 10 m above ground [m/s]
+                attribution:
+                  type: string
+                  example: GFS
+                variable_id:
+                  type: string
+                  description: unique ID of the forecast for grouping
+                  example: wind-10m:gfs
+                decoding:
+                  type: object
+                  title: Decoding
+                  properties:
+                    channels:
+                      type: string
+                      enum:
+                        - r
+                        - g
+                        - b
+                        - rg
+                        - rb
+                        - gb
+                        - rgb
+                      description: Channel to decode the info from
+                      example: rg
+                    min:
+                      type: number
+                      description: Min boundary of the data for decoding
+                      example: -75
+                    max:
+                      type: number
+                      description: Max boundary of the data for decoding
+                      example: 75
+                unit:
+                  type: string
+                  description: Human-friendly unit of the values
+                  example: ms
+                release_timestamp:
+                  type: string
+                  description: Date of release for the whole batch, ISO timestamp
+                  example: '2023-03-01T06:00:00+00:00'
+                timestamp:
+                  type: string
+                  description: ISO timestamp of the forecast frame – the moment in time it depicts
+                  example: '2023-03-01T11:00:00+00:00'
+      required:
+        - bounds
+        - tile_matrix_set
+        - keyframes
+    WeatherCatalogResult:
+      type: object
+      title: WeatherCatalogResult
+      properties:
+        variables:
+          type: array
+          description: List of all the available weather variables
+          title: CatalogResult
+          items:
+            allOf:
+              - $ref: '#/components/schemas/TilesetDefinition'
+              - type: object
+                properties:
+                  keyframes:
+                    type: array
+                    title: Keyframes
+                    description: List of the available keyframes for this variable
+                    items:
+                      type: object
+                      title: Keyframe
+                      properties:
+                        id:
+                          type: string
+                          description: UUID of the tileset
+                        timestamp:
+                          type: string
+                          description: ISO timestamp of the tileset
+    APIKey:
+      title: APIKey
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+        origins:
+          type: array
+          items:
+            type: string
+        created:
+          type: string
+          format: date-time
+        changed:
+          type: string
+          format: date-time
+    APIKeySettings:
+      title: APIKeySettings
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: Will be generated automatically unless provided explicitly.
+        description:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+        origins:
+          type: array
+          items:
+            type: string
+    APIKeyPage:
+      title: APIKeyPage
+      type: object
+      properties:
+        cursor:
+          type: string
+          format: byte
+          nullable: true
+        total_count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIKey'

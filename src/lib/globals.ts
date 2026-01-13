@@ -6,6 +6,7 @@ export const CONSENT_DIALOG_ID = 'consent-dialog';
 export const GPANO_FIX_DIALOG_ID = 'gpano-fix-dialog';
 
 export const streetViewBaseURL = 'https://streetviewpublish.googleapis.com';
+export const GITHUB_URL = 'https://github.com/777555777/360-gmaps-uploader';
 
 export const MAX_FILES_UPLOAD = 16;
 export const MAX_CONCURRENT_UPLOADS = 4;

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Info, ShieldCheck, Cookie, MessageCircleQuestionMark } from '@lucide/svelte';
-	import { INFO_DIALOG_ID, CONSENT_DIALOG_ID } from '$lib/globals';
+	import { Info, ShieldCheck, Cookie, MessageCircleQuestionMark, Github } from '@lucide/svelte';
+	import { INFO_DIALOG_ID, CONSENT_DIALOG_ID, GITHUB_URL } from '$lib/globals';
 	import { showDialogById } from '$lib/utils/dialog-helpers';
 	import Dropdown from '$lib/components/util/dropdown.svelte';
 
@@ -47,6 +47,17 @@
 					<Cookie size={16} />
 					<span>Consent Management</span>
 				</button>
+			</li>
+			<li class="github">
+				<a
+					href={GITHUB_URL}
+					target="_blank"
+					rel="noopener noreferrer"
+					onclick={() => closeDropdown()}
+				>
+					<Github size={16} />
+					<span>GitHub Repository</span>
+				</a>
 			</li>
 		</ul>
 	{/snippet}
@@ -107,6 +118,17 @@
 					padding: 0.75rem;
 				}
 			}
+		}
+	}
+
+	/* Add Github entry on small screens */
+	.github {
+		display: none;
+	}
+
+	@media (width < 768px) {
+		.github {
+			display: block;
 		}
 	}
 </style>
