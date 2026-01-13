@@ -90,8 +90,8 @@ This project uses the **Google Street View Publish API**. By using this applicat
 
 When enabled, the search feature uses the **MapTiler API** for geocoding. By enabling this feature, you agree to:
 
-- [Terms of Service](https://www.maptiler.com/terms/)
-- [Privacy Policy](https://www.maptiler.com/privacy-policy/).
+- MapTiler's [Terms of Service](https://www.maptiler.com/terms/)
+- MapTiler's [Privacy Policy](https://www.maptiler.com/privacy-policy/).
 
 This software is provided "as-is" without warranty of any kind. The author assumes no liability for any damages or costs arising from the use of this software or the Google Street View API.
 
