@@ -3,7 +3,7 @@
 Pano Publisher is a local-first web application for uploading individual 360° photo spheres to Google Maps and Google Street View.
 
 ## Purpose
-- Upload standalone 360° photos (photo spheres) to Google Street View
+- Upload standalone 360° photo spheres (equirectangular panoramas) to Google Street View
 - Fill the gap left by the discontinued Google Street View mobile app
 - Focus on image uploads only
 
@@ -17,8 +17,9 @@ Pano Publisher is a local-first web application for uploading individual 360° p
 
 ## Data Handling
 - No server-side storage of images
-- All processing happens locally in the browser
+- All image processing happens locally in the browser
 - Images are sent only to Google APIs for publishing
+- Location search requests are sent to external geocoding services but only when used
 
 ## Limitations
 - No video uploads

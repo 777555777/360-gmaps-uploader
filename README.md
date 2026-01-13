@@ -4,9 +4,9 @@
 
 ![](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
-Pano Publisher is a simple webapp for uploading Equirectangular 360-Images to Google Maps via the Google Street View API. It is built with Svelte 5 and processes everything locally on the client up until publishing images to Google.
+Pano Publisher is a simple web app for uploading equirectangular 360° images to Google Maps via the Google Street View API. Built with Svelte 5, it is designed to be local-first, with all image processing happening in the browser. Optional features, such as OpenStreetMap place search, make use of external services but can be disabled via configuration.
 
-A deployed version can be found here: [https://panopublisher.net](https://panopublisher.net)
+A deployed version ready to use can be found here: [https://panopublisher.net](https://panopublisher.net)
 
 ## Features
 
@@ -15,6 +15,7 @@ A deployed version can be found here: [https://panopublisher.net](https://panopu
 - 🌐 **Built-in 360° Preview** - inspect your panoramas directly in the app before publishing
 - 🔐 **Privacy First** - all data processing happens locally in your browser until you publish to Google
 - ✏️ **Geo-Data-Editing** - edit or add geo data via text input or by setting the marker's position on the map
+- 🔍 **Geo Search (optional)** - autocomplete search field to find locations fast
 - 📱 **Responsive UI** - clean, user-friendly interface
 
 ## Prerequisites
@@ -22,6 +23,7 @@ A deployed version can be found here: [https://panopublisher.net](https://panopu
 - Node.js 18+
 - Google Cloud Project with Street View Publish API enabled
 - OAuth 2.0 Client ID (see [Google Auth Setup](docs/GOOGLE_AUTH_SETUP.md))
+- **Optional** if search is enabled: MapTiler API Key (free tier available at [MapTiler](https://www.maptiler.com/cloud/))
 
 ## Installation & Local Development
 
@@ -51,6 +53,9 @@ A deployed version can be found here: [https://panopublisher.net](https://panopu
    ```bash
    VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
    VITE_DRY_RUN=true  # For local testing without actual upload
+
+   MAPTILER_API_KEY=your_maptiler_api_key_here # Only needed if map search is enabled
+   PUBLIC_ENABLE_MAP_SEARCH=true # Set to false to disable map search feature
    ```
 
 4. **Start development server**
@@ -65,7 +70,7 @@ A deployed version can be found here: [https://panopublisher.net](https://panopu
 
 ```bash
 npm run build
-npm run preview  # Test production build
+npm run preview  # Test production build on port 4173
 ```
 
 ## Legal & Disclaimer
@@ -81,17 +86,15 @@ This project uses the **Google Street View Publish API**. By using this applicat
 - Compliance with Google's usage policies
 - The content you publish to Google Street View
 
+### Optional External Services
+
+When enabled, the location search feature uses the **MapTiler API** for geocoding. By enabling this feature, you agree to:
+
+- [Terms of Service](https://www.maptiler.com/terms/)
+- [Privacy Policy](https://www.maptiler.com/privacy-policy/).
+
 This software is provided "as-is" without warranty of any kind. The author assumes no liability for any damages or costs arising from the use of this software or the Google Street View API.
 
 ## License
 
 This project is licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE).
-
-**Key points:**
-
-- Free to use, modify, and distribute
-- Source code must be made available when distributed
-- Network use is distribution - if you host a modified version publicly, you must provide the source code to users
-- Changes must be released under the same license
-
-Copyright (c) 2026 777555777
