@@ -222,8 +222,12 @@
 		border: none;
 		background-color: transparent;
 		font-size: 16px; /* Prevents iOS zoom on focus */
-		color: var(--text-primary);
+		color: var(--text-default);
 		padding: 0.5rem;
+
+		&::placeholder {
+			color: var(--text-subtle);
+		}
 
 		&:focus-visible {
 			outline: none;

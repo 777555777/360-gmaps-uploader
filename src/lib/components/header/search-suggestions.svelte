@@ -60,12 +60,12 @@
 	.suggestion-text {
 		font-size: 14px;
 		font-weight: 500;
-		color: var(--text-primary);
+		color: var(--text-default);
 		margin-bottom: 0.25rem;
 	}
 
 	.suggestion-place-name {
 		font-size: 12px;
-		color: var(--text-secondary);
+		color: var(--text-muted);
 	}
 </style>

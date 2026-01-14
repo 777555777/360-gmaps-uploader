@@ -345,6 +345,7 @@
 		padding: 0.5rem 0.75rem;
 		font-size: 13px;
 		border-bottom: 1px solid var(--border-subtle);
+		color: var(--text-default);
 	}
 
 	.file-item:last-child {

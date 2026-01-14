@@ -139,9 +139,13 @@
 		border: none;
 		background-color: transparent;
 		font-size: 14px;
-		color: var(--text-primary);
+		color: var(--text-default);
 		border-radius: 100vmax;
 		padding: 0.5rem;
+
+		&::placeholder {
+			color: var(--text-subtle);
+		}
 
 		&:focus-visible {
 			outline: 2px solid var(--button-primary);

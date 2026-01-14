@@ -164,7 +164,7 @@
 			border: none;
 			cursor: pointer;
 			padding: 0;
-			background-color: #fff;
+			background-color: transparent;
 			border-radius: 100vmax;
 			color: var(--text-default);
 			flex-shrink: 0;
@@ -212,7 +212,9 @@
 				height: 30px;
 				line-height: 30px;
 				padding-inline: 12px;
+				background-color: var(--surface-subtle);
 				border: 1px solid var(--border-default);
+				color: var(--text-default);
 				border-radius: 100vmax;
 				width: 100%;
 				max-width: 10rem;

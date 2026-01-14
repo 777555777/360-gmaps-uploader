@@ -143,7 +143,7 @@
 		p {
 			font-size: 0.75rem;
 			text-align: left;
-			color: var(--text-subtle);
+			color: var(--text-medium);
 			margin-right: 1rem;
 			padding-left: 0.75rem;
 		}
