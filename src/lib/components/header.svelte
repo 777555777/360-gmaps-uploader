@@ -97,8 +97,7 @@
 			display: flex;
 			align-items: center;
 			justify-content: left;
-			gap: 0.25rem;
-
+			gap: 0.5rem;
 			user-select: none;
 			cursor: pointer;
 

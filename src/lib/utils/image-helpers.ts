@@ -242,7 +242,7 @@ export async function validateStreetViewImage(file: File): Promise<ValidationRes
 		// Minimum resolution
 		if (imageWidth < MIN_WIDTH || imageHeight < MIN_HEIGHT) {
 			errors.push(
-				`Resolution too low. At least ${MIN_WIDTH}×${MIN_HEIGHT} required (Current: ${imageWidth}×${imageHeight}).`
+				`Resolution too low. At least ${MIN_WIDTH}x${MIN_HEIGHT} required (Current: ${imageWidth}x${imageHeight}).`
 			);
 		}
 
@@ -253,7 +253,7 @@ export async function validateStreetViewImage(file: File): Promise<ValidationRes
 		}
 	} catch (err) {
 		console.log('err', err);
-		errors.push('Could not read JPEG dimensions. Is the file corrupted?');
+		errors.push('The JPEG image appears to be corrupted or invalid.');
 	}
 
 	// --- 4. Validate Google Photo Sphere XMP metadata ---

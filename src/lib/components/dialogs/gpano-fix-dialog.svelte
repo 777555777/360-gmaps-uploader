@@ -371,6 +371,7 @@
 		margin: 0;
 		font-size: 12px;
 		line-height: 1.6;
+		color: var(--chip-primary-fg);
 
 		li {
 			margin: 0;
@@ -390,7 +391,7 @@
 		margin: 0;
 		font-size: 13px;
 		line-height: 1.6;
-		/* color: var(--chip-danger-fg); */
+		color: var(--chip-danger-fg);
 
 		li {
 			margin: 0;
