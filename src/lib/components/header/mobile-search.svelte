@@ -1,144 +1,43 @@
 <script lang="ts">
 	import { Eraser, MapPinHouse, Search, X } from '@lucide/svelte';
 	import { onMount } from 'svelte';
-	import { mapState } from '$lib/map-state.svelte';
-	import { consentState } from '$lib/consent-state.svelte';
-	import type { GeocodingFeature } from '$lib/types/geocoding';
+	import { searchState } from '$lib/search-state.svelte';
 	import SearchSuggestions from './search-suggestions.svelte';
 
-	// State
-	let searchQuery = $state('');
-	let suggestions = $state<GeocodingFeature[]>([]);
-	let isLoading = $state(false);
-	let selectedIndex = $state(-1);
-	let lastSelectedFeature = $state<GeocodingFeature | null>(null);
-	let abortController: AbortController | null = null;
-	let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+	// Mobile-specific state
 	let mounted = $state(false);
 
-	// Rate limiting (max 15 requests per minute to be safe)
-	const MAX_REQUESTS_PER_MINUTE = 15;
-	let requestTimestamps: number[] = [];
-
 	// Element references
-	let inputElement: HTMLInputElement;
-	let popoverElement: HTMLElement;
+	let inputElement = $state<HTMLInputElement | null>(null);
+	let popoverElement = $state<HTMLElement | null>(null);
 
 	// Popover ID
 	const popoverId = 'mobile-search-popover';
-
-	// Check if search is enabled (requires consent)
-	const isSearchEnabled = $derived(consentState.hasConsented() === true);
-
-	// Derived: should show suggestions
-	const showSuggestions = $derived(suggestions.length > 0 || isLoading);
-
-	// Focus on user's geolocation
-	async function focusUserLocation() {
-		await mapState.focusUserLocation();
-		closeOverlay();
-	}
-
-	// Check if we're within rate limit
-	function isWithinRateLimit(): boolean {
-		const now = Date.now();
-		const oneMinuteAgo = now - 60000;
-
-		requestTimestamps = requestTimestamps.filter((ts) => ts > oneMinuteAgo);
-
-		if (requestTimestamps.length >= MAX_REQUESTS_PER_MINUTE) {
-			console.warn('Rate limit reached. Please wait before searching again.');
-			return false;
-		}
-
-		requestTimestamps.push(now);
-		return true;
-	}
 
 	// Initialize mounted state
 	onMount(() => {
 		mounted = true;
 	});
 
-	// Debounced search function
-	async function searchLocations(query: string) {
-		if (!mounted || !isSearchEnabled) return;
-
-		abortController?.abort();
-		if (debounceTimeout) clearTimeout(debounceTimeout);
-
-		if (!query.trim()) {
-			suggestions = [];
-			return;
-		}
-
-		debounceTimeout = setTimeout(async () => {
-			if (!isWithinRateLimit()) return;
-
-			isLoading = true;
-			abortController = new AbortController();
-
-			try {
-				const response = await fetch(
-					`/api/geocoding?q=${encodeURIComponent(query)}&limit=5&autocomplete=true`,
-					{ signal: abortController.signal }
-				);
-
-				if (!response.ok) throw new Error('Geocoding request failed');
-
-				const data = await response.json();
-				suggestions = data.features || [];
-				selectedIndex = suggestions.length > 0 ? 0 : -1;
-			} catch (error) {
-				if (error instanceof Error && error.name !== 'AbortError') {
-					console.error('Search error:', error);
-				}
-				suggestions = [];
-			} finally {
-				isLoading = false;
-			}
-		}, 400);
-	}
-
-	// Handle input change
-	function handleInput(event: Event) {
-		const target = event.target as HTMLInputElement;
-		searchQuery = target.value;
-		searchLocations(searchQuery);
-	}
-
-	// Select a suggestion and focus map
-	function selectSuggestion(feature: GeocodingFeature) {
-		searchQuery = feature.place_name;
-		lastSelectedFeature = feature;
-		const [lng, lat] = feature.center;
-
-		if (feature.bbox) {
-			mapState.focusBounds(feature.bbox[1], feature.bbox[0], feature.bbox[3], feature.bbox[2]);
-		} else {
-			mapState.focusLocation(lat, lng, 14);
-		}
-
-		suggestions = [];
+	// Enhanced handlers that also control the overlay
+	function handleSelectSuggestion(feature: import('$lib/types/geocoding').GeocodingFeature) {
+		searchState.selectSuggestion(feature);
 		closeOverlay();
 	}
 
-	// Clear search
-	function clearSearch() {
-		searchQuery = '';
-		suggestions = [];
-		selectedIndex = -1;
-		lastSelectedFeature = null;
+	function handleClearSearch() {
+		searchState.clearSearch();
 		inputElement?.focus();
 	}
 
-	// Handle search button click (first suggestion or last selected)
+	async function handleFocusUserLocation() {
+		await searchState.focusUserLocation();
+		closeOverlay();
+	}
+
 	function handleSearchClick() {
-		if (suggestions.length > 0) {
-			selectSuggestion(suggestions[0]);
-		} else if (lastSelectedFeature) {
-			selectSuggestion(lastSelectedFeature);
-		}
+		searchState.handleSearchClick();
+		closeOverlay();
 	}
 
 	// Open/close overlay
@@ -154,30 +53,13 @@
 
 	// Keyboard navigation
 	function handleKeydown(event: KeyboardEvent) {
-		switch (event.key) {
-			case 'ArrowDown':
-				if (suggestions.length === 0) return;
-				event.preventDefault();
-				selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1);
-				break;
-			case 'ArrowUp':
-				if (suggestions.length === 0) return;
-				event.preventDefault();
-				selectedIndex = Math.max(selectedIndex - 1, 0);
-				break;
-			case 'Enter':
-				event.preventDefault();
-				if (suggestions.length > 0) {
-					const indexToSelect = selectedIndex >= 0 ? selectedIndex : 0;
-					selectSuggestion(suggestions[indexToSelect]);
-				} else if (lastSelectedFeature && searchQuery === lastSelectedFeature.place_name) {
-					selectSuggestion(lastSelectedFeature);
-				}
-				break;
-			case 'Escape':
-				event.preventDefault();
-				closeOverlay();
-				break;
+		const shouldClose = searchState.handleKeydown(event, true);
+		if (shouldClose) {
+			closeOverlay();
+		}
+		// Also close on Enter when selecting a suggestion
+		if (event.key === 'Enter' && (searchState.suggestions.length > 0 || searchState.searchQuery)) {
+			closeOverlay();
 		}
 	}
 </script>
@@ -185,8 +67,8 @@
 <!-- Trigger Button -->
 <button
 	class="clickable-icon search-trigger"
-	title={isSearchEnabled ? 'Search location' : 'Accept cookies to enable search'}
-	disabled={!isSearchEnabled}
+	title={searchState.isSearchEnabled ? 'Search location' : 'Accept cookies to enable search'}
+	disabled={!searchState.isSearchEnabled}
 	onclick={openOverlay}
 >
 	<Search />
@@ -200,7 +82,7 @@
 				<button
 					class="clickable-icon"
 					title="Search"
-					disabled={!isSearchEnabled}
+					disabled={!searchState.isSearchEnabled}
 					onclick={handleSearchClick}
 				>
 					<Search />
@@ -208,23 +90,27 @@
 				<input
 					bind:this={inputElement}
 					type="text"
-					placeholder={isSearchEnabled ? 'Search location...' : 'Accept cookies to search'}
+					placeholder={searchState.isSearchEnabled
+						? 'Search location...'
+						: 'Accept cookies to search'}
 					class="search-input"
-					value={searchQuery}
-					oninput={handleInput}
+					value={searchState.searchQuery}
+					oninput={searchState.handleInput}
 					onkeydown={handleKeydown}
-					disabled={!isSearchEnabled}
+					disabled={!searchState.isSearchEnabled}
 				/>
-				{#if searchQuery && isSearchEnabled}
-					<button class="clickable-icon" onclick={clearSearch} title="Clear search">
+				{#if searchState.searchQuery && searchState.isSearchEnabled}
+					<button class="clickable-icon" onclick={handleClearSearch} title="Clear search">
 						<Eraser size={18} />
 					</button>
 				{/if}
 				<button
 					class="clickable-icon"
-					onclick={focusUserLocation}
-					title={isSearchEnabled ? 'Focus your location' : 'Accept cookies to enable location'}
-					disabled={!isSearchEnabled}
+					onclick={handleFocusUserLocation}
+					title={searchState.isSearchEnabled
+						? 'Focus your location'
+						: 'Accept cookies to enable location'}
+					disabled={!searchState.isSearchEnabled}
 				>
 					<MapPinHouse />
 				</button>
@@ -233,9 +119,14 @@
 		<button class="clickable-icon close-btn" onclick={closeOverlay} title="Close search">
 			<X size={24} />
 		</button>
-		{#if showSuggestions}
+		{#if searchState.showDropdown}
 			<div class="suggestions-container">
-				<SearchSuggestions {suggestions} {isLoading} {selectedIndex} onSelect={selectSuggestion} />
+				<SearchSuggestions
+					suggestions={searchState.suggestions}
+					isLoading={searchState.isLoading}
+					selectedIndex={searchState.selectedIndex}
+					onSelect={handleSelectSuggestion}
+				/>
 			</div>
 		{/if}
 	</div>
