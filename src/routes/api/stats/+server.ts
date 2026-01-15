@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRateLimiterStats, getUnknownStats } from '$lib/server/rate-limiter';
 import { dev } from '$app/environment';
+import { STATS_API_TOKEN } from '$env/static/private';
 
 /**
  * Monitoring endpoint for rate limiter statistics
@@ -18,13 +19,13 @@ import { dev } from '$app/environment';
  * or restrict to internal network only
  *
  *  example:
- *  curl -H "Authorization: Bearer YOUR_STATS_API_TOKEN" https://panopublisher.net/api/stats
+ *  curl -H "Authorization: Bearer STATS_API_TOKEN" https://panopublisher.net/api/stats
  */
 export const GET: RequestHandler = async ({ request }) => {
 	// In production: Add authentication or IP whitelist
 	if (!dev) {
 		const authHeader = request.headers.get('authorization');
-		const expectedToken = process.env.STATS_API_TOKEN;
+		const expectedToken = STATS_API_TOKEN;
 
 		if (!expectedToken || authHeader !== `Bearer ${expectedToken}`) {
 			return json({ error: 'Unauthorized' }, { status: 401 });
