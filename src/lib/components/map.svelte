@@ -3,6 +3,8 @@
 	import { mapState } from '$lib/map-state.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapPosition } from '$lib/utils/map-location-helpers';
+	import darkTilesExample from '$lib/assets/tile-example-dark.webp';
+	import lightTilesExample from '$lib/assets/tile-example-light.webp';
 
 	let mapContainer: HTMLDivElement;
 
@@ -18,6 +20,9 @@
 			// Import Leaflet CSS
 			await import('leaflet/dist/leaflet.css');
 
+			// Initialize tile layer preference from localStorage
+			const initialLayer = mapState.initializeTileLayer();
+
 			// set location
 			const map = Leaflet.map(mapContainer, {
 				center: mapPosition.center,
@@ -27,14 +32,30 @@
 			});
 
 			// OpenStreetMap Tiles
-			Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			const lightLayer = Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				attribution:
 					'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 				maxZoom: 19
-			}).addTo(map);
+			});
 
-			// Set map instance in state
+			const darkLayer = Leaflet.tileLayer(
+				'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+				{
+					attribution:
+						'&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+					maxZoom: 20
+				}
+			);
+
+			// Add initial layer based on stored preference
+			if (initialLayer === 'light') {
+				lightLayer.addTo(map);
+			} else {
+				darkLayer.addTo(map);
+			}
+
 			mapState.setMap(map);
+			mapState.setTileLayers(lightLayer, darkLayer);
 
 			map.on('click', (e) => {
 				// If we're in picking mode, execute callback
@@ -154,9 +175,83 @@
 			>
 		</div>
 	{/if}
+
+	<div class="map-tile-selector">
+		<button
+			class="tile-preview-btn light {mapState.currentTileLayer === 'light' ? 'active' : ''}"
+			style="--preview-light-image: url('{lightTilesExample}');"
+			class:active={mapState.currentTileLayer === 'light'}
+			onclick={() => mapState.setMapTileLayer('light')}
+			title="Light Map"
+			aria-label="Switch to light map theme"
+		>
+			<div class="preview-image light-preview"></div>
+			<span class="tile-label"></span>
+		</button>
+
+		<button
+			class="tile-preview-btn dark {mapState.currentTileLayer === 'dark' ? 'active' : ''}"
+			style=" --preview-dark-image: url('{darkTilesExample}');"
+			class:active={mapState.currentTileLayer === 'dark'}
+			onclick={() => mapState.setMapTileLayer('dark')}
+			title="Dark Map"
+			aria-label="Switch to dark map theme"
+		>
+			<div class="preview-image dark-preview"></div>
+			<span class="tile-label"></span>
+		</button>
+	</div>
 </div>
 
 <style>
+	.map-tile-selector {
+		position: absolute;
+		position-anchor: --map-anchor;
+		bottom: anchor(bottom);
+		left: anchor(left);
+		padding: 1rem;
+
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+
+		button {
+			width: 58px;
+			height: 58px;
+			border: 4px solid var(--border-subtle);
+			border-radius: 8px;
+			cursor: pointer;
+			box-shadow:
+				0 1px 3px 0 var(--shadow-inner),
+				0 4px 8px 3px var(--shadow-outer);
+			transition: border-color 0.1s ease-in-out;
+
+			&.active {
+				border-color: var(--primary-700);
+			}
+			&:hover {
+				border-color: var(--primary-500);
+				filter: brightness(1.05);
+			}
+			&:active {
+				border-color: var(--primary-700);
+				filter: brightness(0.95);
+			}
+			&:focus-visible {
+				outline: 3px solid var(--primary-500);
+				outline-offset: 2px;
+			}
+		}
+
+		button.light {
+			background-image: var(--preview-light-image);
+		}
+		button.dark {
+			background-image: var(--preview-dark-image);
+		}
+	}
+
+	/* ================================ */
 	.map-container {
 		display: flex;
 		flex-direction: column;

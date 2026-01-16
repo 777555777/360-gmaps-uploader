@@ -17,6 +17,13 @@ class MapState {
 	isPickingLocation = $state<boolean>(false);
 	pickingCallback = $state<((lat: number, lng: number) => void) | null>(null);
 
+	// Map tile layer (light/dark)
+	currentTileLayer = $state<'light' | 'dark'>('light');
+	lightLayer: Leaflet.TileLayer | null = null;
+	darkLayer: Leaflet.TileLayer | null = null;
+	// localStorage key
+	private readonly TILE_LAYER_STORAGE_KEY = 'map-tile-layer-preference';
+
 	clearFocus(closePopup: boolean = true): void {
 		if (closePopup) {
 			this.map?.closePopup();
@@ -27,6 +34,48 @@ class MapState {
 	// Set the map instance
 	setMap(mapInstance: Leaflet.Map): void {
 		this.map = mapInstance;
+	}
+
+	// Beim Initialisieren die gespeicherte Präferenz laden
+	initializeTileLayer(): 'light' | 'dark' {
+		if (typeof window === 'undefined') return 'light'; // SSR guard
+
+		const stored = localStorage.getItem(this.TILE_LAYER_STORAGE_KEY);
+		if (stored === 'light' || stored === 'dark') {
+			this.currentTileLayer = stored;
+			return stored;
+		}
+		return 'light';
+	}
+
+	setTileLayers(light: Leaflet.TileLayer, dark: Leaflet.TileLayer) {
+		this.lightLayer = light;
+		this.darkLayer = dark;
+	}
+
+	setMapTileLayer(layer: 'light' | 'dark') {
+		if (!this.map || !this.lightLayer || !this.darkLayer) return;
+
+		// Remove current layer
+		if (this.currentTileLayer === 'light') {
+			this.map.removeLayer(this.lightLayer);
+		} else {
+			this.map.removeLayer(this.darkLayer);
+		}
+
+		// Add new layer
+		if (layer === 'light') {
+			this.lightLayer.addTo(this.map);
+		} else {
+			this.darkLayer.addTo(this.map);
+		}
+
+		this.currentTileLayer = layer;
+
+		// Persist to localStorage
+		if (typeof window !== 'undefined') {
+			localStorage.setItem(this.TILE_LAYER_STORAGE_KEY, layer);
+		}
 	}
 
 	// Create a custom marker icon (green for selected, blue for default, gray for published)
