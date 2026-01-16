@@ -9,7 +9,9 @@
 	--neutral-400: oklch(from var(--neutral-base) 0.55 c h);
 	--neutral-500: oklch(from var(--neutral-base) 0.42 c h);
 	--neutral-600: oklch(from var(--neutral-base) 0.32 c h);
+	--neutral-650: oklch(from var(--neutral-base) 0.28 c h);
 	--neutral-700: oklch(from var(--neutral-base) 0.26 c h);
+	--neutral-750: oklch(from var(--neutral-base) 0.23 c h);
 	--neutral-800: oklch(from var(--neutral-base) 0.21 c h);
 	--neutral-900: oklch(from var(--neutral-base) 0.15 c h);
 
@@ -33,8 +35,11 @@
 	--danger-300: oklch(from var(--danger-base) 0.75 c h);
 	--danger-500: var(--danger-base);
 	--danger-700: oklch(from var(--danger-base) 0.52 c h);
+}
 
-	/* ========================================================================= */
+/* ========================================================================= */
+
+:root {
 	/* Borders */
 	--border-subtle: var(--neutral-200);
 	--border-default: var(--neutral-300);
@@ -124,4 +129,140 @@
 	--accordion-bg: var(--neutral-50);
 	--accordion-bg-hover: var(--neutral-100);
 	--accordion-bg-active: var(--neutral-200);
+}
+
+/* ========================================================================= */
+/* Dark Mode */
+/* ========================================================================= */
+
+:root[data-theme='dark'] {
+	--util-sat: 0.2;
+
+	/* Borders */
+	--border-subtle: var(--neutral-600);
+	--border-default: var(--neutral-500);
+	--border-strong: var(--neutral-400);
+
+	/* Surfaces */
+	--surface-base: var(--neutral-750);
+	--surface-subtle: var(--neutral-650);
+	--surface-strong: var(--neutral-600);
+	--surface-dark: var(--neutral-100);
+
+	/* Text Colors */
+	--text-default: var(--neutral-100);
+	--text-muted: var(--neutral-300);
+	--text-medium: var(--neutral-350);
+	--text-subtle: var(--neutral-400);
+	--text-light: var(--neutral-800);
+	--text-white: var(--neutral-0);
+
+	/* Map Marker / Checkbox */
+	--backdrop-color: oklch(from var(--neutral-900) 0.05 c h / 0.6);
+
+	/* Shadows */
+	--shadow-inner: oklch(from var(--neutral-900) 0.05 c h / 0.25);
+	--shadow-outer: oklch(from var(--neutral-900) 0.05 c h / 0.35);
+
+	/* Chip/Badge colors */
+	--chip-success-bg: oklch(from var(--success-base) 0.25 calc(c * var(--util-sat)) h);
+	--chip-success-fg: oklch(from var(--success-base) 0.75 c h);
+	--chip-success-hover-bg: oklch(from var(--success-base) 0.3 calc(c * var(--util-sat)) h);
+	--chip-success-active-bg: oklch(from var(--success-base) 0.35 calc(c * var(--util-sat)) h);
+
+	--chip-warn-bg: oklch(from var(--warn-base) 0.25 calc(c * var(--util-sat)) h);
+	--chip-warn-fg: oklch(from var(--warn-base) 0.8 c h);
+
+	--chip-danger-bg: oklch(from var(--danger-base) 0.25 calc(c * var(--util-sat)) h);
+	--chip-danger-fg: oklch(from var(--danger-base) 0.75 c h);
+	--chip-danger-hover-bg: oklch(from var(--danger-base) 0.3 calc(c * var(--util-sat)) h);
+	--chip-danger-active-bg: oklch(from var(--danger-base) 0.35 calc(c * var(--util-sat)) h);
+
+	--chip-primary-bg: oklch(from var(--primary-base) 0.25 calc(c * var(--util-sat)) h);
+	--chip-primary-fg: oklch(from var(--primary-base) 0.75 c h);
+	--chip-primary-bg-light: oklch(from var(--primary-base) 0.2 calc(c * 0.3) h);
+
+	--chip-neutral-bg: var(--neutral-600);
+	--chip-neutral-fg: var(--neutral-300);
+
+	/* Button colors */
+	--button-primary-bg: oklch(from var(--primary-base) 0.25 calc(c * var(--util-sat)) h);
+
+	/* Dropdown colors */
+	--dropdown-bg: var(--surface-base);
+	--dropdown-bg-hover: var(--neutral-650);
+	--dropdown-bg-active: var(--neutral-600);
+
+	/* Accordion colors */
+	--accordion-bg: var(--neutral-700);
+	--accordion-bg-hover: var(--neutral-600);
+	--accordion-bg-active: var(--neutral-500);
+}
+
+/* ========================================================================= */
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme]) {
+		--util-sat: 0.2;
+
+		/* Borders */
+		--border-subtle: var(--neutral-600);
+		--border-default: var(--neutral-500);
+		--border-strong: var(--neutral-400);
+
+		/* Surfaces */
+		--surface-base: var(--neutral-750);
+		--surface-subtle: var(--neutral-650);
+		--surface-strong: var(--neutral-600);
+		--surface-dark: var(--neutral-100);
+
+		/* Text Colors */
+		--text-default: var(--neutral-100);
+		--text-muted: var(--neutral-300);
+		--text-medium: var(--neutral-350);
+		--text-subtle: var(--neutral-400);
+		--text-light: var(--neutral-800);
+		--text-white: var(--neutral-0);
+
+		/* Map Marker / Checkbox */
+		--backdrop-color: oklch(from var(--neutral-900) 0.05 c h / 0.6);
+
+		/* Shadows */
+		--shadow-inner: oklch(from var(--neutral-900) 0.05 c h / 0.25);
+		--shadow-outer: oklch(from var(--neutral-900) 0.05 c h / 0.35);
+
+		/* Chip/Badge colors */
+		--chip-success-bg: oklch(from var(--success-base) 0.25 calc(c * var(--util-sat)) h);
+		--chip-success-fg: oklch(from var(--success-base) 0.75 c h);
+		--chip-success-hover-bg: oklch(from var(--success-base) 0.3 calc(c * var(--util-sat)) h);
+		--chip-success-active-bg: oklch(from var(--success-base) 0.35 calc(c * var(--util-sat)) h);
+
+		--chip-warn-bg: oklch(from var(--warn-base) 0.25 calc(c * var(--util-sat)) h);
+		--chip-warn-fg: oklch(from var(--warn-base) 0.8 c h);
+
+		--chip-danger-bg: oklch(from var(--danger-base) 0.25 calc(c * var(--util-sat)) h);
+		--chip-danger-fg: oklch(from var(--danger-base) 0.75 c h);
+		--chip-danger-hover-bg: oklch(from var(--danger-base) 0.3 calc(c * var(--util-sat)) h);
+		--chip-danger-active-bg: oklch(from var(--danger-base) 0.35 calc(c * var(--util-sat)) h);
+
+		--chip-primary-bg: oklch(from var(--primary-base) 0.25 calc(c * var(--util-sat)) h);
+		--chip-primary-fg: oklch(from var(--primary-base) 0.75 c h);
+		--chip-primary-bg-light: oklch(from var(--primary-base) 0.2 calc(c * 0.3) h);
+
+		--chip-neutral-bg: var(--neutral-600);
+		--chip-neutral-fg: var(--neutral-300);
+
+		/* Button colors */
+		--button-primary-bg: oklch(from var(--primary-base) 0.25 calc(c * var(--util-sat)) h);
+
+		/* Dropdown colors */
+		--dropdown-bg: var(--surface-base);
+		--dropdown-bg-hover: var(--neutral-650);
+		--dropdown-bg-active: var(--neutral-600);
+
+		/* Accordion colors */
+		--accordion-bg: var(--neutral-700);
+		--accordion-bg-hover: var(--neutral-600);
+		--accordion-bg-active: var(--neutral-500);
+	}
 }

@@ -104,6 +104,10 @@
 			text-align: center;
 			white-space: nowrap;
 		}
+
+		@media (prefers-color-scheme: dark) {
+			--google-btn-bg: #3d3e42;
+		}
 	}
 
 	@media (width < 576px) {

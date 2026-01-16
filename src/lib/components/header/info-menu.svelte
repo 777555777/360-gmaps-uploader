@@ -3,6 +3,7 @@
 	import { INFO_DIALOG_ID, CONSENT_DIALOG_ID, GITHUB_URL } from '$lib/globals';
 	import { showDialogById } from '$lib/utils/dialog-helpers';
 	import Dropdown from '$lib/components/util/dropdown.svelte';
+	import ThemeSwitcher from './theme-switcher.svelte';
 
 	function openInfoDialog(closeDropdown: () => void) {
 		closeDropdown();
@@ -58,6 +59,10 @@
 					<Github size={16} />
 					<span>GitHub Repository</span>
 				</a>
+			</li>
+			<hr class="separator s-h3tuGtvYjf1M" />
+			<li>
+				<ThemeSwitcher />
 			</li>
 		</ul>
 	{/snippet}

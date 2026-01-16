@@ -218,6 +218,10 @@
 			background-size: 50%;
 			background-repeat: repeat;
 			filter: opacity(0.175);
+
+			@media (prefers-color-scheme: dark) {
+				filter: opacity(0.375);
+			}
 		}
 
 		.placeholder-content {
