@@ -51,8 +51,8 @@ A deployed version ready to use can be found here: [https://panopublisher.net](h
    Edit `.env` and enter your values:
 
    ```bash
-   VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-   VITE_DRY_RUN=true  # For local testing without actual upload
+   PUBLIC_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+   PUBLIC_DRY_RUN=true  # For local testing without actual upload
 
    PUBLIC_MAPTILER_API_KEY=your_maptiler_api_key_here # Public key with domain restrictions
    PUBLIC_ENABLE_MAP_SEARCH=true # Set to false to disable map search feature

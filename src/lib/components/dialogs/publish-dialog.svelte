@@ -18,12 +18,13 @@
 		CircleX,
 		Clock
 	} from '@lucide/svelte';
+	import { env } from '$env/dynamic/public';
 
 	// ENV-based dry-run mode (forced in dev, disabled in prod)
-	const ENV_DRY_RUN = import.meta.env.VITE_DRY_RUN === 'true';
+	const PUBLIC_DRY_RUN = env.PUBLIC_DRY_RUN === 'true';
 
-	// Settings - if ENV_DRY_RUN is true, always use dry-run mode
-	let dryRunMode = $state(ENV_DRY_RUN ? true : false);
+	// Settings - if PUBLIC_DRY_RUN is true, always use dry-run mode
+	let dryRunMode = $state(PUBLIC_DRY_RUN ? true : false);
 
 	// Upload state
 	let isUploading = $state(false);
@@ -189,7 +190,7 @@
 		<p>No photos selected. Please select photos from the list first.</p>
 	{:else}
 		<!-- Dry-Run Indicator (when forced by ENV) -->
-		{#if ENV_DRY_RUN}
+		{#if PUBLIC_DRY_RUN}
 			<div class="dry-run-indicator">
 				<p>DRY-RUN MODE ACTIVE</p>
 				<small>Photos will be uploaded but not published to Google Maps</small>

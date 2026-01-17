@@ -12,7 +12,7 @@
 	import MobileSearch from './header/mobile-search.svelte';
 	import { env } from '$env/dynamic/public';
 
-	const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+	const GOOGLE_CLIENT_ID = env.PUBLIC_GOOGLE_CLIENT_ID ?? '';
 	const ENABLE_MAP_SEARCH = env.PUBLIC_ENABLE_MAP_SEARCH !== 'false';
 
 	// Scopes for Street View Publish API

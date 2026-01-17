@@ -33,6 +33,7 @@
    - See [GOOGLE_AUTH_SETUP.md](docs/GOOGLE_AUTH_SETUP.md) for OAuth setup
 
 6. **Street View Upload Flow** (3-step process):
+
    ```typescript
    // 1. Request upload URL
    const { uploadUrl } = await startUpload(accessToken);
@@ -43,7 +44,7 @@
    ```
 
    - Implementation: [streetview-api.ts](src/lib/utils/streetview-api.ts)
-   - Dry-run mode: Set `VITE_DRY_RUN=true` in `.env` to skip step 3
+   - Dry-run mode: Set `PUBLIC_DRY_RUN=true` in `.env` to skip step 3
 
 ## Key Component Patterns
 
@@ -84,8 +85,8 @@ npm run deploy           # Deploy to server (requires DEPLOY_SERVER_PATH in .env
 
 Copy `.env-template` → `.env` and set:
 
-- `VITE_GOOGLE_CLIENT_ID`: Google OAuth client ID
-- `VITE_DRY_RUN=true`: Test mode (skips actual publish to Google)
+- `PUBLIC_GOOGLE_CLIENT_ID`: Google OAuth client ID
+- `PUBLIC_DRY_RUN=true`: Test mode (skips actual publish to Google)
 
 ### Deployment
 
@@ -133,7 +134,7 @@ Copy `.env-template` → `.env` and set:
 
 ## Testing & Debugging
 
-- **Dry-Run Mode**: Set `VITE_DRY_RUN=true` to test without publishing to Google
+- **Dry-Run Mode**: Set `PUBLIC_DRY_RUN=true` to test without publishing to Google
 - **Browser DevTools**: Check Web Worker performance in Performance tab
 - **Metadata Validation**: Use GPano fix dialog to inspect missing XMP fields
 - **Console Logs**: Auth/upload errors logged with structured messages
