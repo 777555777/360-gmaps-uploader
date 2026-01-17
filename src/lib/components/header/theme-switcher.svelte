@@ -52,13 +52,25 @@
 <div class="container-row">
 	<div class="switcher-row">
 		<div class="toggle" data-active={currentTheme}>
-			<button onclick={() => switchTheme('dark')} aria-label="Dark mode">
-				<Moon size={16} />
-			</button>
-			<button onclick={() => switchTheme('light')} aria-label="Light mode">
+			<button
+				aria-pressed={currentTheme === 'light'}
+				title="Light mode"
+				onclick={() => switchTheme('light')}
+			>
 				<Sun size={16} />
 			</button>
-			<button onclick={() => switchTheme('system')} aria-label="System theme">
+			<button
+				aria-pressed={currentTheme === 'dark'}
+				title="Dark mode"
+				onclick={() => switchTheme('dark')}
+			>
+				<Moon size={16} />
+			</button>
+			<button
+				aria-pressed={currentTheme === 'system'}
+				title="System mode"
+				onclick={() => switchTheme('system')}
+			>
 				<SunMoon size={16} />
 			</button>
 		</div>
@@ -91,21 +103,22 @@
 		top: 0.25rem;
 		left: 0.25rem;
 		bottom: 0.25rem;
+		will-change: transform;
 
 		width: calc((100% - 0.5rem) / 3);
 		background-color: var(--surface-dark);
 		border-radius: 100vmax;
 		transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
-
 		z-index: 0;
 	}
 
 	/* Positionen */
-	.toggle[data-active='dark']::before {
+
+	.toggle[data-active='light']::before {
 		transform: translateX(0%);
 	}
 
-	.toggle[data-active='light']::before {
+	.toggle[data-active='dark']::before {
 		transform: translateX(100%);
 	}
 
@@ -127,9 +140,7 @@
 		transition: color 150ms ease;
 	}
 
-	.toggle[data-active='dark'] button:nth-child(1),
-	.toggle[data-active='light'] button:nth-child(2),
-	.toggle[data-active='system'] button:nth-child(3) {
+	button[aria-pressed='true'] {
 		color: var(--text-light);
 	}
 </style>
