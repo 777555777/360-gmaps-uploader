@@ -51,26 +51,14 @@
 
 <div class="container-row">
 	<div class="switcher-row">
-		<div class="toggle">
-			<button
-				class={currentTheme === 'dark' ? 'active' : ''}
-				onclick={() => switchTheme('dark')}
-				aria-label="Dark mode"
-			>
+		<div class="toggle" data-active={currentTheme}>
+			<button onclick={() => switchTheme('dark')} aria-label="Dark mode">
 				<Moon size={16} />
 			</button>
-			<button
-				class={currentTheme === 'light' ? 'active' : ''}
-				onclick={() => switchTheme('light')}
-				aria-label="Light mode"
-			>
+			<button onclick={() => switchTheme('light')} aria-label="Light mode">
 				<Sun size={16} />
 			</button>
-			<button
-				class={currentTheme === 'system' ? 'active' : ''}
-				onclick={() => switchTheme('system')}
-				aria-label="System theme"
-			>
+			<button onclick={() => switchTheme('system')} aria-label="System theme">
 				<SunMoon size={16} />
 			</button>
 		</div>
@@ -79,43 +67,69 @@
 
 <style>
 	.container-row {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 1rem;
-		padding: 0.5rem 0.35rem;
+		padding: 0.5rem 0.75rem;
 	}
 
 	.switcher-row {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	button {
-		border: none;
-		background-color: transparent;
-		cursor: pointer;
-		color: var(--text-default);
-		display: flex;
-		padding: 0.25rem;
-	}
-
-	button.active {
-		background-color: var(--surface-dark);
-		color: var(--text-light);
-		border-radius: 100vmax;
+		margin: 0 auto;
+		max-width: 450px;
 	}
 
 	.toggle {
+		position: relative;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0.25rem;
+		padding: 0.25rem;
+		border-radius: 100vmax;
+		border: 1px solid var(--border-subtle);
+	}
+
+	.toggle::before {
+		content: '';
+		position: absolute;
+		top: 0.25rem;
+		left: 0.25rem;
+		bottom: 0.25rem;
+
+		width: calc((100% - 0.5rem) / 3);
+		background-color: var(--surface-dark);
+		border-radius: 100vmax;
+		transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+
+		z-index: 0;
+	}
+
+	/* Positionen */
+	.toggle[data-active='dark']::before {
+		transform: translateX(0%);
+	}
+
+	.toggle[data-active='light']::before {
+		transform: translateX(100%);
+	}
+
+	.toggle[data-active='system']::before {
+		transform: translateX(200%);
+	}
+
+	button {
+		position: relative;
+		z-index: 1;
+		border: none;
+		background: none;
+		color: var(--text-default);
+		padding: 0.5rem;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		gap: 0.5rem;
-		border-radius: 100vmax;
-		border: 1px solid var(--border-subtle);
-		background-color: transparent;
-		width: fit-content;
-		padding: 0.125rem;
+		cursor: pointer;
+		transition: color 150ms ease;
+	}
+
+	.toggle[data-active='dark'] button:nth-child(1),
+	.toggle[data-active='light'] button:nth-child(2),
+	.toggle[data-active='system'] button:nth-child(3) {
+		color: var(--text-light);
 	}
 </style>
