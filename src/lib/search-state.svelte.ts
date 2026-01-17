@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { PUBLIC_MAPTILER_API_KEY, PUBLIC_ENABLE_MAP_SEARCH } from '$env/static/public';
 import { consentState } from '$lib/consent-state.svelte';
 import { mapState } from '$lib/map-state.svelte';
 import type { GeocodingFeature } from '$lib/types/geocoding';
@@ -6,6 +7,9 @@ import type { GeocodingFeature } from '$lib/types/geocoding';
 /**
  * Singleton state for location search functionality with rate limiting and autocomplete.
  * Shared between mobile and desktop search components.
+ *
+ * Uses MapTiler Geocoding API directly from the frontend.
+ * API key is public but domain-restricted in MapTiler dashboard.
  */
 class LocationSearchState {
 	// Search state
@@ -19,14 +23,18 @@ class LocationSearchState {
 	private abortController: AbortController | null = null;
 	private debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
-	// Rate limiting (max 15 requests per minute)
+	// Rate limiting (max 15 requests per minute) - client-side throttling
 	private readonly MAX_REQUESTS_PER_MINUTE = 15;
 	private requestTimestamps: number[] = [];
 	private debounceDelay = 400; // milliseconds
 
 	// Derived state
 	get isSearchEnabled() {
-		return consentState.hasConsented() === true;
+		return (
+			consentState.hasConsented() === true &&
+			PUBLIC_ENABLE_MAP_SEARCH !== 'false' &&
+			!!PUBLIC_MAPTILER_API_KEY
+		);
 	}
 
 	get hasSuggestions() {
@@ -59,7 +67,7 @@ class LocationSearchState {
 	}
 
 	/**
-	 * Debounced search function that fetches location suggestions
+	 * Debounced search function that fetches location suggestions directly from MapTiler API
 	 */
 	async searchLocations(query: string) {
 		if (!browser || !this.isSearchEnabled) return;
@@ -83,11 +91,22 @@ class LocationSearchState {
 			this.isLoading = true;
 			this.abortController = new AbortController();
 
+			const lang = getBrowserLanguage();
+
 			try {
-				const response = await fetch(
-					`/api/geocoding?q=${encodeURIComponent(query)}&limit=5&autocomplete=true`,
-					{ signal: this.abortController.signal }
+				// Build MapTiler API URL
+				const maptilerUrl = new URL(
+					`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json`
 				);
+				maptilerUrl.searchParams.set('key', PUBLIC_MAPTILER_API_KEY);
+				maptilerUrl.searchParams.set('limit', '5');
+				maptilerUrl.searchParams.set('language', lang);
+				maptilerUrl.searchParams.set('autocomplete', 'true');
+
+				// Fetch directly from MapTiler API
+				const response = await fetch(maptilerUrl.toString(), {
+					signal: this.abortController.signal
+				});
 
 				if (!response.ok) throw new Error('Geocoding request failed');
 
@@ -199,3 +218,8 @@ class LocationSearchState {
 
 // Export singleton instance
 export const searchState = new LocationSearchState();
+
+function getBrowserLanguage() {
+	const langs = navigator.languages ?? [];
+	return langs[0] ?? navigator.language ?? 'en';
+}
