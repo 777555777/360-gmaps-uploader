@@ -8,6 +8,8 @@
  * Reference: https://developers.google.com/streetview/spherical-metadata
  */
 
+import exifr from 'exifr';
+
 export interface GPanoMetadata {
 	ProjectionType?: string;
 	UsePanoramaViewer?: string;
@@ -24,59 +26,78 @@ export interface GPanoMetadata {
 }
 
 /**
- * Extracts Google Photo Sphere (GPano) XMP metadata from a JPEG image.
+ * ExifR options for performance-optimized metadata extraction.
+ * Reads first 2MB with chunked reading for large 360° images (up to 75MB).
+ * Supports extended XMP (multiSegment) for robust parsing.
+ */
+export const EXIFR_OPTIONS = {
+	// Enable XMP and TIFF for GPano and dimensions
+	tiff: true,
+	xmp: true,
+	gps: true,
+	// Disable unneeded segments
+	icc: false,
+	iptc: false,
+	jfif: false,
+	ihdr: false,
+	// Performance: chunked reading with 2MB first chunk
+	chunked: true,
+	firstChunkSize: 2 * 1024 * 1024, // 2 MB - metadata is always at start
+	chunkSize: 256 * 1024, // 256 KB for subsequent chunks if needed
+	chunkLimit: 10, // Allow more chunks for extended XMP support
+	// Extended XMP support for large metadata blocks
+	multiSegment: true,
+	// Keep keys/values as-is for GPano string values
+	translateKeys: true,
+	translateValues: true,
+	reviveValues: true,
+	mergeOutput: true,
+	silentErrors: true
+} as const;
+
+// GPano field names as they appear in ExifR output (without namespace prefix)
+const GPANO_FIELDS = [
+	'ProjectionType',
+	'UsePanoramaViewer',
+	'FullPanoWidthPixels',
+	'FullPanoHeightPixels',
+	'CroppedAreaImageWidthPixels',
+	'CroppedAreaImageHeightPixels',
+	'CroppedAreaLeftPixels',
+	'CroppedAreaTopPixels',
+	'InitialViewHeadingDegrees',
+	'InitialViewPitchDegrees',
+	'InitialViewRollDegrees'
+] as const;
+
+/**
+ * Extracts Google Photo Sphere (GPano) XMP metadata from a JPEG image using ExifR.
  * These metadata fields are required by the Google Street View Publish API.
  *
- * Performance: Only reads the first 2 MB of the file, since XMP/EXIF metadata
- * is always stored in APP1 segments at the beginning of JPEGs (typically within
- * the first 100-200 KB). This avoids loading the entire image data into memory.
+ * Performance: Uses ExifR's chunked reading with 2MB first chunk size.
+ * This is 10-50x faster than reading the entire file (which can be 50+ MB).
+ * Also supports extended XMP for robust parsing of large metadata blocks.
  *
  * @param file - The JPEG image file
  * @returns GPano metadata object or null if not found
  */
 export async function extractGPanoMetadata(file: File): Promise<GPanoMetadata | null> {
 	try {
-		// Only read first 2 MB - XMP metadata is always at the start of JPEG files
-		// This is 10-50x faster than reading the entire file (which can be 50+ MB)
-		const CHUNK_SIZE = 2 * 1024 * 1024; // 2 MB
-		const buffer = await file.slice(0, Math.min(CHUNK_SIZE, file.size)).arrayBuffer();
-		const decoder = new TextDecoder('utf-8');
-		const content = decoder.decode(buffer);
+		const exifData = await exifr.parse(file, EXIFR_OPTIONS);
 
-		// Search for XMP packet in the file
-		const xmpStart = content.indexOf('<?xpacket begin');
-		const xmpEnd = content.indexOf('<?xpacket end');
-
-		if (xmpStart === -1 || xmpEnd === -1) {
+		if (!exifData) {
 			return null;
 		}
 
-		const xmpData = content.substring(xmpStart, xmpEnd + 50);
-
-		// Extract GPano metadata
-		// Support both formats:
-		// 1. Attribute format: GPano:FieldName="value"
-		// 2. XML element format: <GPano:FieldName>value</GPano:FieldName>
+		// Extract GPano fields from ExifR output
+		// ExifR parses XMP and flattens namespace prefixes, so GPano:ProjectionType becomes ProjectionType
 		const gpano: GPanoMetadata = {};
 
-		// Try attribute format first (used by some tools like Insta360 Studio)
-		const attrRegex = /GPano:(\w+)="([^"]*)"/g;
-		const attrMatches = [...xmpData.matchAll(attrRegex)];
-
-		for (const match of attrMatches) {
-			const key = match[1] as keyof GPanoMetadata;
-			gpano[key] = match[2];
-		}
-
-		// Also parse XML element format (used by PTGui and other stitching software)
-		const elemRegex = /<GPano:(\w+)>([^<]+)<\/GPano:\1>/g;
-		const elemMatches = [...xmpData.matchAll(elemRegex)];
-
-		for (const match of elemMatches) {
-			const key = match[1] as keyof GPanoMetadata;
-			// Only set if not already set by attribute format
-			if (!gpano[key]) {
-				gpano[key] = match[2];
+		for (const field of GPANO_FIELDS) {
+			const value = exifData[field];
+			if (value !== undefined && value !== null) {
+				// Convert to string as GPanoMetadata expects string values
+				gpano[field as keyof GPanoMetadata] = String(value);
 			}
 		}
 
@@ -84,8 +105,8 @@ export async function extractGPanoMetadata(file: File): Promise<GPanoMetadata | 
 		if (Object.keys(gpano).length === 0) {
 			return null;
 		}
-		console.info('found the following gpano metadata for file', file.name, gpano);
 
+		console.info('found the following gpano metadata for file', file.name, gpano);
 		return gpano;
 	} catch (error) {
 		console.error('Failed to extract GPano metadata:', error);
@@ -213,44 +234,78 @@ export function generateDefaultGPanoMetadata(width: number, height: number): GPa
 }
 
 /**
- * Reads JPEG width and height very quickly from the SOF segment.
- * Only uses the first 1 MB of the file.
+ * Extracts image dimensions using ExifR with fallback chain.
+ * Uses multiple EXIF and XMP fields for maximum compatibility across different cameras and editors.
+ *
+ * Fallback order:
+ * 1. Standard EXIF fields (ImageWidth/Height, ExifImageWidth/Height, PixelXDimension/YDimension)
+ * 2. GPano XMP fields (CroppedAreaImageWidthPixels/HeightPixels - the actual image dimensions)
+ * 3. GPano XMP fields (FullPanoWidthPixels/HeightPixels - for full 360° panos these equal image size)
+ *
+ * Note: Panorama software like PTGui and editors like Photoshop/Lightroom often strip
+ * standard EXIF dimension tags but preserve GPano XMP metadata.
+ *
+ * Performance: Uses ExifR's chunked reading - no need to load the entire file.
+ *
+ * @param file - The JPEG image file
+ * @returns Image dimensions { width, height }
+ * @throws Error if dimensions cannot be determined
  */
-export async function getJpegSize(file: File): Promise<{ width: number; height: number }> {
-	const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB reichen locker
-	const buffer = await file.slice(0, CHUNK_SIZE).arrayBuffer();
-	const view = new DataView(buffer);
+export async function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+	const exifData = await exifr.parse(file, EXIFR_OPTIONS);
 
-	let offset = 2; // JPEG starts with 0xFFD8
-
-	while (offset < view.byteLength) {
-		if (view.getUint8(offset) !== 0xff) {
-			throw new Error('Invalid JPEG (missing marker).');
-		}
-
-		const marker = view.getUint8(offset + 1);
-		offset += 2;
-
-		// SOF0, SOF2 contain width/height
-		if (marker >= 0xc0 && marker <= 0xc3) {
-			offset += 3; // Skip segment length + precision
-			const height = view.getUint16(offset);
-			offset += 2;
-			const width = view.getUint16(offset);
-			return { width, height };
-		}
-
-		// Skip other segments
-		const length = view.getUint16(offset);
-		offset += length;
+	if (!exifData) {
+		throw new Error('Could not read image metadata - file may be corrupted.');
 	}
 
-	throw new Error('SOF marker not found (not a valid JPEG?).');
+	// Use fallback chain for dimensions - different cameras/editors use different fields
+	// 1. Standard EXIF fields
+	// 2. GPano CroppedArea fields (actual image dimensions for 360° photos)
+	// 3. GPano FullPano fields (for full equirectangular panos, these equal image size)
+	const width =
+		exifData.ImageWidth ??
+		exifData.ExifImageWidth ??
+		exifData.PixelXDimension ??
+		exifData.SourceImageWidth ??
+		parseNumberField(exifData.CroppedAreaImageWidthPixels) ??
+		parseNumberField(exifData.FullPanoWidthPixels);
+
+	const height =
+		exifData.ImageHeight ??
+		exifData.ExifImageHeight ??
+		exifData.PixelYDimension ??
+		exifData.SourceImageHeight ??
+		parseNumberField(exifData.CroppedAreaImageHeightPixels) ??
+		parseNumberField(exifData.FullPanoHeightPixels);
+
+	if (typeof width !== 'number' || typeof height !== 'number' || width <= 0 || height <= 0) {
+		throw new Error('Could not determine image dimensions from EXIF data.');
+	}
+
+	return { width, height };
+}
+
+/**
+ * Helper to parse a field that might be a string or number into a number.
+ * GPano fields are sometimes strings like "14030" instead of numbers.
+ */
+function parseNumberField(value: unknown): number | undefined {
+	if (typeof value === 'number' && value > 0) {
+		return value;
+	}
+	if (typeof value === 'string') {
+		const parsed = parseInt(value, 10);
+		if (!isNaN(parsed) && parsed > 0) {
+			return parsed;
+		}
+	}
+	return undefined;
 }
 
 /**
  * Finds the XMP APP1 segment in a JPEG buffer.
  * Returns the start offset and length if found.
+ * This is still needed for XMP injection (ExifR is read-only).
  */
 function findXmpSegment(view: Uint8Array): { offset: number; length: number } | null {
 	const XMP_NAMESPACE = 'http://ns.adobe.com/xap/1.0/';

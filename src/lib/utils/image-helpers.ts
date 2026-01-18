@@ -2,7 +2,7 @@ import exifr from 'exifr';
 import {
 	extractGPanoMetadata,
 	generateDefaultGPanoMetadata,
-	getJpegSize,
+	getImageDimensions,
 	validateGPanoMetadata,
 	type GPanoMetadata
 } from './gpano-helpers';
@@ -233,9 +233,9 @@ export async function validateStreetViewImage(file: File): Promise<ValidationRes
 		errors.push(`File size exceeds the limit of 75 MB.`);
 	}
 
-	// --- 3. Read JPEG dimensions quickly from header ---
+	// --- 3. Read image dimensions using ExifR ---
 	try {
-		const dimensions = await getJpegSize(file);
+		const dimensions = await getImageDimensions(file);
 		imageWidth = dimensions.width;
 		imageHeight = dimensions.height;
 

@@ -13,11 +13,15 @@
 	import { Upload } from '@lucide/svelte';
 
 	let isDragging = $state(false);
+	let isProcessing = $state(false);
+	let processingCount = $state(0);
 	let fileInput: HTMLInputElement | undefined;
 
 	function handleDragEnter(event: DragEvent): void {
 		event.preventDefault();
-		isDragging = true;
+		if (!isProcessing) {
+			isDragging = true;
+		}
 	}
 
 	function handleDragOver(event: DragEvent): void {
@@ -33,6 +37,10 @@
 		event.preventDefault();
 		isDragging = false;
 
+		if (isProcessing) {
+			return;
+		}
+
 		const files = event.dataTransfer?.files;
 		if (files && files.length > 0) {
 			processFiles(files);
@@ -47,7 +55,7 @@
 	}
 
 	async function processFiles(files: FileList): Promise<void> {
-		if (!files.length) {
+		if (!files.length || isProcessing) {
 			return;
 		}
 
@@ -58,44 +66,55 @@
 			return;
 		}
 
-		// Validate all files and collect results
-		const validationResults: { file: File; validation: ValidationResult }[] = [];
+		// Set processing state to show loading indicator
+		isProcessing = true;
+		processingCount = files.length;
 
-		for (const file of files) {
-			const validation = await validateStreetViewImage(file);
-			validationResults.push({ file, validation });
-		}
+		try {
+			// Validate all files and collect results
+			const validationResults: { file: File; validation: ValidationResult }[] = [];
 
-		// Process results through the GPano fix state
-		gpanoFixState.processValidationResults(validationResults);
+			for (const file of files) {
+				const validation = await validateStreetViewImage(file);
+				validationResults.push({ file, validation });
+			}
 
-		// Close upload dialog first
-		closeDialogById(UPLOAD_DIALOG_ID);
+			// Process results through the GPano fix state
+			gpanoFixState.processValidationResults(validationResults);
 
-		// Determine what to do based on validation results
-		const hasFixable = gpanoFixState.hasFixableFiles;
-		const hasRejected = gpanoFixState.hasRejectedFiles;
-		const hasValid = gpanoFixState.validFiles.length > 0;
+			// Close upload dialog first
+			closeDialogById(UPLOAD_DIALOG_ID);
 
-		if (hasFixable || hasRejected) {
-			// Show the dialog for any combination that needs user attention:
-			// - Files that need metadata fixing
-			// - Files that were rejected (even with valid files)
-			// - Only rejected files
-			showDialogById(GPANO_FIX_DIALOG_ID);
-		} else if (hasValid) {
-			// All files are valid, add them directly (no dialog needed)
-			fileState.addFiles(gpanoFixState.validFiles);
-			gpanoFixState.clear();
-		}
+			// Determine what to do based on validation results
+			const hasFixable = gpanoFixState.hasFixableFiles;
+			const hasRejected = gpanoFixState.hasRejectedFiles;
+			const hasValid = gpanoFixState.validFiles.length > 0;
 
-		if (fileInput) {
-			fileInput.value = '';
+			if (hasFixable || hasRejected) {
+				// Show the dialog for any combination that needs user attention:
+				// - Files that need metadata fixing
+				// - Files that were rejected (even with valid files)
+				// - Only rejected files
+				showDialogById(GPANO_FIX_DIALOG_ID);
+			} else if (hasValid) {
+				// All files are valid, add them directly (no dialog needed)
+				fileState.addFiles(gpanoFixState.validFiles);
+				gpanoFixState.clear();
+			}
+
+			if (fileInput) {
+				fileInput.value = '';
+			}
+		} finally {
+			// Always reset processing state
+			isProcessing = false;
 		}
 	}
 
 	function handleClick(): void {
-		fileInput?.click();
+		if (!isProcessing) {
+			fileInput?.click();
+		}
 	}
 
 	function mimeToReadableFormat(mimeType: string): string {
@@ -105,8 +124,7 @@
 </script>
 
 <div
-	class="upload-area"
-	class:dragging={isDragging}
+	class="upload-area {isDragging ? 'dragging' : ''} {isProcessing ? 'processing' : ''}"
 	ondragenter={handleDragEnter}
 	ondragover={handleDragOver}
 	ondragleave={handleDragLeave}
@@ -115,19 +133,27 @@
 	role="button"
 	tabindex="0"
 	onkeydown={(e) => e.key === 'Enter' && handleClick()}
+	aria-disabled={isProcessing}
 >
-	<Upload size={48} />
-
-	<p class="upload-title">Add images by clicking or dragging them here</p>
-	<p class="upload-hint">
-		Supported formats:
-		<strong>
-			{SUPPORTED_IMAGE_FORMATS.map(mimeToReadableFormat).join(', ')}
-		</strong>
-		<br />
-		Maximum file size per image:
-		<strong>{(MAX_FILE_SIZE_BYTES / (1024 * 1024)).toFixed(0)} MB</strong>
-	</p>
+	{#if isProcessing}
+		<div class="spinner-large"></div>
+		<p class="upload-title">Validating images...</p>
+		<p class="upload-hint">
+			Processing <strong>{processingCount}</strong> image(s). Please wait...
+		</p>
+	{:else}
+		<Upload size={48} />
+		<p class="upload-title">Add images by clicking or dragging them here</p>
+		<p class="upload-hint">
+			Supported formats:
+			<strong>
+				{SUPPORTED_IMAGE_FORMATS.map(mimeToReadableFormat).join(', ')}
+			</strong>
+			<br />
+			Maximum file size per image:
+			<strong>{(MAX_FILE_SIZE_BYTES / (1024 * 1024)).toFixed(0)} MB</strong>
+		</p>
+	{/if}
 
 	<input
 		bind:this={fileInput}
@@ -136,6 +162,7 @@
 		multiple
 		onchange={handleFileSelect}
 		class="file-input"
+		disabled={isProcessing}
 	/>
 </div>
 
@@ -163,6 +190,18 @@
 		color: var(--button-primary);
 	}
 
+	.upload-area.processing {
+		cursor: not-allowed;
+		opacity: 0.8;
+		pointer-events: none;
+	}
+
+	.upload-area.processing:hover {
+		border-color: var(--border-default);
+		background-color: var(--surface-subtle);
+		color: var(--text-muted);
+	}
+
 	.upload-area:focus {
 		outline: 2px solid var(--button-primary);
 		outline-offset: 2px;
@@ -185,5 +224,21 @@
 
 	.file-input {
 		display: none;
+	}
+
+	.spinner-large {
+		display: inline-block;
+		width: 48px;
+		height: 48px;
+		border: 4px solid var(--spinner-secondary);
+		border-top-color: var(--spinner-primary);
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>
