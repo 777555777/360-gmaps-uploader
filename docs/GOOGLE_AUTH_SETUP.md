@@ -38,7 +38,7 @@ Diese Anwendung verwendet **Google Identity Services (GIS)** für die OAuth 2.0 
 Aktualisiere die Client ID in `src/lib/components/header.svelte`:
 
 ```typescript
-const GOOGLE_CLIENT_ID = 'DEINE-CLIENT-ID.apps.googleusercontent.com';
+const PUBLIC_GOOGLE_CLIENT_ID = 'DEINE-CLIENT-ID.apps.googleusercontent.com';
 ```
 
 ## Verwendung

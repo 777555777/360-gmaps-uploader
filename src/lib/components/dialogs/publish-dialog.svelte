@@ -18,13 +18,13 @@
 		CircleX,
 		Clock
 	} from '@lucide/svelte';
-	import { env } from '$env/dynamic/public';
+	import { PUBLIC_DRY_RUN } from '$env/static/public';
 
 	// ENV-based dry-run mode (forced in dev, disabled in prod)
-	const PUBLIC_DRY_RUN = env.PUBLIC_DRY_RUN === 'true';
+	const DRY_RUN_MODE = PUBLIC_DRY_RUN === 'true';
 
-	// Settings - if PUBLIC_DRY_RUN is true, always use dry-run mode
-	let dryRunMode = $state(PUBLIC_DRY_RUN ? true : false);
+	// Settings - if DRY_RUN_MODE is true, always use dry-run mode
+	let dryRunMode = $state(DRY_RUN_MODE ? true : false);
 
 	// Upload state
 	let isUploading = $state(false);

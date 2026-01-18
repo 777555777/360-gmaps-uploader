@@ -10,10 +10,10 @@
 	import { ArrowLeft } from '@lucide/svelte';
 	import SearchInput from './header/search-input.svelte';
 	import MobileSearch from './header/mobile-search.svelte';
-	import { env } from '$env/dynamic/public';
+	import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_ENABLE_MAP_SEARCH } from '$env/static/public';
 
-	const GOOGLE_CLIENT_ID = env.PUBLIC_GOOGLE_CLIENT_ID ?? '';
-	const ENABLE_MAP_SEARCH = env.PUBLIC_ENABLE_MAP_SEARCH !== 'false';
+	const GOOGLE_CLIENT_ID = PUBLIC_GOOGLE_CLIENT_ID || '';
+	const ENABLE_MAP_SEARCH = PUBLIC_ENABLE_MAP_SEARCH !== 'false';
 
 	// Scopes for Street View Publish API
 	// Documentation: https://developers.google.com/streetview/publish/first-app
