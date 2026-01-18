@@ -8,7 +8,7 @@
 	target="_blank"
 	rel="noopener noreferrer"
 	aria-label="GitHub Repository"
-	title="Navigate to the code on GitHub"
+	title="View source code on GitHub"
 	class="clickable-icon"
 >
 	<Github size={24} />

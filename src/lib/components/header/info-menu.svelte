@@ -16,7 +16,7 @@
 
 <Dropdown>
 	{#snippet trigger()}
-		<span class="clickable-icon" title="Menu">
+		<span class="clickable-icon" title="Open Information Menu" aria-label="Information Menu">
 			<Info size={24} />
 		</span>
 	{/snippet}

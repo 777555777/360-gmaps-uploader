@@ -63,9 +63,9 @@
 	<button
 		class="clickable-icon btn-overlay delete-btn"
 		style="position-anchor: --image-anchor-{index}"
-		aria-label="Remove Photo"
+		aria-label="Remove photo"
 		onclick={onRemove}
-		title="Remove Photo"
+		title="Remove photo"
 	>
 		<Trash2 size={22} />
 	</button>

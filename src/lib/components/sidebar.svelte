@@ -14,10 +14,10 @@
 			class="upload-btn"
 			commandfor={UPLOAD_DIALOG_ID}
 			command="show-modal"
-			title="Add 360-Photo"
+			title="Add 360 photos to upload List"
 		>
 			<Plus size={20} />
-			<span>Add 360-Photo</span>
+			<span>Add Photos</span>
 		</button>
 
 		<button
@@ -25,7 +25,7 @@
 			disabled={!hasSelection}
 			commandfor={PUBLISH_DIALOG_ID}
 			command="show-modal"
-			title="Publish Selected Photos to Google Maps"
+			title="Publish selected photos to Google Maps"
 		>
 			<Upload size={20} />
 			<span>Publish ({selectedFiles.size})</span>
