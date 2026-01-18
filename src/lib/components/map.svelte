@@ -176,7 +176,7 @@
 		</div>
 	{/if}
 
-	<div class="map-tile-selector">
+	<!-- <div class="map-tile-selector">
 		<button
 			class="tile-preview-btn light {mapState.currentTileLayer === 'light' ? 'active' : ''}"
 			style="--preview-light-image: url('{lightTilesExample}');"
@@ -200,11 +200,11 @@
 			<div class="preview-image dark-preview"></div>
 			<span class="tile-label"></span>
 		</button>
-	</div>
+	</div> -->
 </div>
 
 <style>
-	.map-tile-selector {
+	/* .map-tile-selector {
 		position: absolute;
 		position-anchor: --map-anchor;
 		bottom: anchor(bottom);
@@ -249,7 +249,7 @@
 		button.dark {
 			background-image: var(--preview-dark-image);
 		}
-	}
+	} */
 
 	/* ================================ */
 	.map-container {
@@ -397,7 +397,7 @@
 	}
 
 	/* Touch devices (tablets, phones) */
-	@media (hover: none) and (pointer: coarse) {
+	@media (pointer: coarse) {
 		.desktop {
 			display: none;
 		}
