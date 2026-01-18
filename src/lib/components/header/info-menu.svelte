@@ -5,13 +5,11 @@
 	import Dropdown from '$lib/components/util/dropdown.svelte';
 	import ThemeSwitcher from './theme-switcher.svelte';
 
-	function openInfoDialog(closeDropdown: () => void) {
-		closeDropdown();
+	function openInfoDialog() {
 		showDialogById(INFO_DIALOG_ID);
 	}
 
-	function openConsentDialog(closeDropdown: () => void) {
-		closeDropdown();
+	function openConsentDialog() {
 		showDialogById(CONSENT_DIALOG_ID);
 	}
 </script>
@@ -23,39 +21,34 @@
 		</span>
 	{/snippet}
 
-	{#snippet content(closeDropdown)}
+	{#snippet content()}
 		<ul class="menu-list">
 			<li>
-				<button onclick={() => openInfoDialog(closeDropdown)}>
+				<button onclick={() => openInfoDialog()}>
 					<Info size={16} />
 					<span>About this Application</span>
 				</button>
 			</li>
 			<li>
-				<a href="/faq" onclick={() => closeDropdown()}>
+				<a href="/faq">
 					<MessageCircleQuestionMark size={16} />
 					<span>FAQ</span>
 				</a>
 			</li>
 			<li>
-				<a href="/privacy" onclick={() => closeDropdown()}>
+				<a href="/privacy">
 					<ShieldCheck size={16} />
 					<span>Privacy Policy (DE)</span>
 				</a>
 			</li>
 			<li>
-				<button onclick={() => openConsentDialog(closeDropdown)}>
+				<button onclick={() => openConsentDialog()}>
 					<Cookie size={16} />
 					<span>Consent Management</span>
 				</button>
 			</li>
 			<li class="github">
-				<a
-					href={GITHUB_URL}
-					target="_blank"
-					rel="noopener noreferrer"
-					onclick={() => closeDropdown()}
-				>
+				<a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
 					<Github size={16} />
 					<span>GitHub Repository</span>
 				</a>

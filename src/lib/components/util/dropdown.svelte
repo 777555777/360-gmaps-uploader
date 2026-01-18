@@ -8,18 +8,11 @@
 	}: {
 		dropdownId?: string;
 		trigger: Snippet;
-		content: Snippet<[() => void]>;
+		content: Snippet;
 	} = $props();
 
 	const anchorName = $derived(`--dropdown-anchor-${dropdownId}`);
 	const popoverId = $derived(`dropdown-menu-${dropdownId}`);
-
-	function closeDropdown() {
-		const popover = document.getElementById(popoverId);
-		if (popover) {
-			popover.hidePopover();
-		}
-	}
 </script>
 
 <!-- Dropdown Trigger -->
@@ -35,7 +28,7 @@
 
 <!-- Dropdown Menu -->
 <div popover id={popoverId} style="position-anchor: {anchorName};" class="dropdown-menu">
-	{@render content(closeDropdown)}
+	{@render content()}
 </div>
 
 <style>
@@ -106,6 +99,7 @@
 		}
 
 		.dropdown-menu::backdrop {
+			pointer-events: auto;
 			background-color: var(--backdrop-color);
 			backdrop-filter: blur(2px);
 			transition:
