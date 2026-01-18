@@ -190,7 +190,7 @@
 		<p>No photos selected. Please select photos from the list first.</p>
 	{:else}
 		<!-- Dry-Run Indicator (when forced by ENV) -->
-		{#if PUBLIC_DRY_RUN}
+		{#if dryRunMode}
 			<div class="dry-run-indicator">
 				<p>DRY-RUN MODE ACTIVE</p>
 				<small>Photos will be uploaded but not published to Google Maps</small>
