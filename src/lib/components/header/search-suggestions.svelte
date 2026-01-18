@@ -33,7 +33,7 @@
 	.loading {
 		padding: 1rem;
 		text-align: center;
-		color: var(--text-secondary);
+		color: var(--text-muted);
 		font-size: 14px;
 	}
 

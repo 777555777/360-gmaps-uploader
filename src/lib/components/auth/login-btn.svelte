@@ -40,10 +40,22 @@
 </button>
 
 <style>
+	:root[data-theme='light'] {
+		--google-btn-bg: #202124;
+	}
+	:root[data-theme='dark'] {
+		--google-btn-bg: #3d3e42;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:root:not([data-theme]) {
+			--google-btn-bg: #3d3e42;
+		}
+	}
+
 	.google-btn {
 		--google-logo-bg: #fff;
 		--google-sign-in-text: #e8eaed;
-		--google-btn-bg: #202124;
 		--google-btn-bg-hover: #555658;
 		--google-btn-bg-active: #1a1a1b;
 
@@ -103,10 +115,6 @@
 			letter-spacing: 0.25px;
 			text-align: center;
 			white-space: nowrap;
-		}
-
-		@media (prefers-color-scheme: dark) {
-			--google-btn-bg: #3d3e42;
 		}
 	}
 
