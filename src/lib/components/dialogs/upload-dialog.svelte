@@ -10,7 +10,7 @@
 	} from '$lib/globals';
 	import { closeDialogById, showDialogById } from '$lib/utils/dialog-helpers';
 	import { validateStreetViewImage, type ValidationResult } from '$lib/utils/image-helpers';
-	import { Upload } from '@lucide/svelte';
+	import { ImageUp } from '@lucide/svelte';
 	import DropZone from '$lib/components/util/drop-zone.svelte';
 
 	let isProcessing = $state(false);
@@ -93,7 +93,7 @@
 
 	<DropZone bind:this={dropZone} onfiles={handleFiles} {isProcessing} accept="image/jpeg,image/jpg">
 		{#snippet idle()}
-			<Upload size={48} />
+			<ImageUp size={48} />
 			<p class="upload-title">Add images by clicking or dragging them here</p>
 			<p class="upload-hint">
 				Supported formats:

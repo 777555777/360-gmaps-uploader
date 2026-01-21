@@ -99,7 +99,7 @@
 	--chip-primary-fg: oklch(from var(--primary-base) 0.45 c h);
 	--chip-primary-bg-light: oklch(from var(--primary-base) 0.97 calc(c * 0.15) h);
 
-	--chip-neutral-bg: var(--neutral-50);
+	--chip-neutral-bg: var(--neutral-100);
 	--chip-neutral-fg: var(--neutral-600);
 
 	/* Button colors */

@@ -14,9 +14,10 @@
 		PANO_VIEWER_DIALOG_ID,
 		CONSENT_DIALOG_ID,
 		GPANO_FIX_DIALOG_ID,
-		MAX_FILES_UPLOAD
+		GPS_DATA_DIALOG_ID,
+		GPX_MATCH_DIALOG_ID
 	} from '$lib/globals';
-	import UploadArea from '$lib/components/upload-list/upload-area.svelte';
+	import UploadDialog from '$lib/components/dialogs/upload-dialog.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
 	import { gpanoFixState } from '$lib/gpano-fix-state.svelte';
@@ -24,6 +25,8 @@
 	import { consentState } from '$lib/consent-state.svelte';
 	import { Cookie, MapPin } from '@lucide/svelte';
 	import placeholderMapPng from '$lib/assets/map-placeholder.webp';
+	import GpsDataDialog from '$lib/components/dialogs/gps-data-dialog.svelte';
+	import GpxMatchDialog from '$lib/components/dialogs/gpx-match-dialog.svelte';
 
 	let currentPanoramaFile = $derived(fileState.currentPanoramaFile);
 	let publishDialogRef: PublishDialog | undefined = $state();
@@ -98,22 +101,12 @@
 	<meta property="og:url" content="https://panopublisher.net" />
 </svelte:head>
 
-{#snippet uploadDialogContent()}
-	<div class="upload-area-container">
-		<div class="upload-instructions">
-			<p>
-				Add <strong>between 1 and {MAX_FILES_UPLOAD}</strong> panorama images.<br /> The Image
-				format must be equirectangular with a <strong>2:1 aspect ratio</strong>.
-			</p>
-			<p>
-				Your images are processed locally until you publish them to Google
-				<br />
-				If an image has no GPS metadata, you can add it manually later.
-			</p>
-		</div>
+{#snippet gpsDataDialogContent()}
+	<GpsDataDialog />
+{/snippet}
 
-		<UploadArea />
-	</div>
+{#snippet uploadDialogContent()}
+	<UploadDialog />
 {/snippet}
 
 {#snippet publishDialogContent()}
@@ -128,6 +121,10 @@
 
 {#snippet gpanoFixDialogContent()}
 	<GPanoFixDialog />
+{/snippet}
+
+{#snippet gpxMatchDialogContent()}
+	<GpxMatchDialog />
 {/snippet}
 
 <Header />
@@ -159,6 +156,7 @@
 	</div>
 
 	<Dialog dialogId={UPLOAD_DIALOG_ID} title="Add 360 Photos" body={uploadDialogContent} />
+	<Dialog dialogId={GPS_DATA_DIALOG_ID} title="Add GPS Data" body={gpsDataDialogContent} />
 	<Dialog
 		dialogId={PUBLISH_DIALOG_ID}
 		title="Publish Photos"
@@ -176,6 +174,11 @@
 		body={gpanoFixDialogContent}
 		onDismiss={handleGPanoFixDialogClose}
 	/>
+	<Dialog
+		dialogId={GPX_MATCH_DIALOG_ID}
+		title="GPS Matching Results"
+		body={gpxMatchDialogContent}
+	/>
 </main>
 
 <style>
@@ -185,12 +188,6 @@
 		overflow: hidden;
 		background-color: var(--surface-subtle);
 		padding-top: 16px;
-	}
-
-	.upload-instructions {
-		margin-bottom: 24px;
-		font-size: 14px;
-		text-align: center;
 	}
 
 	.map-wrapper {
