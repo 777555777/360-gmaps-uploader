@@ -66,6 +66,7 @@
 
 	/* Spinner */
 	--spinner-primary: var(--primary-500);
+	--spinner-neutral: var(--neutral-100);
 	--spinner-secondary: var(--neutral-300);
 
 	/* Map Marker / Checkbox */

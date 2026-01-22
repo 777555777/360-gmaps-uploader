@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { authState } from '$lib/auth-state.svelte';
 	import { getInitials, getAvatarColor } from '$lib/utils/avatar-helpers';
+	import { ExternalLink, LogOut } from '@lucide/svelte';
 
 	let { dropdownId = crypto.randomUUID() }: { dropdownId?: string } = $props();
 	let user = $derived(authState.user);
@@ -48,7 +49,23 @@
 
 	<hr class="separator" />
 	<ul>
-		<li><a href="/" onclick={handleSignOut}>Logout</a></li>
+		<li>
+			<a
+				href="https://www.google.com/maps/contrib/{user?.sub}/photos"
+				target="_blank"
+				rel="noopener"
+				class="contributions-link"
+			>
+				<ExternalLink size={16} />
+				My Contributions
+			</a>
+		</li>
+		<li>
+			<a href="/" onclick={handleSignOut}>
+				<LogOut size={16} />
+				Logout</a
+			>
+		</li>
 	</ul>
 </div>
 
@@ -172,7 +189,9 @@
 				}
 
 				a {
-					display: block;
+					display: flex;
+					align-items: center;
+					gap: 0.75rem;
 					user-select: none;
 					padding: 0.5rem 0.75rem;
 					background-color: transparent;

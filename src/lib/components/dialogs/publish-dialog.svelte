@@ -16,7 +16,8 @@
 		Globe,
 		CircleCheck,
 		CircleX,
-		Clock
+		Clock,
+		ExternalLink
 	} from '@lucide/svelte';
 	import { PUBLIC_DRY_RUN } from '$env/static/public';
 
@@ -197,12 +198,6 @@
 			</div>
 		{/if}
 
-		<p>
-			After your photos have been successfully published, they will be visible to the public on
-			Google Maps as blue circles. Please note that it may take a few hours or days for them to
-			appear.
-		</p>
-
 		<!-- File Summary -->
 		<div class="file-summary">
 			<p>
@@ -219,10 +214,15 @@
 					{displayFiles.length === 1 ? 'photo' : 'photos'} ready for upload
 					{#if isUploading}
 						<span class="upload-progress"
-							>- Uploading {currentFileIndex + 1} of {displayFiles.length}...</span
-						>
+							>- Uploading {currentFileIndex + 1} of {displayFiles.length}...
+						</span>
 					{/if}
 				{/if}
+			</p>
+
+			<p>
+				Your photos will be visible to the public on Google Maps as blue circles once they've been
+				published. <strong>This may take a few hours or days.</strong>
 			</p>
 
 			{#if filesWithoutGeo.length > 0 && frozenFiles.length === 0}
@@ -232,6 +232,18 @@
 				</p>
 			{/if}
 		</div>
+
+		<!-- Google Maps Contributions Link (after successful upload) -->
+		{#if results.length > 0 && !isUploading && successCount > 0 && authState.user?.sub}
+			<a
+				href="https://www.google.com/maps/contrib/{authState.user.sub}/photos"
+				target="_blank"
+				rel="noopener"
+				class="contributions-link"
+			>
+				View your contributions on Google Maps <ExternalLink size={16} />
+			</a>
+		{/if}
 
 		<!-- File List (always visible) -->
 		<ul class="file-list">
@@ -275,7 +287,12 @@
 			{:else if !isUploading}
 				<button class="secondary-btn" onclick={resetAndClose}> Close </button>
 			{:else}
-				<button class="secondary-btn" disabled> Uploading... </button>
+				<button class="secondary-btn" disabled>
+					<div class="loading-indicator">
+						Uploading
+						<span class="spinner"></span>
+					</div>
+				</button>
 			{/if}
 		</div>
 	{/if}
@@ -317,11 +334,24 @@
 
 	.file-summary {
 		padding: 0.75rem;
-		background: var(--chip-neutral-bg);
+		background-color: var(--surface-subtle);
 		border-radius: 8px;
 
 		p {
 			margin: 0;
+		}
+	}
+
+	a.contributions-link {
+		color: var(--link-color);
+		text-decoration: none;
+		word-break: break-word;
+		font-size: 14px;
+		display: inline-flex;
+		gap: 0.25rem;
+
+		&:hover {
+			text-decoration: underline;
 		}
 	}
 
@@ -369,5 +399,10 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.spinner {
+		border: 2px solid var(--spinner-secondary);
+		border-top-color: var(--spinner-neutral);
 	}
 </style>
