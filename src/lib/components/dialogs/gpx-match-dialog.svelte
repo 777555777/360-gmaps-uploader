@@ -160,7 +160,7 @@
 		<!-- File List (shows all files: matched and unmatched) -->
 		{#if allFiles.length > 0}
 			<ul class="file-list">
-				{#each allFiles as item (item.file.name)}
+				{#each allFiles as item (item.file)}
 					{@const isMatched = 'suggestedGPS' in item}
 					{@const isSkipped = 'reason' in item && item.reason === 'Already has GPS data'}
 					{@const badgeInfo = getBadgeInfo(item)}
