@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { PUBLISH_DIALOG_ID, UPLOAD_DIALOG_ID } from '$lib/globals';
+	import { PUBLISH_DIALOG_ID, UPLOAD_DIALOG_ID, GPS_DATA_DIALOG_ID } from '$lib/globals';
 	import UploadList from './upload-list/upload-list.svelte';
 	import { fileState } from '$lib/file-state.svelte';
-	import { Plus, Upload } from '@lucide/svelte';
+	import { FileUp, Plus, Upload } from '@lucide/svelte';
 
 	let hasSelection = $derived(fileState.hasSelection);
 	let selectedFiles = $derived(fileState.selectedFiles);
+	let hasFiles = $derived(fileState.files.size > 0);
 </script>
 
 <aside>
@@ -18,6 +19,16 @@
 		>
 			<Plus size={20} />
 			<span>Add Photos</span>
+		</button>
+
+		<button
+			class="upload-btn icon-only"
+			disabled={!hasFiles}
+			commandfor={GPS_DATA_DIALOG_ID}
+			command="show-modal"
+			title="Add GPS data from .gpx file"
+		>
+			<FileUp size={20} />
 		</button>
 
 		<button
@@ -55,6 +66,7 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			gap: 1rem;
 			padding: 16px 0;
 			border-bottom: 1px solid var(--border-subtle);
 
@@ -69,7 +81,7 @@
 				background-color: var(--surface-base);
 
 				border: none;
-				padding: 0.625rem 1rem;
+				padding: 0.625rem 0.875rem;
 				border-radius: 100vmax;
 				cursor: pointer;
 				border: 2px solid transparent;
@@ -86,13 +98,13 @@
 				color: var(--text-muted);
 				transition: all 0.2s ease;
 
-				&:last-of-type {
-					margin-left: 16px;
-				}
-
 				span {
 					margin-right: 6px;
 					line-height: 1;
+				}
+
+				&.icon-only {
+					padding: 0.625rem;
 				}
 
 				&:hover {
@@ -145,6 +157,15 @@
 			width: unset;
 			height: 50%;
 			border-bottom: none;
+		}
+	}
+
+	@media (max-width: 576px) {
+		aside {
+			button.upload-btn {
+				padding: 0.5rem 0.75rem;
+				font-size: 0.75rem;
+			}
 		}
 	}
 </style>
