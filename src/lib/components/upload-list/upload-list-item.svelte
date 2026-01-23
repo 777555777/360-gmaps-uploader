@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapState } from '$lib/map-state.svelte';
-	import { ShieldAlert } from '@lucide/svelte';
-	import GeoDataChip from './geo-data-chip.svelte';
+	import { Globe, MapPin, ShieldAlert } from '@lucide/svelte';
 	import GeoEditPopover from './geo-edit-popover.svelte';
-	import PublishedChip from './published-chip.svelte';
 	import Thumbnail from './thumbnail.svelte';
-	import ErrorChip from '../util/error-chip.svelte';
+	import Badge from '../util/badge.svelte';
+	import { stopEventPropagation } from '$lib/utils/ui-helper';
 
 	let { file, index } = $props();
 
@@ -53,7 +52,8 @@
 			if (
 				target?.closest('.publish-checkbox') ||
 				target?.closest('.close-btn-overlay') ||
-				target?.closest('.geo-data')
+				target?.closest('.geo-data') ||
+				target?.closest('.badge')
 			) {
 				return;
 			}
@@ -89,21 +89,62 @@
 			</div>
 			<div class="card-footer">
 				{#if metadataError}
-					<ErrorChip message={metadataError}>
+					<!-- Red Error Badge -->
+					<Badge message={metadataError} level="danger">
 						{#snippet icon()}
 							<ShieldAlert size={18} />
 						{/snippet}
-					</ErrorChip>
+					</Badge>
 				{:else if isLoading}
 					<div class="loading-indicator">
 						<span class="spinner"></span>
 						<span>Loading Metadata...</span>
 					</div>
+				{:else if hasGeoData && metadata?.geoLocation && !isPublished}
+					<!-- Green Geo-Data Button Badge -->
+					<Badge
+						message={`${metadata.geoLocation.latitude.toFixed(5)}° | ${metadata.geoLocation.longitude.toFixed(5)}°`}
+						level="success"
+						anchorName={`geo-data-anchor-${index}`}
+						popoverTarget={`geo-popover-${index}`}
+						title="Edit GPS Data"
+					>
+						{#snippet icon()}
+							<MapPin size={18} />
+						{/snippet}
+					</Badge>
+				{:else if hasGeoData && metadata?.geoLocation && isPublished}
+					<!-- Grey Geo-Data Badge + Grey Icon-Badge -->
+					<Badge
+						message={`${metadata.geoLocation.latitude.toFixed(5)}° | ${metadata.geoLocation.longitude.toFixed(5)}°`}
+						level="neutral"
+						anchorName={`geo-data-anchor-${index}`}
+						popoverTarget={`geo-popover-${index}`}
+						title="Edit GPS Data"
+						disabled={true}
+					>
+						{#snippet icon()}
+							<MapPin size={18} />
+						{/snippet}
+					</Badge>
+					<Badge message={''} level="neutral" title="Published to Google Maps">
+						{#snippet icon()}
+							<Globe size={16} />
+						{/snippet}
+					</Badge>
 				{:else}
-					<GeoDataChip {index} {hasGeoData} {metadata} {isPublished} />
-					{#if isPublished}
-						<PublishedChip />
-					{/if}
+					<!-- Red Geo-Data Button Badge -->
+					<Badge
+						message={'Click to add GPS data'}
+						level="danger"
+						anchorName={`geo-data-anchor-${index}`}
+						popoverTarget={`geo-popover-${index}`}
+						title="Edit GPS Data"
+					>
+						{#snippet icon()}
+							<MapPin size={18} />
+						{/snippet}
+					</Badge>
 				{/if}
 			</div>
 		</div>
@@ -116,6 +157,7 @@
 				disabled={!canSelect}
 				checked={isSelected}
 				onchange={handleSelectionToggle}
+				onkeydown={stopEventPropagation}
 			/>
 		</label>
 	</div>

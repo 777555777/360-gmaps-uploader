@@ -90,6 +90,8 @@
 
 	--chip-warn-bg: oklch(from var(--warn-base) 0.92 calc(c * 0.25) h);
 	--chip-warn-fg: oklch(from var(--warn-base) 0.45 c h);
+	--chip-warn-hover-bg: oklch(from var(--warn-base) 0.88 calc(c * 0.25) h);
+	--chip-warn-active-bg: oklch(from var(--warn-base) 0.84 calc(c * 0.25) h);
 
 	--chip-danger-bg: oklch(from var(--danger-base) 0.92 calc(c * 0.25) h);
 	--chip-danger-fg: oklch(from var(--danger-base) 0.45 c h);
@@ -98,10 +100,14 @@
 
 	--chip-primary-bg: oklch(from var(--primary-base) 0.92 calc(c * 0.25) h);
 	--chip-primary-fg: oklch(from var(--primary-base) 0.45 c h);
+	--chip-primary-hover-bg: oklch(from var(--primary-base) 0.88 calc(c * 0.25) h);
+	--chip-primary-active-bg: oklch(from var(--primary-base) 0.84 calc(c * 0.25) h);
 	--chip-primary-bg-light: oklch(from var(--primary-base) 0.97 calc(c * 0.15) h);
 
 	--chip-neutral-bg: var(--neutral-100);
 	--chip-neutral-fg: var(--neutral-600);
+	--chip-neutral-hover-bg: var(--neutral-200);
+	--chip-neutral-active-bg: var(--neutral-300);
 
 	/* Button colors */
 	--button-primary: var(--primary-500);
