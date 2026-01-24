@@ -19,7 +19,7 @@ Pano Publisher is a local-first web application for uploading individual 360° p
 - No server-side storage of images
 - All image processing happens locally in the browser
 - Images are sent only to Google APIs for publishing
-- Location search requests are sent to external geocoding services but only when used
+- Location search requests are sent directly from the client to external geocoding services but only when used
 
 ## Limitations
 - No video uploads

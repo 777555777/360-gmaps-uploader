@@ -67,8 +67,8 @@
 				{#snippet content()}
 					<p>
 						No, Pano Publisher does not store your images or personal data. Your images are uploaded
-						directly from your browser to Google Street View. When you use the location search,
-						search requests are sent to an external service <a
+						directly from your browser to Google Street View. When you use the location search, your
+						browser sends search requests directly to <a
 							href="https://www.maptiler.com/"
 							target="_blank"
 							rel="noopener noreferrer">MapTiler</a
