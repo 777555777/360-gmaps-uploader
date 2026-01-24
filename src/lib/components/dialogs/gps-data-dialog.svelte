@@ -9,17 +9,25 @@
 
 	let isProcessing = $state(false);
 	let dropZone: DropZone | undefined;
+	let errorMessage = $state<string | null>(null);
+
+	export function handleDialogClose() {
+		errorMessage = null;
+	}
 
 	async function handleFiles(files: FileList): Promise<void> {
+		// Clear previous error message
+		errorMessage = null;
+
 		// Validate single GPX file
 		if (files.length !== 1) {
-			alert('Please select a single .gpx file');
+			errorMessage = 'Please select a single .gpx file';
 			return;
 		}
 
 		const file = files[0];
 		if (!file.name.toLowerCase().endsWith('.gpx')) {
-			alert('Please select a .gpx file');
+			errorMessage = 'Please select a .gpx file';
 			return;
 		}
 
@@ -30,7 +38,7 @@
 			await gpxState.parseGPX(file, parseGPXFile);
 
 			if (gpxState.parseError) {
-				alert(`Failed to parse GPX file: ${gpxState.parseError}`);
+				errorMessage = `Failed to parse GPX file: ${gpxState.parseError}`;
 				gpxState.clear();
 				return;
 			}
@@ -39,7 +47,7 @@
 			const filesToMatch = Array.from(fileState.files);
 
 			if (filesToMatch.length === 0) {
-				alert('No images to match. Please upload images first.');
+				errorMessage = 'No images to match. Please upload images first.';
 				gpxState.clear();
 				return;
 			}
@@ -57,7 +65,7 @@
 			if (gpxState.hasMatches || gpxState.hasUnmatched) {
 				showDialogById(GPX_MATCH_DIALOG_ID);
 			} else {
-				alert('No matching images found. Check that your images have timestamps.');
+				errorMessage = 'No matching images found. Check that your images have timestamps.';
 				gpxState.clear();
 			}
 
@@ -65,9 +73,7 @@
 			dropZone?.resetInput();
 		} catch (error) {
 			console.error('GPX processing error:', error);
-			alert(
-				`Failed to process GPX file: ${error instanceof Error ? error.message : 'Unknown error'}`
-			);
+			errorMessage = `Failed to process GPX file: ${error instanceof Error ? error.message : 'Unknown error'}`;
 			gpxState.clear();
 		} finally {
 			isProcessing = false;
@@ -84,6 +90,15 @@
 			timestamps.
 		</p>
 	</div>
+
+	<!-- Error Banner -->
+	{#if errorMessage}
+		<div class="banner error">
+			<div class="banner-text">
+				<p>{errorMessage}</p>
+			</div>
+		</div>
+	{/if}
 
 	<DropZone bind:this={dropZone} onfiles={handleFiles} {isProcessing} accept=".gpx">
 		{#snippet idle()}
@@ -115,6 +130,13 @@
 		margin-bottom: 24px;
 		font-size: 14px;
 		text-align: center;
+	}
+
+	/* Additional Banner Styles */
+	.banner {
+		justify-content: center;
+		text-align: center;
+		margin-bottom: 1.5rem;
 	}
 
 	.upload-hint {

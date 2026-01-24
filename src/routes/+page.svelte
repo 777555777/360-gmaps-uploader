@@ -31,6 +31,7 @@
 	let currentPanoramaFile = $derived(fileState.currentPanoramaFile);
 	let publishDialogRef: PublishDialog | undefined = $state();
 	let uploadDialogRef: UploadDialog | undefined = $state();
+	let gpsDataDialogRef: GpsDataDialog | undefined = $state();
 
 	function handlePublishDialogClose() {
 		publishDialogRef?.onDialogClose();
@@ -38,6 +39,10 @@
 
 	function handleUploadDialogClose() {
 		uploadDialogRef?.handleDialogClose();
+	}
+
+	function handleGpsDataDialogClose() {
+		gpsDataDialogRef?.handleDialogClose();
 	}
 
 	function handleGPanoFixDialogClose() {
@@ -107,7 +112,7 @@
 </svelte:head>
 
 {#snippet gpsDataDialogContent()}
-	<GpsDataDialog />
+	<GpsDataDialog bind:this={gpsDataDialogRef} />
 {/snippet}
 
 {#snippet uploadDialogContent()}
@@ -166,7 +171,12 @@
 		body={uploadDialogContent}
 		onDismiss={handleUploadDialogClose}
 	/>
-	<Dialog dialogId={GPS_DATA_DIALOG_ID} title="Add GPS Data" body={gpsDataDialogContent} />
+	<Dialog
+		dialogId={GPS_DATA_DIALOG_ID}
+		title="Add GPS Data"
+		body={gpsDataDialogContent}
+		onDismiss={handleGpsDataDialogClose}
+	/>
 	<Dialog
 		dialogId={PUBLISH_DIALOG_ID}
 		title="Publish Photos"
