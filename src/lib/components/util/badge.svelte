@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { stopEventPropagation } from '$lib/utils/ui-helper.js';
 
-	type BadgeLevel = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+	export type BadgeLevel = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 
 	let {
 		message,

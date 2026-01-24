@@ -92,7 +92,7 @@
 					<!-- Red Error Badge -->
 					<Badge message={metadataError} level="danger">
 						{#snippet icon()}
-							<ShieldAlert size={18} />
+							<ShieldAlert size={16} />
 						{/snippet}
 					</Badge>
 				{:else if isLoading}
@@ -110,7 +110,7 @@
 						title="Edit GPS Data"
 					>
 						{#snippet icon()}
-							<MapPin size={18} />
+							<MapPin size={16} />
 						{/snippet}
 					</Badge>
 				{:else if hasGeoData && metadata?.geoLocation && isPublished}
@@ -124,7 +124,7 @@
 						disabled={true}
 					>
 						{#snippet icon()}
-							<MapPin size={18} />
+							<MapPin size={16} />
 						{/snippet}
 					</Badge>
 					<Badge message={''} level="neutral" title="Published to Google Maps">
@@ -142,7 +142,7 @@
 						title="Edit GPS Data"
 					>
 						{#snippet icon()}
-							<MapPin size={18} />
+							<MapPin size={16} />
 						{/snippet}
 					</Badge>
 				{/if}

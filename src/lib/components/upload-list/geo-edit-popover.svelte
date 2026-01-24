@@ -105,7 +105,7 @@
 					popovertarget="geo-popover-{index}"
 					popovertargetaction="hide"
 				>
-					<Crosshair size={18} />
+					<Crosshair size={16} />
 				</button>
 
 				<input

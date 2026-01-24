@@ -2,12 +2,12 @@
 	import { page } from '$app/state';
 	import { authState } from '$lib/auth-state.svelte';
 	import { consentState } from '$lib/consent-state.svelte';
+	import { ArrowLeft } from '@lucide/svelte';
 	import logo from '$lib/assets/logo.svg';
 	import LoginBtn from './auth/login-btn.svelte';
 	import LogoutBtn from './auth/logout-btn.svelte';
 	import GithubLink from './header/github-link.svelte';
 	import InfoMenu from './header/info-menu.svelte';
-	import { ArrowLeft } from '@lucide/svelte';
 	import SearchInput from './header/search-input.svelte';
 	import MobileSearch from './header/mobile-search.svelte';
 	import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_ENABLE_MAP_SEARCH } from '$env/static/public';

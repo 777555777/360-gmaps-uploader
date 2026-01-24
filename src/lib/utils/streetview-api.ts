@@ -63,7 +63,7 @@ export interface PublishedPhoto {
 }
 
 export interface UploadProgress {
-	step: 'idle' | 'startUpload' | 'uploadBytes' | 'publish' | 'done' | 'error';
+	step: 'Idle' | 'Start Upload' | 'Upload Bytes' | 'Publish' | 'Done' | 'Error';
 	message: string;
 	photoId?: string;
 	uploadUrl?: string;
@@ -254,18 +254,18 @@ export async function uploadPhoto(options: UploadOptions): Promise<UploadResult>
 
 	try {
 		// Step 1: Get upload URL
-		progress('startUpload', 'Requesting upload URL...');
+		progress('Start Upload', 'Requesting upload URL...');
 		const { uploadUrl } = await startUpload(accessToken);
-		progress('startUpload', 'Upload URL received');
+		progress('Start Upload', 'Upload URL received');
 
 		// Step 2: Upload photo bytes
-		progress('uploadBytes', `Uploading ${file.name}...`);
+		progress('Upload Bytes', `Uploading ${file.name}...`);
 		await uploadPhotoBytes(accessToken, uploadUrl, file);
-		progress('uploadBytes', 'Photo bytes uploaded');
+		progress('Upload Bytes', 'Photo bytes uploaded');
 
 		// Step 3: Publish (or skip in dry-run mode)
 		if (dryRun) {
-			progress('done', '✅ Dry-run complete! Photo NOT published.', { uploadUrl });
+			progress('Done', 'Dry-run complete! Photo NOT published.', { uploadUrl });
 			return {
 				success: true,
 				uploadUrl,
@@ -273,7 +273,7 @@ export async function uploadPhoto(options: UploadOptions): Promise<UploadResult>
 			};
 		}
 
-		progress('publish', 'Publishing photo to Street View...');
+		progress('Publish', 'Publishing photo to Street View...');
 		const metadata: PublishPhotoRequest = {
 			uploadReference: { uploadUrl },
 			pose: {
@@ -286,7 +286,7 @@ export async function uploadPhoto(options: UploadOptions): Promise<UploadResult>
 		const result = await publishPhoto(accessToken, metadata);
 		const photoId = result.photoId?.id;
 
-		progress('done', '✅ Photo published!', { photoId });
+		progress('Done', 'Photo published!', { photoId });
 		return {
 			success: true,
 			photoId,
@@ -294,7 +294,7 @@ export async function uploadPhoto(options: UploadOptions): Promise<UploadResult>
 		};
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-		progress('error', `❌ Upload failed: ${errorMessage}`, { error: errorMessage });
+		progress('Error', `Upload failed: ${errorMessage}`, { error: errorMessage });
 		return {
 			success: false,
 			error: errorMessage,

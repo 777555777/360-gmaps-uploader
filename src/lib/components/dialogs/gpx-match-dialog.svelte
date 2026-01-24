@@ -4,7 +4,7 @@
 	import { formatTimeDifference } from '$lib/utils/gpx-helpers';
 	import { closeDialogById } from '$lib/utils/dialog-helpers';
 	import { GPX_MATCH_DIALOG_ID } from '$lib/globals';
-	import { Image, CheckCircle, AlertTriangle, SkipForward, FastForward } from '@lucide/svelte';
+	import { Image, FastForward, CircleCheck, TriangleAlert } from '@lucide/svelte';
 	import Badge from '$lib/components/util/badge.svelte';
 	import Accordion from '../util/accordion.svelte';
 
@@ -122,7 +122,7 @@
 		{#if matchedFiles.length > 0}
 			<Badge level="success" message="{matchedFiles.length} matched">
 				{#snippet icon()}
-					<CheckCircle size={16} />
+					<CircleCheck size={16} />
 				{/snippet}
 			</Badge>
 		{/if}
@@ -130,7 +130,6 @@
 		{#if skippedFiles.length > 0}
 			<Badge level="neutral" message="{skippedFiles.length} skipped">
 				{#snippet icon()}
-					<!-- <SkipForward size={16} /> -->
 					<FastForward size={16} />
 				{/snippet}
 			</Badge>
@@ -139,7 +138,7 @@
 		{#if unmatchedFiles.length > 0}
 			<Badge level="danger" message="{unmatchedFiles.length} unmatched">
 				{#snippet icon()}
-					<AlertTriangle size={16} />
+					<TriangleAlert size={16} />
 				{/snippet}
 			</Badge>
 		{/if}

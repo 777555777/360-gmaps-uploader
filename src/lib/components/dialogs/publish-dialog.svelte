@@ -7,7 +7,6 @@
 	import { uploadPhoto, type UploadProgress, type UploadResult } from '$lib/utils/streetview-api';
 	import { dateToUnixSeconds } from '$lib/utils/publish-helpers';
 	import LoginBtn from '$lib/components/auth/login-btn.svelte';
-	import StatusBadge from '$lib/components/util/status-badge.svelte';
 	import {
 		FlaskConical,
 		Image,
@@ -20,6 +19,7 @@
 		ExternalLink
 	} from '@lucide/svelte';
 	import { PUBLIC_DRY_RUN } from '$env/static/public';
+	import Badge, { type BadgeLevel } from '../util/badge.svelte';
 
 	// ENV-based dry-run mode (forced in dev, disabled in prod)
 	const DRY_RUN_MODE = PUBLIC_DRY_RUN === 'true';
@@ -30,7 +30,7 @@
 	// Upload state
 	let isUploading = $state(false);
 	let currentFileIndex = $state(0);
-	let currentProgress = $state<UploadProgress>({ step: 'idle', message: '' });
+	let currentProgress = $state<UploadProgress>({ step: 'Idle', message: '' });
 	let results = $state<UploadResult[]>([]);
 
 	// Frozen list of files for upload (stays stable during/after upload)
@@ -117,13 +117,13 @@
 		}
 
 		isUploading = false;
-		currentProgress = { step: 'done', message: 'All uploads completed!' };
+		currentProgress = { step: 'Done', message: 'All uploads completed!' };
 	}
 
 	function resetState() {
 		isUploading = false;
 		currentFileIndex = 0;
-		currentProgress = { step: 'idle', message: '' };
+		currentProgress = { step: 'Idle', message: '' };
 		results = [];
 		frozenFiles = [];
 	}
@@ -142,15 +142,15 @@
 	type IconType = 'image' | 'link' | 'upload' | 'globe' | 'check' | 'error' | 'clock';
 
 	// Get status info for a file at a given index
-	function getFileStatus(index: number): { icon: IconType; label: string; class: string } {
+	function getFileStatus(index: number): { icon: IconType; label: string; class: BadgeLevel } {
 		const result = results[index];
 
 		// Already has a result
 		if (result) {
 			if (result.success) {
-				return { icon: 'check', label: result.dryRun ? 'dry-run' : 'published', class: 'success' };
+				return { icon: 'check', label: result.dryRun ? 'Dry-run' : 'Published', class: 'success' };
 			} else {
-				return { icon: 'error', label: 'failed', class: 'error' };
+				return { icon: 'error', label: 'Failed', class: 'danger' };
 			}
 		}
 
@@ -164,16 +164,16 @@
 				done: 'check',
 				error: 'error'
 			};
-			return { icon: iconMap[step] || 'clock', label: step, class: 'uploading' };
+			return { icon: iconMap[step] || 'clock', label: step, class: 'info' };
 		}
 
 		// Waiting in queue
 		if (isUploading && currentFileIndex < index) {
-			return { icon: 'clock', label: 'waiting', class: 'waiting' };
+			return { icon: 'clock', label: 'Waiting', class: 'warning' };
 		}
 
 		// Ready to upload (not started yet)
-		return { icon: 'image', label: 'ready', class: 'ready' };
+		return { icon: 'image', label: 'Ready', class: 'neutral' };
 	}
 
 	// Count successes/failures
@@ -268,7 +268,7 @@
 						{/if}
 					</span>
 					<span class="file-name">{file.name}</span>
-					<StatusBadge statusClass={status.class} label={status.label} />
+					<Badge message={status.label} level={status.class}></Badge>
 				</li>
 			{/each}
 		</ul>

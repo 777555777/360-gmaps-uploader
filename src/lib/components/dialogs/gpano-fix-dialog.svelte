@@ -4,8 +4,9 @@
 	import { injectGPanoMetadata, type GPanoMetadata } from '$lib/utils/image-helpers';
 	import { closeDialogById } from '$lib/utils/dialog-helpers';
 	import { GPANO_FIX_DIALOG_ID } from '$lib/globals';
-	import { Check, Wrench, FileX } from '@lucide/svelte';
+	import { Wrench, FileX, CircleCheck } from '@lucide/svelte';
 	import Accordion from '$lib/components/util/accordion.svelte';
+	import Badge from '../util/badge.svelte';
 
 	let isProcessing = $state(false);
 	let processedCount = $state(0);
@@ -138,31 +139,25 @@
 		<!-- Summary Pills -->
 		<div class="summary">
 			{#if gpanoFixState.validCount > 0}
-				<div class="summary-item valid">
-					<Check size={16} />
-					<span>
-						<strong>{gpanoFixState.validCount}</strong>
-						{validSuffix}
-					</span>
-				</div>
+				<Badge message={`${gpanoFixState.validCount} ${validSuffix}`} level="success">
+					{#snippet icon()}
+						<CircleCheck size={16} />
+					{/snippet}
+				</Badge>
 			{/if}
 			{#if gpanoFixState.fixableCount > 0}
-				<div class="summary-item fixable">
-					<Wrench size={16} />
-					<span>
-						<strong>{gpanoFixState.fixableCount}</strong>
-						{fixableSuffix}
-					</span>
-				</div>
+				<Badge message={`${gpanoFixState.fixableCount} ${fixableSuffix}`} level="info">
+					{#snippet icon()}
+						<Wrench size={16} />
+					{/snippet}
+				</Badge>
 			{/if}
 			{#if gpanoFixState.rejectedCount > 0}
-				<div class="summary-item rejected">
-					<FileX size={16} />
-					<span>
-						<strong>{gpanoFixState.rejectedCount}</strong>
-						{rejectedSuffix}
-					</span>
-				</div>
+				<Badge message={`${gpanoFixState.rejectedCount} ${rejectedSuffix}`} level="danger">
+					{#snippet icon()}
+						<FileX size={16} />
+					{/snippet}
+				</Badge>
 			{/if}
 		</div>
 
@@ -307,31 +302,6 @@
 		flex-wrap: wrap;
 	}
 
-	.summary-item {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		padding: 4px 8px;
-		max-width: 12rem;
-		text-overflow: ellipsis;
-		border-radius: 100vmax;
-		font-size: 13px;
-	}
-
-	.summary-item.valid {
-		background-color: var(--chip-success-bg);
-		color: var(--chip-success-fg);
-	}
-
-	.summary-item.fixable {
-		background-color: var(--chip-primary-bg);
-		color: var(--chip-primary-fg);
-	}
-
-	.summary-item.rejected {
-		background-color: var(--chip-danger-bg);
-		color: var(--chip-danger-fg);
-	}
 	/* ====================================================== */
 
 	/* Sections for file lists */
