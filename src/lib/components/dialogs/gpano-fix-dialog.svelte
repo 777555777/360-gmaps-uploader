@@ -129,8 +129,8 @@
 <div class="dialog-container">
 	<div class="dialog-content">
 		<!-- Info Banner -->
-		<div class="info-banner {hasOnlyRejected || hasValidAndRejected ? 'error' : ''}">
-			<div class="info-text">
+		<div class="banner {hasOnlyRejected || hasValidAndRejected ? 'error' : 'info'}">
+			<div class="banner-text">
 				<strong>{infoTitle}</strong>
 				<p>{infoText}</p>
 			</div>
@@ -258,41 +258,6 @@
 		gap: 1.5rem;
 	}
 
-	/* Info Banner Section */
-	.info-banner {
-		display: flex;
-		gap: 12px;
-		padding: 16px;
-		background-color: var(--chip-primary-bg);
-		border-radius: 8px;
-		color: var(--chip-primary-fg);
-
-		div.info-text {
-			display: flex;
-			flex-direction: column;
-			gap: 4px;
-
-			strong {
-				font-size: 15px;
-			}
-
-			p {
-				color: var(--chip-primary-fg);
-			}
-		}
-	}
-
-	/* Cascade override info style with error style */
-	.info-banner.error {
-		background-color: var(--chip-danger-bg);
-		color: var(--chip-danger-fg);
-
-		div.info-text {
-			p {
-				color: var(--chip-danger-fg);
-			}
-		}
-	}
 	/* ====================================================== */
 
 	/* Summary Chips Section */

@@ -127,6 +127,61 @@ p {
 
 /*  =========================================  */
 
+/* Text Banner Section */
+.banner {
+	display: flex;
+	gap: 12px;
+	padding: 16px;
+	background-color: var(--chip-neutral-bg);
+	border-radius: 8px;
+	color: var(--chip-neutral-fg);
+
+	div.banner-text {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+
+		strong {
+			font-size: 15px;
+		}
+
+		p {
+			color: var(--chip-neutral-fg);
+		}
+	}
+
+	&.error {
+		background-color: var(--chip-danger-bg);
+		color: var(--chip-danger-fg);
+		div.banner-text p {
+			color: var(--chip-danger-fg);
+		}
+	}
+	&.info {
+		background-color: var(--chip-primary-bg);
+		color: var(--chip-primary-fg);
+		div.banner-text p {
+			color: var(--chip-primary-fg);
+		}
+	}
+	&.success {
+		background-color: var(--chip-success-bg);
+		color: var(--chip-success-fg);
+		div.banner-text p {
+			color: var(--chip-success-fg);
+		}
+	}
+	&.warning {
+		background-color: var(--chip-warn-bg);
+		color: var(--chip-warn-fg);
+		div.banner-text p {
+			color: var(--chip-warn-fg);
+		}
+	}
+}
+
+/*  =========================================  */
+
 .clickable-icon {
 	display: flex;
 	align-items: center;

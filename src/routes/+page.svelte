@@ -30,9 +30,14 @@
 
 	let currentPanoramaFile = $derived(fileState.currentPanoramaFile);
 	let publishDialogRef: PublishDialog | undefined = $state();
+	let uploadDialogRef: UploadDialog | undefined = $state();
 
 	function handlePublishDialogClose() {
 		publishDialogRef?.onDialogClose();
+	}
+
+	function handleUploadDialogClose() {
+		uploadDialogRef?.handleDialogClose();
 	}
 
 	function handleGPanoFixDialogClose() {
@@ -106,7 +111,7 @@
 {/snippet}
 
 {#snippet uploadDialogContent()}
-	<UploadDialog />
+	<UploadDialog bind:this={uploadDialogRef} />
 {/snippet}
 
 {#snippet publishDialogContent()}
@@ -155,7 +160,12 @@
 		{/if}
 	</div>
 
-	<Dialog dialogId={UPLOAD_DIALOG_ID} title="Add 360 Photos" body={uploadDialogContent} />
+	<Dialog
+		dialogId={UPLOAD_DIALOG_ID}
+		title="Add 360 Photos"
+		body={uploadDialogContent}
+		onDismiss={handleUploadDialogClose}
+	/>
 	<Dialog dialogId={GPS_DATA_DIALOG_ID} title="Add GPS Data" body={gpsDataDialogContent} />
 	<Dialog
 		dialogId={PUBLISH_DIALOG_ID}

@@ -16,16 +16,22 @@
 	let isProcessing = $state(false);
 	let processingCount = $state(0);
 	let dropZone: DropZone | undefined;
+	let errorMessage = $state<string | null>(null);
+
+	export function handleDialogClose() {
+		errorMessage = null;
+	}
 
 	async function handleFiles(files: FileList): Promise<void> {
 		if (!files.length || isProcessing) {
 			return;
 		}
 
+		// Clear previous error message
+		errorMessage = null;
+
 		if (files.length > MAX_FILES_UPLOAD) {
-			alert(
-				`You can upload a maximum of ${MAX_FILES_UPLOAD} files at once. Please select fewer files.`
-			);
+			errorMessage = `You can upload a maximum of ${MAX_FILES_UPLOAD} files at once. You selected ${files.length} files. Please select fewer files.`;
 			return;
 		}
 
@@ -85,11 +91,23 @@
 			must be equirectangular with a <strong>2:1 aspect ratio</strong>.
 		</p>
 		<p>
-			Your images are processed locally until you publish them to Google
+			Your images are processed locally until you publish them to Google.
 			<br />
 			If an image has no GPS metadata, you can add it manually later.
 		</p>
 	</div>
+
+	<!-- Error Banner -->
+	{#if errorMessage}
+		<div class="banner error">
+			<div class="banner-text">
+				<p>
+					Please select fewer files.<br /> You can import a maximum of
+					<strong>{MAX_FILES_UPLOAD}</strong> files at once.
+				</p>
+			</div>
+		</div>
+	{/if}
 
 	<DropZone bind:this={dropZone} onfiles={handleFiles} {isProcessing} accept="image/jpeg,image/jpg">
 		{#snippet idle()}
@@ -126,7 +144,7 @@
 	}
 
 	.upload-instructions {
-		margin-bottom: 24px;
+		margin-bottom: 1.5rem;
 		font-size: 14px;
 		text-align: center;
 	}
@@ -134,8 +152,15 @@
 	.upload-hint {
 		margin: 0;
 		font-size: 14px;
-		color: var(--text-subtle);
+		color: var(--text-);
 		text-align: center;
+	}
+
+	/* Additional Banner Styles */
+	.banner {
+		justify-content: center;
+		text-align: center;
+		margin-bottom: 1.5rem;
 	}
 
 	.spinner-large {
