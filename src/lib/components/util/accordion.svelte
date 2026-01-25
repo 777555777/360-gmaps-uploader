@@ -52,6 +52,10 @@
 		margin: -0.25rem;
 		padding: 0.25rem 0.5rem;
 		transition: background-color 0.15s ease;
+
+		@media (max-width: 576px) {
+			user-select: none;
+		}
 	}
 
 	summary:hover {

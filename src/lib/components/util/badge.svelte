@@ -13,7 +13,7 @@
 		title,
 		disabled
 	}: {
-		message: string;
+		message: string | Snippet;
 		icon?: Snippet;
 		level?: BadgeLevel;
 		anchorName?: string;
@@ -35,8 +35,10 @@
 		{#if icon}
 			{@render icon()}
 		{/if}
-		{#if message}
+		{#if typeof message === 'string'}
 			<span>{message}</span>
+		{:else if message}
+			{@render message()}
 		{/if}
 	</button>
 {:else}
@@ -63,6 +65,7 @@
 		border-radius: 100vmax;
 		max-width: 14rem;
 		font-size: 13px;
+		user-select: none;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		line-height: normal;

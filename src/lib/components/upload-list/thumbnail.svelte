@@ -110,6 +110,7 @@
 		height: 180px;
 		object-fit: cover;
 		border-radius: 8px 8px 0 0;
+		color: var(--text-default);
 		/* anchor-name is set inline via style="{index}" */
 	}
 
@@ -144,11 +145,16 @@
 	}
 
 	@media (max-width: 576px) {
-		img {
-			height: 120px;
-		}
+		img,
 		.loading-indicator {
-			height: 120px;
+			height: 130px;
+		}
+	}
+
+	@media (max-width: 420px) {
+		img,
+		.loading-indicator {
+			height: 100px;
 		}
 	}
 </style>

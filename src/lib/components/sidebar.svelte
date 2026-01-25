@@ -60,14 +60,14 @@
 		background-color: var(--surface-base);
 		border-radius: 8px 8px 0 0;
 
-		margin: 0 12px 0 12px;
+		margin: 0 12px;
 
 		.sidebar-option-header {
 			display: flex;
 			justify-content: center;
 			align-items: center;
 			gap: 1rem;
-			padding: 16px 0;
+			padding: 1rem 0;
 			border-bottom: 1px solid var(--border-subtle);
 
 			.upload-btn {
@@ -96,6 +96,7 @@
 				font-family: 'Open Sans', sans-serif;
 				letter-spacing: 0.0175em;
 				color: var(--text-muted);
+				user-select: none;
 				transition: all 0.2s ease;
 
 				span {
@@ -160,11 +161,31 @@
 		}
 	}
 
-	@media (max-width: 576px) {
+	@media (max-width: 420px) {
 		aside {
-			button.upload-btn {
-				padding: 0.5rem 0.75rem;
-				font-size: 0.75rem;
+			margin: 0 6px;
+			padding: 0 8px;
+			height: 45%;
+
+			.sidebar-option-header {
+				padding: 0.5rem 0;
+
+				button.upload-btn:not(.icon-only) {
+					:global(svg) {
+						display: none;
+					}
+				}
+
+				button.upload-btn {
+					padding: 13px 16px;
+
+					span {
+						margin-right: 0;
+					}
+				}
+			}
+			.sidebar-list {
+				padding: 8px;
 			}
 		}
 	}

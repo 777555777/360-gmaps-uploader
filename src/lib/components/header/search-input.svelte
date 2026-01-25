@@ -138,7 +138,7 @@
 		flex: 1;
 		border: none;
 		background-color: transparent;
-		font-size: 14px;
+		font-size: 16px; /* Prevents iOS zoom on focus */
 		color: var(--text-default);
 		border-radius: 100vmax;
 		padding: 0.5rem;

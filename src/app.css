@@ -261,6 +261,7 @@ p {
 	border: 2px solid transparent;
 	cursor: pointer;
 	font-size: 13px;
+	user-select: none;
 	flex-shrink: 0;
 	box-shadow:
 		0 2px 3px 0 var(--shadow-inner),

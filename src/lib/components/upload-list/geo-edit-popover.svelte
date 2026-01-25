@@ -218,7 +218,7 @@
 				border-radius: 100vmax;
 				width: 100%;
 				max-width: 10rem;
-				font-size: 13px;
+				font-size: 16px; /* Prevents iOS zoom on focus */
 				font-family: inherit;
 				transition:
 					border-color 0.15s ease,

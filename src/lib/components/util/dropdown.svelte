@@ -63,6 +63,7 @@
 
 		text-align: left;
 		padding: 0.5rem;
+		user-select: none;
 		background-color: var(--dropdown-bg);
 		border: 1px solid var(--border-subtle);
 		border-radius: 8px;

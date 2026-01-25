@@ -135,12 +135,15 @@
 				{:else}
 					<!-- Red Geo-Data Button Badge -->
 					<Badge
-						message={'Click to add GPS data'}
 						level="danger"
 						anchorName={`geo-data-anchor-${index}`}
 						popoverTarget={`geo-popover-${index}`}
 						title="Edit GPS Data"
 					>
+						{#snippet message()}
+							<span class="desktop-text">Click to add GPS data</span>
+							<span class="mobile-text">Tap to add GPS data</span>
+						{/snippet}
 						{#snippet icon()}
 							<MapPin size={16} />
 						{/snippet}
@@ -211,6 +214,29 @@
 	@media (max-width: 396px) {
 		.card-header h3 {
 			max-width: 200px;
+		}
+
+		.upload-item {
+			.card-body {
+				padding-block: 8px;
+				padding-inline: 12px;
+			}
+		}
+	}
+
+	.mobile-text {
+		display: none;
+	}
+	.desktop-text {
+		display: inline;
+	}
+
+	@media (pointer: coarse) {
+		.mobile-text {
+			display: inline;
+		}
+		.desktop-text {
+			display: none;
 		}
 	}
 

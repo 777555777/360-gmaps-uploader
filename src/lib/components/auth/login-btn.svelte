@@ -71,6 +71,7 @@
 		border: none;
 		border-radius: 100vmax;
 		cursor: pointer;
+		user-select: none;
 		transition:
 			background-color 0.2s,
 			border-color 0.2s;

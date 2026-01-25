@@ -313,4 +313,11 @@
 			gap: 1rem;
 		}
 	}
+
+	@media (max-width: 576px) {
+		main {
+			padding-top: 6px;
+			gap: 6px;
+		}
+	}
 </style>
