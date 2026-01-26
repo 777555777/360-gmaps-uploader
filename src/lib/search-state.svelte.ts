@@ -221,5 +221,7 @@ export const searchState = new LocationSearchState();
 
 function getBrowserLanguage() {
 	const langs = navigator.languages ?? [];
-	return langs[0] ?? navigator.language ?? 'en';
+	const raw = langs[0] ?? navigator.language ?? 'en';
+	const normalized = raw.split('-')[0]?.split('_')[0] ?? raw;
+	return normalized || 'en';
 }
