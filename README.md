@@ -1,12 +1,12 @@
 # Pano Publisher
 
-![alt text](/docs/assets/dummy-ui-example.png)
+![alt text](/docs/assets/ui-example.png)
 
-![](https://img.shields.io/badge/license-AGPL--3.0-blue)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](https://github.com/777555777/360-gmaps-uploader/blob/main/LICENSE)
 
 Pano Publisher is a simple web app for uploading equirectangular 360° images to Google Maps via the Google Street View API. Built with Svelte 5, it is designed to be local-first, with all image processing happening in the browser. Optional features, such as OpenStreetMap place search, make use of external services but can be disabled via configuration.
 
-A deployed version ready to use can be found here: [https://panopublisher.net](https://panopublisher.net)
+A deployed version free and ready to use can be found here: [https://panopublisher.net](https://panopublisher.net)
 
 ## Features
 
@@ -15,8 +15,11 @@ A deployed version ready to use can be found here: [https://panopublisher.net](h
 - 🌐 **Built-in 360° Preview** - inspect your panoramas directly in the app before publishing
 - 🔐 **Privacy First** - all data processing happens locally in your browser until you publish to Google
 - ✏️ **Geo-Data-Editing** - edit or add geo data via text input or by setting the marker's position on the map
+- 🧭 **GPX Track Matching** - automatically match timestamps to GPS data from to fill missing location data
+- 🧩 **GPano Metadata Fix** - detect missing GPano XMP fields and fix them before publishing
 - 🔍 **Geo Search (optional)** - autocomplete search field to find locations fast
 - 📱 **Responsive UI** - clean, user-friendly interface
+- 🌙 **Dark Mode** - toggle between light and dark themes for comfortable viewing
 
 ## Prerequisites
 
