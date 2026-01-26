@@ -3,8 +3,9 @@
 	import { mapState } from '$lib/map-state.svelte';
 	import { fileState } from '$lib/file-state.svelte';
 	import { mapPosition } from '$lib/utils/map-location-helpers';
-	import darkTilesExample from '$lib/assets/tile-example-dark.webp';
-	import lightTilesExample from '$lib/assets/tile-example-light.webp';
+	import type { Map } from 'leaflet';
+	// import darkTilesExample from '$lib/assets/tile-example-dark.webp';
+	// import lightTilesExample from '$lib/assets/tile-example-light.webp';
 
 	let mapContainer: HTMLDivElement;
 
@@ -12,7 +13,15 @@
 		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-crosshair-icon lucide-crosshair"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>
 	`);
 
+	const I_DEVICE_PATTERN = /iPad|iPhone|iPod/;
+	const isMacWithTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+	const isIOSDevice = I_DEVICE_PATTERN.test(navigator.userAgent) || isMacWithTouch;
+
 	onMount(() => {
+		let destroyed = false;
+		let removeDoubleTapHandler: (() => void) | null = null;
+		let mapInstance: Map | null = null;
+
 		// Dynamic import of Leaflet (client-side only)
 		(async () => {
 			const Leaflet = await import('leaflet');
@@ -23,6 +32,8 @@
 			// Initialize tile layer preference from localStorage
 			const initialLayer = mapState.initializeTileLayer();
 
+			if (destroyed || !mapContainer) return;
+
 			// set location
 			const map = Leaflet.map(mapContainer, {
 				center: mapPosition.center,
@@ -30,6 +41,30 @@
 				minZoom: 2,
 				maxZoom: 19
 			});
+			mapInstance = map;
+
+			// iOS Safari sometimes fails to trigger Leaflet's double-tap zoom
+			if (isIOSDevice) {
+				let lastTap = 0;
+				const handleTouchEnd = (event: TouchEvent) => {
+					if (!mapContainer) return;
+					const now = Date.now();
+					const delta = now - lastTap;
+					lastTap = now;
+					if (delta > 0 && delta < 300) {
+						const touch = event.changedTouches[0];
+						if (!touch) return;
+						const rect = mapContainer.getBoundingClientRect();
+						const point = Leaflet.point(touch.clientX - rect.left, touch.clientY - rect.top);
+						const latLng = map.containerPointToLatLng(point);
+						map.setView(latLng, map.getZoom() + 1);
+					}
+				};
+				mapContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+				removeDoubleTapHandler = () => {
+					mapContainer.removeEventListener('touchend', handleTouchEnd);
+				};
+			}
 
 			// OpenStreetMap Tiles
 			const lightLayer = Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -81,10 +116,14 @@
 
 		// Cleanup
 		return () => {
-			if (mapState.map) {
-				mapState.map.remove();
-				mapState.setMap(null as any);
+			destroyed = true;
+			removeDoubleTapHandler?.();
+			const mapToRemove = mapInstance ?? mapState.map;
+			const container = (mapToRemove as any)?._container as HTMLElement | undefined;
+			if (mapToRemove && container && container.parentNode) {
+				mapToRemove.remove();
 			}
+			mapState.setMap(null as any);
 		};
 	});
 
@@ -263,6 +302,10 @@
 		width: 100%;
 		height: 100%;
 		z-index: 0;
+	}
+
+	:global(.leaflet-control-zoom.leaflet-bar.leaflet-control) {
+		user-select: none;
 	}
 
 	@media (max-width: 576px) {
