@@ -165,7 +165,6 @@
 		{#if hasFixable}
 			<div class="section info">
 				<h3>Images that will be prepared automatically</h3>
-				<p class="metadata-info">Required GPano metadata will be added before publishing.</p>
 				{#each gpanoFixState.fixableFiles as item (item.file.name)}
 					<Accordion name="file-details" summaryTitle={item.file.name}>
 						{#snippet header()}
@@ -291,13 +290,6 @@
 	.section.rejected-only {
 		padding-top: 0;
 		border-top: none;
-	}
-
-	/* Metadata details */
-	.metadata-info {
-		font-size: 12px;
-		color: var(--text-subtle);
-		margin: 0;
 	}
 
 	.metadata-list {

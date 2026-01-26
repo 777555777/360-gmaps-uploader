@@ -133,7 +133,7 @@
 
 		if (mapContainer) {
 			if (isPickingLocation) {
-				mapContainer.style.cursor = `url('data:image/svg+xml;utf8,${crosshairSvg}') 12 12, crosshair`;
+				mapContainer.style.cursor = `url('data:image/svg+xml;utf8,${crosshairSvg}') 12 18, crosshair`;
 			} else {
 				mapContainer.style.cursor = '';
 			}
