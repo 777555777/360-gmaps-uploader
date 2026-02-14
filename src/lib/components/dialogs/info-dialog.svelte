@@ -12,7 +12,8 @@
 		<h3>About this Application</h3>
 		<p>
 			This application lets you upload individual 360° photo spheres directly to Google Maps /
-			Street View. Uploaded images appear as blue photo circles on Google Maps.
+			Street View for <strong>free</strong>. Uploaded images appear as blue photo circles on Google
+			Maps.
 		</p>
 		<p>
 			The app was created to fill a gap in Google's official tools.
