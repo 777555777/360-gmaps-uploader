@@ -35,7 +35,8 @@ ssh $SERVER_PART "mkdir -p $PATH_PART/build"
 
 # Step 3: Copy build files and Dockerfile
 echo "[3/4] Copying files to server..."
-scp -r ./build/* $DEPLOY_SERVER_PATH/build/
+# --delete removes files from the server that no longer exist in the current build
+rsync -a --delete ./build/ "$DEPLOY_SERVER_PATH/build/"
 scp ./docker/Dockerfile $DEPLOY_SERVER_PATH/
 scp ./package.json $DEPLOY_SERVER_PATH/
 scp ./package-lock.json $DEPLOY_SERVER_PATH/

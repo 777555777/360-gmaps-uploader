@@ -3,9 +3,11 @@
 	import '@photo-sphere-viewer/core/index.css';
 	import { onMount, onDestroy } from 'svelte';
 
-	let { file } = $props<{
+	let {
+		file
+	}: {
 		file: File;
-	}>();
+	} = $props();
 
 	let viewerContainer: HTMLDivElement;
 	let viewer: Viewer | null = null;

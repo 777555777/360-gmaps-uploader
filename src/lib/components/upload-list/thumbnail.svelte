@@ -3,11 +3,15 @@
 	import { fileState } from '$lib/file-state.svelte';
 	import { ImagePlay, Trash2 } from '@lucide/svelte';
 
-	let { file, index, onRemove } = $props<{
+	let {
+		file,
+		index,
+		onRemove
+	}: {
 		file: File;
 		index: number;
 		onRemove: () => void;
-	}>();
+	} = $props();
 
 	// Check cache first for instant display after navigation
 	let cachedUrl = $derived(fileState.thumbnailCache.get(file));
